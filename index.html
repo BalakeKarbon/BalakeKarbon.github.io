@@ -1,0 +1,189 @@
+<html lang="eng">
+<head>
+	<meta charset="utf-8"/>
+	<title>web-portfolio</title>
+</head>
+<body>
+	<div id='terminal-container'></div>
+	<noscript>You are extra cool because whatever you are viewing this on does not support javascript!</noscript>
+	<script src="/base.js"></script>
+	<script>
+		var poweredOn=true;
+		var loggedIn=false;
+		var terminalHistory=[];
+		var terminalHTML='';
+		var terminalText=document.createElement('div');
+		terminalText.style.position='absolute';
+		terminalText.style.top='0%';
+		terminalText.style.paddingLeft='12.5%';
+		terminalText.style.paddingTop='6.25%';
+		terminalText.style.width='56.25%';
+		terminalText.style.height='58.333333333333336%';
+		terminalText.style.fontFamily='localUnifont';
+		terminalText.style.color='#00FF00';
+		terminalText.style.wordWrap='break-word';
+		terminalText.style.overflow='hidden';
+		var fontScale=0.02;
+		var fontWidthModifier=0.8666666666666667;
+		var fontHeightModifier=1.8181818181818182;
+		var terminalCharacterWidth=0;
+		var terminalCharacterHeight=0;
+		function getTerminalDimensions() {
+			var tw=parseFloat(document.getElementById('terminal-container').style.width);
+			var th=parseFloat(document.getElementById('terminal-container').style.height);
+			var tf=parseFloat(terminalText.style.fontSize);
+			terminalCharacterWidth=Math.floor(tw/(tf*fontWidthModifier));
+			terminalCharacterHeight=Math.floor(th/(tf*fontHeightModifier));
+		}
+		function adjustScale() {
+			if(window.innerHeight < (window.innerWidth*0.75)) {
+				document.getElementById('terminal-container').style.width=window.innerHeight*1.3333333333333333;
+				document.getElementById('terminal-container').style.height=window.innerHeight;
+				document.getElementById('terminal-container').style.marginLeft=((window.innerWidth-(window.innerHeight*1.3333333333333333))/2)+'px';
+				terminalText.style.fontSize=(window.innerHeight*fontScale)+'px';
+			} else {
+				document.getElementById('terminal-container').style.width=window.innerWidth;
+				document.getElementById('terminal-container').style.height=window.innerWidth*0.75;
+				document.getElementById('terminal-container').style.marginLeft='0%';
+				terminalText.style.fontSize=((window.innerWidth*0.75)*fontScale)+'px';
+			};
+		}
+		function changeTerminalFontSize(ratio) {
+			fontScale=ratio;
+			adjustScale();
+			getTerminalDimensions();
+		}
+		function getTerminalTextLineCount(html) {
+			return Math.floor(removeHTML(html).length/terminalCharacterWidth);
+		}
+		function getTerminalTextArray(html) {
+			htmlArray=[];
+			var index=0;
+			var content='';
+			while(html.length>0) {
+				index=html.search(/(<([^>]+)>)/ig);
+				if(index>-1) {
+					if(index != 0) {
+						content=html.substr(0,index);
+						htmlArray.push([content,content.length]);
+						html=html.substr(index,html.length);
+					} else {
+						content=html.match(/(<([^>]+)>)/ig)[0];
+						htmlArray.push([content,removeHTML(content).length]);
+						html=html.substr(index+content.length,html.length);
+					}
+				} else {
+					htmlArray.push([html,html.length]);
+					html='';
+				}
+			}
+			return htmlArray;
+		}
+		function getTerminalTextHTML(scroll,html) {
+			var newHTML='';
+			var terminalCharacterCount=terminalCharacterWidth*terminalCharacterHeight;
+			var scrollLines=getTerminalTextLineCount(html)-terminalCharacterHeight;
+			var textArray=getTerminalTextArray(html);
+			if(scrollLines<0) {
+				scrollLines=0;
+			}
+			var noHTML=removeHTML(html);
+			var startElement=0;
+			var endElement=0;
+			var endIndex=noHTML.length-(scroll*terminalCharacterWidth);
+			var startIndex=endIndex-terminalCharacterCount;
+			var currentIndex=0;
+			while(currentIndex<startIndex) {
+				currentIndex+=textArray[startElement][1];
+				if(currentIndex<startIndex) {
+					startElement++;
+				}
+			}
+			endElement=startElement;
+			while(currentIndex<endIndex) {
+				currentIndex+=textArray[endElement][1];
+				if(currentIndex<endIndex) {
+					endElement++;
+				}
+			}
+			if(textArray[startElement][0].length>terminalCharacterCount) {
+				newHTML=textArray[startElement][0].substr(startIndex,endIndex);
+			} else {
+				for(var currentElement=startElement;currentElement<endElement;currentElement++) {
+					newHTML+=textArray[currentElement][0];
+				}
+			}
+			return newHTML;
+		}
+		function login(load) {
+			terminalHistory.push('l'); //This should always be the first command!
+			if(load==true) {
+				//Just load text
+			} else {
+				//Type out animated etc
+			};
+		};
+		function main(fileData) {
+			document.getElementById('terminal-container').innerHTML=fileData.responseText;
+			document.getElementById('terminal').setAttribute('width','100%');
+			document.getElementById('terminal').setAttribute('height','100%');
+			document.getElementById('terminal').style.zindex='-1';
+			adjustScale();
+
+			//Setup the terminals structure:
+			//POWER BUTTON
+
+			document.getElementById('terminal-container').appendChild(terminalText);
+			getTerminalDimensions();
+			/*loadFile("res/text/lang/eng/test.txt",null,function(fileData) {
+				terminalText.innerHTML=fileData.responseText;
+			});*/
+			//'<html><head><title>Hello World</title></head><body><div>This is a <a href="index.html">test</a>!</div></body></html>'
+			loadFile("/res/text/lang/eng/test.txt",null,function(fileData) {
+				terminalHTML=fileData.responseText;
+				var sc=getTerminalTextLineCount(terminalHTML)-terminalCharacterHeight
+				var i=0;
+				var m=1;
+				setInterval(function() {
+					if(i<sc && i!=0) {
+						terminalText.innerHTML=getTerminalTextHTML(i,terminalHTML);
+					} else if(i==0) {
+						m=1;
+					} else {
+						m=-1;
+					}
+					i+=m;
+				},100);
+			});
+
+			//Get cookie data here and load values!
+			if(poweredOn==true) {
+				if(loggedIn==false) {
+					login(false);
+				} else {
+					if(terminalHistory.length==0) {
+						login(true);
+						//Start at home screen
+					} else {
+						//Load last commands
+					};
+				};
+			};
+		};
+		loadFile("res/img/terminal.svg",null,main);
+		window.addEventListener('resize',adjustScale);
+	</script>
+	<style>
+		@font-face {
+			font-family: localUnifont;
+			src: url(/res/text/fonts/unifont-13.0.01.ttf);
+		}
+		body {
+			margin: 0px 0px 0px 0px;
+		}
+		#terminal-container {
+			position: absolute;
+		}
+	</style>
+</body>
+</html>
