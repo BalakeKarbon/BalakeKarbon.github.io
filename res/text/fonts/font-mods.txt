@@ -1,6 +1,4 @@
-font multipliers:
-Width: 0.8666666666666667
-Height: 1.8181818181818182
+at 20pt font the characters are 10 pixels wide and 20 pixels tall
 
-term width / (font size * width modifier) = character dimensions width
-term height / (font size * height modifier) = character dimensions height
+height=size
+width=size/2
