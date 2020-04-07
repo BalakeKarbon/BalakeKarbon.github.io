@@ -127,41 +127,95 @@
 				lineIndex--;
 			}
 		}
+		function getCurrentLine() {
+			if(terminalCursor.y>(rows-1)) {
+				terminalCursor.y=(rows-1);
+			} else if(terminalCursor.y<0) {
+				terminalCursor.y=0;
+			}
+			if(terminalCursor.x>(cols-1)) {
+				terminalCursor.x=(cols-1);
+			} else if(terminalCursor.x<0) {
+				terminalCursor.x=0;
+			}
+			while(terminalBuffer[terminalCursor.y]==null) {
+				terminalBuffer.push(['',[]]);
+			}
+			for(var cbli=0;cbli<cols;cbli++) {
+				terminalBuffer[terminalBuffer.length-1][1].push(0);
+			}
+			var offsetRow=0;
+			if(terminalBuffer.length<=rows) {
+				offsetRow=terminalCursor.y;
+			} else {
+				offsetRow=((terminalBuffer.length-1)-rows)+terminalCursor.y;
+			}
+			var curLine=terminalBuffer[offsetRow];
+			while(curLine[0].length<terminalCursor.x) {
+				curLine[0]+=' ';
+				curLine[1].push(0);
+			}
+			return curLine;
+		}
 		function setChar(char,link) {
 			if(terminalBusy==false) {
 				terminalBusy=true;
-				if(char.length>1) {
-					char=char.substr(0,1);
-				}
-				if(terminalCursor.y>(rows-1)) {
-					terminalCursor.y=(rows-1);
-				} else if(terminalCursor.y<0) {
-					terminalCursor.y=0;
-				}
-				if(terminalCursor.x>(cols-1)) {
-					terminalCursor.x=(cols-1);
-				} else if(terminalCursor.x<0) {
-					terminalCursor.x=0;
-				}
-				while(terminalBuffer[terminalCursor.y]==null) {
-					terminalBuffer.push(['',[]]);
-				}
-				for(var cbli=0;cbli<cols;cbli++) {
-					terminalBuffer[terminalBuffer.length-1][1].push(0);
-				}
-				var offsetRow=0;
-				if(terminalBuffer.length<=rows) {
-					offsetRow=terminalCursor.y;
-				} else {
-					offsetRow=((terminalBuffer.length-1)-rows)+terminalCursor.y;
-				}
-				var curLine=terminalBuffer[offsetRow];
-				while(curLine[0].length<=terminalCursor.x) {
-					curLine[0]+=' ';
-					curLine[1].push(0);
-				}
-				curLine[0]=curLine[0].substr(0, terminalCursor.x) + char+ curLine[0].substr(terminalCursor.x + 1);
+				var curLine=getCurrentLine();
+				curLine[0]+=char;
 				curLine[1][terminalCursor.x]=link;
+				render();
+				terminalBusy=false;
+			}
+		}
+		function write(tString,link,quick) {
+			if(terminalBusy==false) {
+				terminalBusy=true;
+				//FUCK WHAT ABOUT THE NEWLINE CHARACTER AAAAAAA FUCKCKCCKCKCKCKC
+				var curLine=getCurrentLine();
+				var newLines=[];
+				var fll=cols-(curLine.length-1);
+				var newLineCount=Math.ceil((tString.length-fll)/cols);
+				newLines.push('');
+				var cci=0;
+				for(cci=0;cci<fll;cci++) {
+					newLines[0]+=tString.charAt(cci);
+				}
+				tString=tString.substr(fll,tString.length);
+				var nli=0;
+				for(nli=0;nli<newLineCount;nli++) {
+					newLines.push('')
+					if(tString.length>=cols) {
+						for(cci=0;cci<cols;cci++) {
+							newLines[nli+1]+=tString.charAt(cci);
+						}
+					} else {
+						for(cci=0;cci<tString.length;cci++) {
+							newLines[nli+1]+=tString.charAt(cci);
+						}
+					}
+				}
+				if(quick) {
+					for(nli=0;nli<newLines.length;nli++) {
+						for(cci=0;cci<newLines[nli].length;cci++) {
+							var curLine2=getCurrentLine();
+							curLine2[0]+=newLines[nli].charAt(cci);
+							curLine2[1][terminalCursor.x]=link;
+							render();
+							terminalCursor.x++;
+						}
+						terminalCursor.x=0;
+						if(terminalCursor.y<rows){
+							terminalCursor.y++;
+						}
+						terminalBuffer.push(['',[]]);
+					}
+				} else {
+					for(nli=0;nli<newLines.length;nli++) {
+						for(cci=0;cci<newLines[nli].length;cci++) {
+
+						}
+					}
+				}
 				terminalBusy=false;
 			}
 		}
@@ -176,19 +230,9 @@
 			terminalContext.font=fontSize+'px localUnifont';
 			terminalContext.fillStyle = '#00ff00';
 			initTerminalLines();
-			terminalCursor.x=Math.floor(cols/2)-1;
-			terminalCursor.y=Math.floor(rows/2)-1;
-			setChar('#',0);
-			terminalCursor.x=Math.floor(cols/2);
-			terminalCursor.y=Math.floor(rows/2)-1;
-			setChar('#',0);
-			terminalCursor.x=Math.floor(cols/2)-1;
-			terminalCursor.y=Math.floor(rows/2);
-			setChar('#',0);
-			terminalCursor.x=Math.floor(cols/2);
-			terminalCursor.y=Math.floor(rows/2);
-			setChar('#',0);
-			render();
+			loadFile("res/text/lang/eng/test.txt",null,function(fileData) {
+				write(fileData.responseText);
+			});
 			//Get cookie data here and load values!
 
 		};
