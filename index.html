@@ -82,15 +82,12 @@
 				}
 			}
 			for(tli=0;tli<rows;tli++) {
-				var newLine = [];
-				for(var cnc=0;cnc<cols;cnc++) {
-					newLine.push(document.createElementNS('http://www.w3.org/2000/svg','text'));
-					newLine[cnc].setAttribute('x',75+terminalScreenBorder+((fontSize/2)*cnc));
-					newLine[cnc].setAttribute('y',25+((terminalScreenBorder+((tli)*fontSize))+fontSize));
-					newLine[cnc].setAttribute('style','font-size:'+fontSize+'px;font-family:localUnifont;fill:#00FF00;fill-opacity:1;stroke:none;stroke-width:0.0');
-					newLine[cnc].textContent=' ';
-					document.getElementById('terminal').insertBefore(newLine[cnc],document.getElementById('terminal').firstChild);
-				}
+				var newLine = document.createElementNS('http://www.w3.org/2000/svg','text');
+				newLine.setAttribute('x',75+terminalScreenBorder);
+				newLine.setAttribute('y',25+((terminalScreenBorder+((tli)*fontSize))+fontSize));
+				newLine.setAttribute('style','font-size:'+fontSize+'px;font-family:localUnifont;fill:#00FF00;fill-opacity:1;stroke:none;stroke-width:0.0');
+				newLine.textContent='';
+				document.getElementById('terminal').insertBefore(newLine,document.getElementById('terminal').firstChild);
 				terminalLines.push(newLine);
 			}
 		}
@@ -115,26 +112,32 @@
 			}
 			while(lineIndex>=lineStop) {
 				var curText=terminalBuffer[lineIndex];
-				for(var curChar=0;curChar<curText[0].length;curChar++) {
-					terminalContext.fillText(curText[0][curChar],terminalScreenBorder+((fontSize/2)*curChar),(terminalScreenBorder+((lineIndex-lineStop)*fontSize))+fontSize);
-					if(curText[1][curChar]!=0) {
-						terminalLines[lineIndex-lineStop][curChar].onclick=terminalLinks[curText[1][curChar]];
-					} else {
-						terminalLines[lineIndex-lineStop][curChar].onclick=null;
+				for(var curChar=0;curChar<cols;curChar++) {
+					if(curText[0].length>curChar) {
+						terminalContext.fillText(curText[0][curChar],terminalScreenBorder+((fontSize/2)*curChar),(terminalScreenBorder+((lineIndex-lineStop)*fontSize))+fontSize);
+						var newLink = document.createElementNS('http://www.w3.org/2000/svg','tspan');
+						if(curText[1][curChar]!=0) {
+							newLink.onClick=terminalLinks[curText[1][curChar]];
+						}
+						if(curText[0].charAt(curChar)==' ') {
+							terminalLines[lineIndex-lineStop].innerHTML+='&nbsp;';
+						} else {
+							terminalLines[lineIndex-lineStop].innerHTML+=curText[0].charAt(curChar);
+						}
+						terminalLines[lineIndex-lineStop].appendChild(newLink);
 					}
-					terminalLines[lineIndex-lineStop][curChar].textContent=curText[0][curChar];
 				}
 				lineIndex--;
 			}
 		}
 		function getCurrentLine() {
-			if(terminalCursor.y>(rows-1)) {
-				terminalCursor.y=(rows-1);
+			if(terminalCursor.y>rows) {
+				terminalCursor.y=rows;
 			} else if(terminalCursor.y<0) {
 				terminalCursor.y=0;
 			}
-			if(terminalCursor.x>(cols-1)) {
-				terminalCursor.x=(cols-1);
+			if(terminalCursor.x>cols) {
+				terminalCursor.x=cols;
 			} else if(terminalCursor.x<0) {
 				terminalCursor.x=0;
 			}
@@ -155,68 +158,58 @@
 				curLine[0]+=' ';
 				curLine[1].push(0);
 			}
-			return curLine;
+			return [curLine,offsetRow];
 		}
 		function setChar(char,link) {
 			if(terminalBusy==false) {
 				terminalBusy=true;
 				var curLine=getCurrentLine();
-				curLine[0]+=char;
-				curLine[1][terminalCursor.x]=link;
-				render();
+				curLine[0][0]=curLine[0][0].substr(0, terminalCursor.x) + char+ curLine[0][0].substr(terminalCursor.x + 1);
+				curLine[0][1][terminalCursor.x]=link;
 				terminalBusy=false;
 			}
 		}
 		function write(tString,link,quick) {
 			if(terminalBusy==false) {
 				terminalBusy=true;
-				//FUCK WHAT ABOUT THE NEWLINE CHARACTER AAAAAAA FUCKCKCCKCKCKCKC
-				var curLine=getCurrentLine();
-				var newLines=[];
-				var fll=cols-(curLine.length-1);
-				var newLineCount=Math.ceil((tString.length-fll)/cols);
-				newLines.push('');
-				var cci=0;
-				for(cci=0;cci<fll;cci++) {
-					newLines[0]+=tString.charAt(cci);
-				}
-				tString=tString.substr(fll,tString.length);
+				var newLines=[''];
+				var fll=terminalCursor.y;
+				var cls='';
 				var nli=0;
-				for(nli=0;nli<newLineCount;nli++) {
-					newLines.push('')
-					if(tString.length>=cols) {
-						for(cci=0;cci<cols;cci++) {
-							newLines[nli+1]+=tString.charAt(cci);
-						}
+				var cc=fll;
+				var cci=0;
+				for(cci=0;cci<tString.length;cci++) {
+					if(tString.charAt(cci)=='\n') {
+						newLines.push('')
+						nli++;
+						cc=0;
 					} else {
-						for(cci=0;cci<tString.length;cci++) {
-							newLines[nli+1]+=tString.charAt(cci);
-						}
-					}
-				}
-				if(quick) {
-					for(nli=0;nli<newLines.length;nli++) {
-						for(cci=0;cci<newLines[nli].length;cci++) {
-							var curLine2=getCurrentLine();
-							curLine2[0]+=newLines[nli].charAt(cci);
-							curLine2[1][terminalCursor.x]=link;
-							render();
-							terminalCursor.x++;
-						}
-						terminalCursor.x=0;
-						if(terminalCursor.y<rows){
-							terminalCursor.y++;
-						}
-						terminalBuffer.push(['',[]]);
-					}
-				} else {
-					for(nli=0;nli<newLines.length;nli++) {
-						for(cci=0;cci<newLines[nli].length;cci++) {
-
+						newLines[nli]+=tString.charAt(cci);
+						if(cc>=cols) {
+							newLines.push('')
+							nli++;
+							cc=0;
+						} else {
+							cc++;
 						}
 					}
 				}
 				terminalBusy=false;
+				for(nli=0;nli<newLines.length;nli++) {
+					for(cci=0;cci<newLines[nli].length;cci++) {
+						terminalCursor.x=cci;
+						if(nli==0) {
+							terminalCursor.x+=fll;
+						}
+						setChar(newLines[nli].charAt(cci),link);
+					}
+					if(terminalBuffer.length<rows) {
+						terminalCursor.y++;
+					} else if(nli<(newLines.length-2)) {
+						terminalCursor.y=rows;
+						terminalBuffer.push(['',[]]);
+					}
+				}
 			}
 		}
 		function main(fileData) {
@@ -230,8 +223,10 @@
 			terminalContext.font=fontSize+'px localUnifont';
 			terminalContext.fillStyle = '#00ff00';
 			initTerminalLines();
+			//setChar('H',0);
 			loadFile("res/text/lang/eng/test.txt",null,function(fileData) {
-				write(fileData.responseText);
+				write(fileData.responseText,0,true);
+				render();
 			});
 			//Get cookie data here and load values!
 
