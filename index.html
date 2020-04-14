@@ -27,8 +27,7 @@
 		var scroll=0;
 		var terminalLinks=[null]; //Setup links first then revert back to them!
 		var terminalBuffer=[]; //Array of strings with the length of cols along with integer array referencing links.
-		var typeRate=1;
-		var terminalBusy=false;
+		var typeRate=20;
 		var terminalCanvas=document.createElement("canvas");
 		var terminalContext=terminalCanvas.getContext("2d");
 		terminalCanvas.width=500;
@@ -39,7 +38,7 @@
 		terminalCanvas.style.width='62.5%';
 		terminalCanvas.style.height='66.66666666666667%';
 		var depletionInterval=20;
-		var depletionSize=5;
+		var depletionSize=10;
 		var rrgb=[0,30,0];
 		function deplete() {
 			var screenImageData = terminalContext.getImageData(0,0,terminalCanvas.width,terminalCanvas.height);
@@ -163,20 +162,62 @@
 			}
 			return [curLine,offsetRow];
 		}
+		var writingChar=false;
 		function setChar(char,link) {
-			if(terminalBusy==false) {
-				terminalBusy=true;
+			if(writingChar==false) {
+				writingChar=true;
 				var curLine=getCurrentLine();
 				curLine[0][0]=curLine[0][0].substr(0, terminalCursor.x) + char+ curLine[0][0].substr(terminalCursor.x + 1);
 				curLine[0][1][terminalCursor.x]=link;
-				terminalBusy=false;
+				writingChar=false;
+			}
+		}
+		var writingString=false;
+		var wcnli=0;
+		var wccci=0;
+		var wcnl=[];
+		var wcfll=0;
+		var wclink=0;
+		function writeCallback() {
+			//console.log(wcnli+' '+wccci);
+			if(wcnli<wcnl.length) {
+				if(wccci<wcnl[wcnli].length) {
+					terminalCursor.x=wccci;
+					if(wcnli==0) {
+						terminalCursor.x+=wcfll;
+					}
+					setChar(wcnl[wcnli].charAt(wccci),wclink);
+					wccci++;
+				} else {
+					wccci=0;
+					wcnli++;
+					if(terminalBuffer.length<rows) {
+						terminalCursor.y++;
+					} else if(wcnli<(wcnl.length)) {
+						terminalCursor.y=rows;
+						terminalBuffer.push(['',[]]);
+						terminalCursor.x=0;
+					}
+					writeCallback();
+				}
+				console.log(wcnli+' '+wcnl.length);
+				if(wcnli==wcnl.length-1) {
+					writingString=false;
+					terminalCursor.x++;
+					console.log('Done!');
+					if(terminalCursor.x>cols) {
+						terminalCursor.y=rows;
+						terminalBuffer.push(['',[]]);
+						terminalCursor.x=0;
+					}
+				}
 			}
 		}
 		function write(tString,link,quick) {
-			if(terminalBusy==false) {
-				terminalBusy=true;
+			if(writingString==false) {
+				writingString=true;
 				var newLines=[''];
-				var fll=terminalCursor.y;
+				var fll=terminalCursor.x;
 				var cls='';
 				var nli=0;
 				var cc=fll;
@@ -188,7 +229,7 @@
 						cc=0;
 					} else {
 						newLines[nli]+=tString.charAt(cci);
-						if(cc>=cols) {
+						if(cc>=(cols-1)) {
 							newLines.push('')
 							nli++;
 							cc=0;
@@ -197,21 +238,30 @@
 						}
 					}
 				}
-				terminalBusy=false;
+				wcnli=0;
+				wccci=0;
+				wcnl=newLines;
+				wcfll=fll;
+				wclink=link;
+				var cc=0;
+				console.log(wcnl);
 				for(nli=0;nli<newLines.length;nli++) {
 					for(cci=0;cci<newLines[nli].length;cci++) {
-						terminalCursor.x=cci;
-						if(nli==0) {
-							terminalCursor.x+=fll;
+						if(quick) {
+							writeCallback();
+							cc++
+						} else {
+							setTimeout(function() {
+								writeCallback();
+								render();
+							},cc*typeRate);
+							cc++;
 						}
-						setChar(newLines[nli].charAt(cci),link);
 					}
-					if(terminalBuffer.length<rows) {
-						terminalCursor.y++;
-					} else if(nli<(newLines.length-2)) {
-						terminalCursor.y=rows;
-						terminalBuffer.push(['',[]]);
-					}
+				}
+				if(quick) {
+					console.log('WTF 1! '+cc);
+					render();
 				}
 			}
 		}
@@ -233,7 +283,11 @@
 			});
 			loadFile("res/text/lang/eng/test.txt",null,function(fileData) {
 				write(fileData.responseText,1,true);
-				render();
+				console.log('WTF 2! '+fileData.responseText.length);
+				//write(fileData.responseText,1,false);
+				console.log('WTF 2! '+'Fuck javascript one more time!'.length);
+				console.log('WTF 2! '+'TestiesTestiesTesties'.length);
+				//render();
 			});
 			//Get cookie data here and load values!
 
