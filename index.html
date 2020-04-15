@@ -27,7 +27,7 @@
 		var scroll=0;
 		var terminalLinks=[null]; //Setup links first then revert back to them!
 		var terminalBuffer=[]; //Array of strings with the length of cols along with integer array referencing links.
-		var typeRate=1;
+		var typeRate=50;
 		var terminalCanvas=document.createElement("canvas");
 		var terminalContext=terminalCanvas.getContext("2d");
 		terminalCanvas.width=500;
@@ -66,7 +66,11 @@
 		}
 		terminalContext.fillStyle = "#00FF00";
 		terminalContext.fillRect(0, 0, terminalCanvas.width, terminalCanvas.height);
-		setInterval(deplete,depletionInterval);
+		setInterval(function() {
+			if(!writingString) {
+				deplete();
+			}
+		},depletionInterval);
 		var terminalCursor = {
 			x:0,
 			y:0
@@ -101,6 +105,8 @@
 		}
 		var lineIndex=0;
 		var lineStop=0;
+		var regularColor='#00ff00';
+		var linkColor='#00aa00';
 		function render() {
 			deplete();
 			if(terminalBuffer.length<=rows) {
@@ -117,11 +123,16 @@
 				var curText=terminalBuffer[lineIndex];
 				for(var curChar=0;curChar<cols;curChar++) {
 					if(curText[0].length>curChar) {
-						terminalContext.fillText(curText[0][curChar],terminalScreenBorder+((fontSize/2)*curChar),(terminalScreenBorder+((lineIndex-lineStop)*fontSize))+fontSize);
+
 						var newLink = document.createElementNS('http://www.w3.org/2000/svg','tspan');
+						newLink.setAttribute('fill',regularColor);
+						terminalContext.fillStyle = regularColor;
 						if(curText[1][curChar]!=0) {
 							newLink.onclick=terminalLinks[curText[1][curChar]];
+							newLink.setAttribute('fill',linkColor);
+							terminalContext.fillStyle = linkColor;
 						}
+						terminalContext.fillText(curText[0][curChar],terminalScreenBorder+((fontSize/2)*curChar),(terminalScreenBorder+((lineIndex-lineStop)*fontSize))+fontSize);
 						if(curText[0].charAt(curChar)==' ') {
 							newLink.innerHTML+='&nbsp;';
 						} else {
@@ -188,6 +199,9 @@
 					}
 					setChar(wcnl[wcnli].charAt(wccci),wclink);
 					wccci++;
+					if(wccci>=wcnl[wcnli].length) {
+						terminalCursor.x++;
+					}
 				} else {
 					wccci=0;
 					wcnli++;
@@ -277,14 +291,22 @@
 			terminalContext.font=fontSize+'px localUnifont';
 			terminalContext.fillStyle = '#00ff00';
 			initTerminalLines();
-			//setChar('H',0);
+			var toggle=0;
 			terminalLinks.push(function() {
-				loadFile("res/text/lang/eng/test.txt",null,function(fileData) {
-					write(fileData.responseText,0,false);
-				});
+				if(!writingString) {
+					if(toggle==0) {
+						toggle++;
+						write('This is not a link!',0,false);
+					} else {
+						toggle=0;
+						write('This is a link!',1,false);
+					}
+				}
 			});
-			write('Loading...\n',1,true);
-			console.log(terminalCursor);
+			/*loadFile("res/text/lang/eng/test.txt",null,function(fileData) {
+				write(fileData.responseText,0,false);
+			});*/
+			write('This is a link!',1,false);
 			//Get cookie data here and load values!
 
 		};
