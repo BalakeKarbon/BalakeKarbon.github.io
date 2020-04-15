@@ -27,7 +27,7 @@
 		var scroll=0;
 		var terminalLinks=[null]; //Setup links first then revert back to them!
 		var terminalBuffer=[]; //Array of strings with the length of cols along with integer array referencing links.
-		var typeRate=20;
+		var typeRate=1;
 		var terminalCanvas=document.createElement("canvas");
 		var terminalContext=terminalCanvas.getContext("2d");
 		terminalCanvas.width=500;
@@ -102,6 +102,7 @@
 		var lineIndex=0;
 		var lineStop=0;
 		function render() {
+			deplete();
 			if(terminalBuffer.length<=rows) {
 				scroll=0;
 			}
@@ -179,7 +180,6 @@
 		var wcfll=0;
 		var wclink=0;
 		function writeCallback() {
-			//console.log(wcnli+' '+wccci);
 			if(wcnli<wcnl.length) {
 				if(wccci<wcnl[wcnli].length) {
 					terminalCursor.x=wccci;
@@ -192,7 +192,10 @@
 					wccci=0;
 					wcnli++;
 					if(terminalBuffer.length<rows) {
-						terminalCursor.y++;
+						if(wcnl.length>wcnli) {
+							terminalCursor.y++;
+							terminalCursor.x=0;
+						}
 					} else if(wcnli<(wcnl.length)) {
 						terminalCursor.y=rows;
 						terminalBuffer.push(['',[]]);
@@ -200,11 +203,11 @@
 					}
 					writeCallback();
 				}
-				console.log(wcnli+' '+wcnl.length);
-				if(wcnli==wcnl.length-1) {
+				if(wcnli==wcnl.length) {
 					writingString=false;
-					terminalCursor.x++;
-					console.log('Done!');
+					if(wcnl[wcnl.length-1].charAt(terminalCursor.x)!='') {
+						terminalCursor.x++;
+					}
 					if(terminalCursor.x>cols) {
 						terminalCursor.y=rows;
 						terminalBuffer.push(['',[]]);
@@ -224,7 +227,7 @@
 				var cci=0;
 				for(cci=0;cci<tString.length;cci++) {
 					if(tString.charAt(cci)=='\n') {
-						newLines.push('')
+						newLines.push('');
 						nli++;
 						cc=0;
 					} else {
@@ -244,9 +247,8 @@
 				wcfll=fll;
 				wclink=link;
 				var cc=0;
-				console.log(wcnl);
 				for(nli=0;nli<newLines.length;nli++) {
-					for(cci=0;cci<newLines[nli].length;cci++) {
+					for(cci=0;cci<=newLines[nli].length;cci++) {
 						if(quick) {
 							writeCallback();
 							cc++
@@ -260,7 +262,6 @@
 					}
 				}
 				if(quick) {
-					console.log('WTF 1! '+cc);
 					render();
 				}
 			}
@@ -278,17 +279,12 @@
 			initTerminalLines();
 			//setChar('H',0);
 			terminalLinks.push(function() {
-				scroll++;
-				render();
+				loadFile("res/text/lang/eng/test.txt",null,function(fileData) {
+					write(fileData.responseText,0,false);
+				});
 			});
-			loadFile("res/text/lang/eng/test.txt",null,function(fileData) {
-				write(fileData.responseText,1,true);
-				console.log('WTF 2! '+fileData.responseText.length);
-				//write(fileData.responseText,1,false);
-				console.log('WTF 2! '+'Fuck javascript one more time!'.length);
-				console.log('WTF 2! '+'TestiesTestiesTesties'.length);
-				//render();
-			});
+			write('Loading...\n',1,true);
+			console.log(terminalCursor);
 			//Get cookie data here and load values!
 
 		};
