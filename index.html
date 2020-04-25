@@ -8,6 +8,13 @@
 	<noscript>You are extra cool because whatever you are viewing this on does not support javascript!</noscript>
 	<script src="/base.js"></script>
 	<script>
+		try {
+			var local_unifont = new FontFace('localUnifont', 'url(/res/text/fonts/unifont-13.0.01.ttf)');
+		}
+		catch(error) {
+			document.body.innerHTML+='<style>@font-face { font-family: localUnifont; src: url(/res/text/fonts/unifont-13.0.01.ttf); }</style>';
+			var local_inufont = null;
+		}
 		function adjustScale() {
 			if(window.innerHeight < (window.innerWidth*0.75)) {
 				document.getElementById('terminal-container').style.width=window.innerHeight*1.3333333333333333;
@@ -27,7 +34,7 @@
 		var scroll=0;
 		var terminalLinks=[null]; //Setup links first then revert back to them!
 		var terminalBuffer=[]; //Array of strings with the length of cols along with integer array referencing links.
-		var typeRate=50;
+		var typeRate=100;
 		var terminalCanvas=document.createElement("canvas");
 		var terminalContext=terminalCanvas.getContext("2d");
 		terminalCanvas.width=500;
@@ -280,6 +287,13 @@
 				}
 			}
 		}
+
+		function lsHome(load) {
+
+		}
+		function start(load) {
+			write('This is a test in order to see if the font loading thingy works!',0,false);
+		}
 		function main(fileData) {
 			document.getElementById('terminal-container').innerHTML=fileData.responseText;
 			document.getElementById('terminal').setAttribute('width','100%');
@@ -291,33 +305,44 @@
 			terminalContext.font=fontSize+'px localUnifont';
 			terminalContext.fillStyle = '#00ff00';
 			initTerminalLines();
-			var toggle=0;
-			terminalLinks.push(function() {
-				if(!writingString) {
-					if(toggle==0) {
-						toggle++;
-						write('This is not a link!',0,false);
-					} else {
-						toggle=0;
-						write('This is a link!',1,false);
-					}
-				}
-			});
-			/*loadFile("res/text/lang/eng/test.txt",null,function(fileData) {
-				write(fileData.responseText,0,false);
-			});*/
-			write('This is a link!',1,false);
-			//Get cookie data here and load values!
+			if(local_unifont!=null) {
+				local_unifont.load().then(function(loaded_face) {
+					document.fonts.add(loaded_face);
+					start(false);
 
+					/*var toggle=0;
+					terminalLinks.push(function() {
+						if(!writingString) {
+							if(toggle==0) {
+								toggle++;
+								write('This is not a link!',0,false);
+							} else {
+								toggle=0;
+								write('This is a link!',1,false);
+							}
+						}
+					});
+					write('This is a link!',1,false);*/
+					/*loadFile("res/text/lang/eng/test.txt",null,function(fileData) {
+						write(fileData.responseText,0,false);
+					});*/
+
+					//Get cookie data here and load values!
+				}).catch(function(error) {
+					console.log(error);
+				});
+			} else {
+				start(false);
+			}
 		};
 		loadFile("res/img/terminal.svg",null,main);
 		window.addEventListener('resize',adjustScale);
 	</script>
 	<style>
-		@font-face {
+		/*@font-face {
 			font-family: localUnifont;
 			src: url(/res/text/fonts/unifont-13.0.01.ttf);
-		}
+		}*/
 		body {
 			margin: 0px 0px 0px 0px;
 		}
