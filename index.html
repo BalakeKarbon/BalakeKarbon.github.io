@@ -32,9 +32,13 @@
 		var rows=(400-(terminalScreenBorder*2))/fontSize;
 		var cols=(500-(terminalScreenBorder*2))/(fontSize/2);
 		var scroll=0;
-		var terminalLinks=[null]; //Setup links first then revert back to them!
+		var terminalLinks=[null,lsHome,aboutMe,contactInfo,resume,projects,function() {
+			 window.open("https://github.com/BalakeKarbon/");
+		},function() {
+			 window.open("https://www.linkedin.com/in/blake-karbon/");
+		}]; //Setup links first then revert back to them!
 		var terminalBuffer=[]; //Array of strings with the length of cols along with integer array referencing links.
-		var typeRate=100;
+		var typeRate=50;
 		var terminalCanvas=document.createElement("canvas");
 		var terminalContext=terminalCanvas.getContext("2d");
 		terminalCanvas.width=500;
@@ -287,12 +291,114 @@
 				}
 			}
 		}
-
-		function lsHome(load) {
-
+		var runningCommand=false;
+		function aboutMe() {
+			if(!runningCommand) {
+				runningCommand=true;
+				write('cat about-me.txt\n',0,false);
+				setTimeout(function() {
+					loadFile("res/text/lang/eng/about-me.txt",null,function(fileData) {
+						write(fileData.responseText+'\n',0,true);
+						write('[',0,true);
+						write('~/home',1,true);
+						write(']$',0,true);
+						runningCommand=false;
+					});
+				},17*typeRate);
+			}
 		}
-		function start(load) {
-			write('This is a test in order to see if the font loading thingy works!',0,false);
+		function contactInfo() {
+			if(!runningCommand) {
+				runningCommand=true;
+				write('cat contact-info.txt\n',0,false);
+				setTimeout(function() {
+					write('Cellular: 720-404-0695\n',0,true);
+					write('Email: blakekarbon@gmail.com\n',0,true);
+					write('GitHub: ',0,true);
+					write('https://github.com/BalakeKarbon/\n',6,true);
+					write('LinkedIn: ',0,true);
+					write('https://www.linkedin.com/in/blake-karbon/\n',7,true);
+					write('[',0,true);
+					write('~/home',1,true);
+					write(']$',0,true);
+					runningCommand=false;
+				},21*typeRate);
+			}
+		}
+		function resume() {
+			if(!runningCommand) {
+				runningCommand=true;
+				write('./resume.pdf\n',0,false);
+				setTimeout(function() {
+					window.open('res/text/lang/eng/2019 Resume.pdf');
+					write('[',0,true);
+					write('~/home',1,true);
+					write(']$',0,true);
+					runningCommand=false;
+				},13*typeRate);
+			}
+		}
+		function projects() {
+			if(!runningCommand) {
+				runningCommand=true;
+				write('ls projects\n',0,false);
+				setTimeout(function() {
+					write(' Demo Project 1.bin\n',0,true);
+					write(' Demo Project 2.bin\n',0,true);
+					write(' Demo Project 3.bin\n',0,true);
+					write(' Demo Project 4.bin\n',0,true);
+					write(' Demo Project 5.bin\n',0,true);
+					write(' Demo Project 6.bin\n',0,true);
+					write(' Demo Project 7.bin\n',0,true);
+					write(' Demo Project 8.bin\n',0,true);
+					write('[',0,true);
+					write('~/home',1,true);
+					write(']$',0,true);
+					runningCommand=false;
+				},12*typeRate);
+			}
+		}
+		function lsHome() {
+			if(!runningCommand) {
+				runningCommand=true;
+				write('ls\n',0,false);
+				setTimeout(function() {
+					write(' about-me.txt\n',2,true);
+					write(' contact-info.txt\n',3,true);
+					write(' resume.pdf\n',4,true);
+					write(' projects\n',5,true);
+					write('[',0,true);
+					write('~/home',1,true);
+					write(']$',0,true);
+					runningCommand=false;
+				},3*typeRate);
+			}
+		}
+		function login() {
+			if(!runningCommand) {
+				runningCommand=true;
+				write('Web_Portfolio login:',0,true);
+				setTimeout(function() {
+					write('futureClient\n',0,false);
+					setTimeout(function() {
+						write('Password:',0,true);
+						setTimeout(function(){
+							//write('\nWelcome!\nLast login: Mon Mar 22 1965 on tty\n\n',0,true); Release date of the PDP-8 computer!
+							write('\nWelcome!\nLast login: Thu Jan 1 1970 00:00:00 on tty\n\n',0,true);
+							write('[',0,true);
+							write('~/home',1,true);
+							write(']$',0,true);
+							setTimeout(function() {
+								runningCommand=false;
+								lsHome();
+							},600);
+						},13*typeRate);
+					},13*typeRate);
+				},1000);
+			}
+		}
+		function start() {
+			login();
 		}
 		function main(fileData) {
 			document.getElementById('terminal-container').innerHTML=fileData.responseText;
@@ -305,10 +411,11 @@
 			terminalContext.font=fontSize+'px localUnifont';
 			terminalContext.fillStyle = '#00ff00';
 			initTerminalLines();
+			//RENDER SOME LOADING STATUS DEAL LIKE MAYBE A BLINKING LED
 			if(local_unifont!=null) {
 				local_unifont.load().then(function(loaded_face) {
 					document.fonts.add(loaded_face);
-					start(false);
+					start();
 
 					/*var toggle=0;
 					terminalLinks.push(function() {
@@ -332,7 +439,7 @@
 					console.log(error);
 				});
 			} else {
-				start(false);
+				start();
 			}
 		};
 		loadFile("res/img/terminal.svg",null,main);
