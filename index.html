@@ -32,12 +32,12 @@
 		var rows=(400-(terminalScreenBorder*2))/fontSize;
 		var cols=(500-(terminalScreenBorder*2))/(fontSize/2);
 		var scroll=0;
-		var terminalLinks=[null,lsHome,aboutMe,contactInfo,resume,projects,function() {
+		var terminalLinks=[null,lsHome,aboutMe,contactInfo,resume,lsProjects,function() {
 			 window.open("https://github.com/BalakeKarbon/");
 		},function() {
 			 window.open("https://www.linkedin.com/in/blake-karbon/");
-		}]; //Setup links first then revert back to them!
-		var terminalBuffer=[]; //Array of strings with the length of cols along with integer array referencing links.
+		},popupBlocked,changeColor,cc0,cc1,cc2];
+		var terminalBuffer=[];
 		var typeRate=50;
 		var terminalCanvas=document.createElement("canvas");
 		var terminalContext=terminalCanvas.getContext("2d");
@@ -141,6 +141,7 @@
 						if(curText[1][curChar]!=0) {
 							newLink.onclick=terminalLinks[curText[1][curChar]];
 							newLink.setAttribute('fill',linkColor);
+							newLink.setAttribute('text-decoration','underline');
 							terminalContext.fillStyle = linkColor;
 						}
 						terminalContext.fillText(curText[0][curChar],terminalScreenBorder+((fontSize/2)*curChar),(terminalScreenBorder+((lineIndex-lineStop)*fontSize))+fontSize);
@@ -153,6 +154,33 @@
 					}
 				}
 				lineIndex--;
+			}
+		}
+		function setTerminalColor(color) {
+			if(color==0) {
+				rrgb=[0,30,0];
+				regularColor='#00ff00';
+				linkColor='#00aa00';
+				terminalContext.fillStyle = "#00FF00";
+				terminalContext.fillRect(0, 0, terminalCanvas.width, terminalCanvas.height);
+				render();
+				setCookie('terminalColor',0,100);
+			} else if(color==1) {
+				rrgb=[25,25,25];
+				regularColor='#ffffff';
+				linkColor='#bbbbbb';
+				terminalContext.fillStyle = "#ffffff";
+				terminalContext.fillRect(0, 0, terminalCanvas.width, terminalCanvas.height);
+				render();
+				setCookie('terminalColor',1,100);
+			} else if(color==2) {
+				rrgb=[107,89,37];
+				regularColor='#f9bc04';
+				linkColor='#dda704';
+				terminalContext.fillStyle = "#f9bc04";
+				terminalContext.fillRect(0, 0, terminalCanvas.width, terminalCanvas.height);
+				render();
+				setCookie('terminalColor',2,100);
 			}
 		}
 		function getCurrentLine() {
@@ -292,27 +320,94 @@
 			}
 		}
 		var runningCommand=false;
+		function writeTerminalCursor() {
+			write('[',0,true);
+			write('futureClient@Web_Portfolio ',0,true);
+			write('~/Blake Karbon',1,true);
+			write(']$',0,true);
+		}
+		function popupBlocked() {
+			if(!runningCommand) {
+				scroll=0;
+				runningCommand=true;
+				write('cat "Permission Issues.txt"\n',0,false);
+				setTimeout(function() {
+					write('If you are reading this you must enable popups for this page in your browser!\n',0,true);
+					writeTerminalCursor();
+					runningCommand=false;
+				},28*typeRate);
+			}
+		}
+		function changeColor() {
+			if(!runningCommand) {
+				scroll=0;
+				runningCommand=true;
+				write('./changeColor.bin -lc\n',0,false);
+				setTimeout(function() {
+					write('Colors:\n',0,true);
+					write('green\n',10,true);
+					write('white\n',11,true);
+					write('orange\n',12,true);
+					writeTerminalCursor();
+					runningCommand=false;
+				},21*typeRate);
+			}
+		}
+		function cc0() {
+			if(!runningCommand) {
+				scroll=0;
+				runningCommand=true;
+				write('./changeColor.bin -c green\n',0,false);
+				setTimeout(function() {
+					setTerminalColor(0);
+					writeTerminalCursor();
+					runningCommand=false;
+				},27*typeRate);
+			}
+		}
+		function cc1() {
+			if(!runningCommand) {
+				scroll=0;
+				runningCommand=true;
+				write('./changeColor.bin -c white\n',0,false);
+				setTimeout(function() {
+					setTerminalColor(1);
+					writeTerminalCursor();
+					runningCommand=false;
+				},27*typeRate);
+			}
+		}
+		function cc2() {
+			if(!runningCommand) {
+				scroll=0;
+				runningCommand=true;
+				write('./changeColor.bin -c orange\n',0,false);
+				setTimeout(function() {
+					setTerminalColor(2);
+					writeTerminalCursor();
+					runningCommand=false;
+				},28*typeRate);
+			}
+		}
 		function aboutMe() {
 			if(!runningCommand) {
 				scroll=0;
 				runningCommand=true;
-				write('cat about-me.txt\n',0,false);
+				write('cat "About Me.txt"\n',0,false);
 				setTimeout(function() {
 					loadFile("res/text/lang/eng/about-me.txt",null,function(fileData) {
 						write(fileData.responseText+'\n',0,true);
-						write('[',0,true);
-						write('~/home',1,true);
-						write(']$',0,true);
+						writeTerminalCursor();
 						runningCommand=false;
 					});
-				},17*typeRate);
+				},19*typeRate);
 			}
 		}
 		function contactInfo() {
 			if(!runningCommand) {
 				scroll=0;
 				runningCommand=true;
-				write('cat contact-info.txt\n',0,false);
+				write('cat "Contact Info.txt"\n',0,false);
 				setTimeout(function() {
 					write('Cellular: 720-404-0695\n',0,true);
 					write('Email: blakekarbon@gmail.com\n',0,true);
@@ -320,44 +415,41 @@
 					write('https://github.com/BalakeKarbon/\n',6,true);
 					write('LinkedIn: ',0,true);
 					write('https://www.linkedin.com/in/blake-karbon/\n',7,true);
-					write('[',0,true);
-					write('~/home',1,true);
-					write(']$',0,true);
+					writeTerminalCursor();
 					runningCommand=false;
-				},21*typeRate);
+				},23*typeRate);
 			}
 		}
 		function resume() {
 			if(!runningCommand) {
 				scroll=0;
 				runningCommand=true;
-				write('./resume.pdf\n',0,false);
+				write('less Resume.pdf > /dev/tty2\n',0,false);
 				setTimeout(function() {
-					window.open('res/text/lang/eng/2019 Resume.pdf');
-					write('[',0,true);
-					write('~/home',1,true);
-					write(']$',0,true);
-					runningCommand=false;
-				},13*typeRate);
+					var newWin = window.open('res/text/lang/eng/2019 Resume.pdf');
+					if(!newWin || newWin.closed || typeof newWin.closed=='undefined') {
+						write('bash: /dev/tty2: ',0,true);
+						write('Permission denied\n',8,true);
+						writeTerminalCursor();
+						setTimeout(function() {
+							runningCommand=false;
+							popupBlocked();
+						},1000);
+					} else {
+						writeTerminalCursor();
+						runningCommand=false;
+					}
+				},28*typeRate);
 			}
 		}
-		function projects() {
+		function lsProjects() {
 			if(!runningCommand) {
 				scroll=0;
 				runningCommand=true;
 				write('ls projects\n',0,false);
 				setTimeout(function() {
-					write(' Demo Project 1.bin\n',0,true);
-					write(' Demo Project 2.bin\n',0,true);
-					write(' Demo Project 3.bin\n',0,true);
-					write(' Demo Project 4.bin\n',0,true);
-					write(' Demo Project 5.bin\n',0,true);
-					write(' Demo Project 6.bin\n',0,true);
-					write(' Demo Project 7.bin\n',0,true);
-					write(' Demo Project 8.bin\n',0,true);
-					write('[',0,true);
-					write('~/home',1,true);
-					write(']$',0,true);
+					write('Demo Project 1.bin\n',0,true);
+					writeTerminalCursor();
 					runningCommand=false;
 				},12*typeRate);
 			}
@@ -368,13 +460,17 @@
 				runningCommand=true;
 				write('ls\n',0,false);
 				setTimeout(function() {
-					write(' about-me.txt\n',2,true);
-					write(' contact-info.txt\n',3,true);
-					write(' resume.pdf\n',4,true);
-					write(' projects\n',5,true);
-					write('[',0,true);
-					write('~/home',1,true);
-					write(']$',0,true);
+					write("'About Me.txt'",2,true);
+					terminalCursor.x=cols/2;
+					write("'Contact Info.txt'\n",3,true);
+					write('Resume.pdf',4,true);
+					terminalCursor.x=cols/2;
+					write("'Permission Issues.txt'\n",0,true);
+					write('projects',5,true);
+					terminalCursor.x=cols/2;
+					write('changeColor.bin',9,true);
+					write('\n',0,true);
+					writeTerminalCursor();
 					runningCommand=false;
 				},3*typeRate);
 			}
@@ -391,9 +487,7 @@
 						setTimeout(function(){
 							//write('\nWelcome!\nLast login: Mon Mar 22 1965 on tty\n\n',0,true); Release date of the PDP-8 computer!
 							write('\nWelcome!\nLast login: Thu Jan 1 1970 00:00:00 on tty\n\n',0,true);
-							write('[',0,true);
-							write('~/home',1,true);
-							write(']$',0,true);
+							writeTerminalCursor();
 							setTimeout(function() {
 								runningCommand=false;
 								lsHome();
@@ -420,7 +514,9 @@
 				} else if(event.deltaY<0) {
 					if(!sc) {
 						sc=true;
-						scroll+=1;
+						if(scroll<(terminalBuffer.length-rows)) {
+							scroll+=1;
+						}
 						render();
 						setTimeout(function() {
 							sc=false;
@@ -443,30 +539,11 @@
 			terminalContext.font=fontSize+'px localUnifont';
 			terminalContext.fillStyle = '#00ff00';
 			initTerminalLines();
-			//RENDER SOME LOADING STATUS DEAL LIKE MAYBE A BLINKING LED
+			setTerminalColor(getCookie('terminalColor'));
 			if(local_unifont!=null) {
 				local_unifont.load().then(function(loaded_face) {
 					document.fonts.add(loaded_face);
 					start();
-
-					/*var toggle=0;
-					terminalLinks.push(function() {
-						if(!writingString) {
-							if(toggle==0) {
-								toggle++;
-								write('This is not a link!',0,false);
-							} else {
-								toggle=0;
-								write('This is a link!',1,false);
-							}
-						}
-					});
-					write('This is a link!',1,false);*/
-					/*loadFile("res/text/lang/eng/test.txt",null,function(fileData) {
-						write(fileData.responseText,0,false);
-					});*/
-
-					//Get cookie data here and load values!
 				}).catch(function(error) {
 					console.log(error);
 				});
@@ -478,10 +555,6 @@
 		window.addEventListener('resize',adjustScale);
 	</script>
 	<style>
-		/*@font-face {
-			font-family: localUnifont;
-			src: url(/res/text/fonts/unifont-13.0.01.ttf);
-		}*/
 		body {
 			margin: 0px 0px 0px 0px;
 		}
