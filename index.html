@@ -294,6 +294,7 @@
 		var runningCommand=false;
 		function aboutMe() {
 			if(!runningCommand) {
+				scroll=0;
 				runningCommand=true;
 				write('cat about-me.txt\n',0,false);
 				setTimeout(function() {
@@ -309,6 +310,7 @@
 		}
 		function contactInfo() {
 			if(!runningCommand) {
+				scroll=0;
 				runningCommand=true;
 				write('cat contact-info.txt\n',0,false);
 				setTimeout(function() {
@@ -327,6 +329,7 @@
 		}
 		function resume() {
 			if(!runningCommand) {
+				scroll=0;
 				runningCommand=true;
 				write('./resume.pdf\n',0,false);
 				setTimeout(function() {
@@ -340,6 +343,7 @@
 		}
 		function projects() {
 			if(!runningCommand) {
+				scroll=0;
 				runningCommand=true;
 				write('ls projects\n',0,false);
 				setTimeout(function() {
@@ -360,6 +364,7 @@
 		}
 		function lsHome() {
 			if(!runningCommand) {
+				scroll=0;
 				runningCommand=true;
 				write('ls\n',0,false);
 				setTimeout(function() {
@@ -376,6 +381,7 @@
 		}
 		function login() {
 			if(!runningCommand) {
+				scroll=0;
 				runningCommand=true;
 				write('Web_Portfolio login:',0,true);
 				setTimeout(function() {
@@ -397,6 +403,32 @@
 				},1000);
 			}
 		}
+		var sc=false;
+		window.addEventListener('wheel', function(event) {
+			if(!runningCommand && !writingString && !writingChar) {
+				if(event.deltaY>0){
+					if(!sc) {
+						sc=true;
+						if(scroll!=0) {
+							scroll+=-1;
+						}
+						render();
+						setTimeout(function() {
+							sc=false;
+						},10);
+					}
+				} else if(event.deltaY<0) {
+					if(!sc) {
+						sc=true;
+						scroll+=1;
+						render();
+						setTimeout(function() {
+							sc=false;
+						},10);
+					}
+				}
+			}
+		});
 		function start() {
 			login();
 		}
