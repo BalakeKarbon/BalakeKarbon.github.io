@@ -5,9 +5,14 @@
 </head>
 <body>
 	<div id='terminal-container'></div>
-	<noscript>You are extra cool because whatever you are viewing this on does not support javascript!</noscript>
+	<noscript>You are extra cool because whatever you are viewing this on does not support javascript! Click <a href='nojs.html'>here</a> to go to the pure HTML site suitable for terminals.</noscript>
 	<script src="/base.js"></script>
 	<script>
+		if(getCookie('page')=='gui') {
+			window.location.href='gui.html';
+		}
+		var tabColor = document.createElement('meta');
+		document.getElementsByTagName('head')[0].appendChild(tabColor);
 		try {
 			var local_unifont = new FontFace('localUnifont', 'url(/res/text/fonts/unifont-13.0.01.ttf)');
 		}
@@ -36,7 +41,7 @@
 			 window.open("https://github.com/BalakeKarbon/");
 		},function() {
 			 window.open("https://www.linkedin.com/in/blake-karbon/");
-		},popupBlocked,changeColor,cc0,cc1,cc2];
+		},popupBlocked,changeColor,cc0,cc1,cc2,graphicalInterface,finishedProjects,currentProjects];
 		var terminalBuffer=[];
 		var typeRate=50;
 		var terminalCanvas=document.createElement("canvas");
@@ -158,20 +163,24 @@
 		}
 		function setTerminalColor(color) {
 			if(color==0) {
-				rrgb=[0,30,0];
+				rrgb=[0,40,0];
 				regularColor='#00ff00';
 				linkColor='#00aa00';
-				terminalContext.fillStyle = "#00FF00";
+				terminalContext.fillStyle = "#00ff00";
 				terminalContext.fillRect(0, 0, terminalCanvas.width, terminalCanvas.height);
 				render();
+				tabColor.setAttribute('name','theme-color');
+				tabColor.setAttribute('content','#00ff00');
 				setCookie('terminalColor',0,100);
 			} else if(color==1) {
-				rrgb=[25,25,25];
+				rrgb=[40,40,40];
 				regularColor='#ffffff';
 				linkColor='#bbbbbb';
 				terminalContext.fillStyle = "#ffffff";
 				terminalContext.fillRect(0, 0, terminalCanvas.width, terminalCanvas.height);
 				render();
+				tabColor.setAttribute('name','theme-color');
+				tabColor.setAttribute('content','#ffffff');
 				setCookie('terminalColor',1,100);
 			} else if(color==2) {
 				rrgb=[107,89,37];
@@ -180,6 +189,8 @@
 				terminalContext.fillStyle = "#f9bc04";
 				terminalContext.fillRect(0, 0, terminalCanvas.width, terminalCanvas.height);
 				render();
+				tabColor.setAttribute('name','theme-color');
+				tabColor.setAttribute('content','#f9bc04');
 				setCookie('terminalColor',2,100);
 			}
 		}
@@ -353,6 +364,31 @@
 				},21*typeRate);
 			}
 		}
+		function graphicalInterface() {
+			if(!runningCommand) {
+				scroll=0;
+				runningCommand=true;
+				write('./"Graphical Interface"/start.bin\n',0,false);
+				setTimeout(function() {
+					write('Loading GUI.',0,true);
+					setTimeout(function() {
+						write('.',0,true);
+						setTimeout(function() {
+							write('.',0,true);
+							setTimeout(function() {
+								write('.\n',0,true);
+								setTimeout(function() {
+									writeTerminalCursor();
+									runningCommand=false;
+									setCookie('page','gui',100);
+									window.location.href='gui.html';
+								},1000);
+							},1000);
+						},1000);
+					},1000);
+				},34*typeRate);
+			}
+		}
 		function cc0() {
 			if(!runningCommand) {
 				scroll=0;
@@ -442,13 +478,50 @@
 				},28*typeRate);
 			}
 		}
+		function currentProjects() {
+			if(!runningCommand) {
+				scroll=0;
+				runningCommand=true;
+				write('ls projects/current/\n',0,false);
+				setTimeout(function() {
+					write('DIY Computer Architectures\n',0,true);
+					writeTerminalCursor();
+					runningCommand=false;
+				},21*typeRate);
+			}
+		}
+		function finishedProjects() {
+			if(!runningCommand) {
+				scroll=0;
+				runningCommand=true;
+				write('ls projects/finished/\n',0,false);
+				setTimeout(function() {
+					write('DIY Neural Network',0,true);
+					terminalCursor.x=cols/2;
+					write('This Website\n',0,true);
+					write('ObiCOOL Website',0,true);
+					terminalCursor.x=cols/2;
+					write('Bluecalf Website\n',0,true);
+					write('fileToBitmap',0,true);
+					terminalCursor.x=cols/2;
+					write('School Security System\n',0,true);
+					write('Daily Drivers',0,true);
+					terminalCursor.x=cols/2;
+					write('Lunchbox Laptop\n',0,true);
+					writeTerminalCursor();
+					runningCommand=false;
+				},22*typeRate);
+			}
+		}
 		function lsProjects() {
 			if(!runningCommand) {
 				scroll=0;
 				runningCommand=true;
 				write('ls projects\n',0,false);
 				setTimeout(function() {
-					write('Demo Project 1.bin\n',0,true);
+					write('finished',14,true);
+					terminalCursor.x=cols/2;
+					write('current\n',15,true);
 					writeTerminalCursor();
 					runningCommand=false;
 				},12*typeRate);
@@ -468,8 +541,8 @@
 					write("'Permission Issues.txt'\n",0,true);
 					write('projects',5,true);
 					terminalCursor.x=cols/2;
-					write('changeColor.bin',9,true);
-					write('\n',0,true);
+					write('changeColor.bin\n',9,true);
+					write("'Graphical Interface'\n",13,true);
 					writeTerminalCursor();
 					runningCommand=false;
 				},3*typeRate);

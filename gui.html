@@ -1,0 +1,22 @@
+<html lang="eng">
+<head>
+	<meta charset="utf-8"/>
+	<title>web-portfolio</title>
+</head>
+<body>
+	<noscript>You are extra cool because whatever you are viewing this on does not support javascript! Click <a href='nojs.html'>here</a> to go to the pure HTML site suitable for terminals.</noscript>
+	<script src="/base.js"></script>
+	<script>
+	if(getCookie('page')=='term') {
+		window.location.href='index.html';
+	}
+	var link=document.createElement('div');
+	link.onclick=function() {
+		setCookie('page','term',100);
+		window.location.href='index.html';
+	}
+	link.innerHTML="Testing!"
+	document.body.appendChild(link);
+	</script>
+</body>
+</html>
