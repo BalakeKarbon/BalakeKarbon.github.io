@@ -2,29 +2,39 @@
 <head>
 	<meta charset="utf-8"/>
 	<title>web-portfolio</title>
+	<link rel="icon" href="res/img/favicon.png" sizes="128x128" type="image/png">
 </head>
 <body>
 	<div id='terminal-container'></div>
 	<noscript>You are extra cool because whatever you are viewing this on does not support javascript! Click <a href='nojs.html'>here</a> to go to the pure HTML site suitable for terminals.</noscript>
 	<script src="/base.js"></script>
 	<script>
-		var keyAudio = [
-			new Audio('res/audio/key0.mp3'),
-			new Audio('res/audio/key1.mp3'),
-			new Audio('res/audio/key2.mp3'),
-			new Audio('res/audio/key3.mp3'),
-			new Audio('res/audio/key4.mp3'),
-			new Audio('res/audio/key5.mp3'),
-			new Audio('res/audio/key6.mp3'),
-			new Audio('res/audio/key7.mp3'),
-			new Audio('res/audio/key8.mp3'),
-			new Audio('res/audio/key9.mp3'),
-			new Audio('res/audio/key10.mp3'),
-			new Audio('res/audio/key11.mp3'),
-			new Audio('res/audio/key12.mp3'),
-			new Audio('res/audio/key13.mp3'),
-			new Audio('res/audio/key14.mp3')
+		var floppyAudio = [
+			new Audio('res/audio/osborne-1/floppy1.mp3'),
+			new Audio('res/audio/osborne-1/floppy3.mp3'),
+			new Audio('res/audio/osborne-1/floppy2.mp3'),
+			new Audio('res/audio/osborne-1/floppy4.mp3'),
+			new Audio('res/audio/osborne-1/floppy6.mp3'),
+			new Audio('res/audio/osborne-1/floppy5.mp3'),
 		];
+		var keyAudio = [
+			new Audio('res/audio/osborne-1/key1.mp3'),
+			new Audio('res/audio/osborne-1/key2.mp3'),
+			new Audio('res/audio/osborne-1/key3.mp3'),
+			new Audio('res/audio/osborne-1/key4.mp3'),
+			new Audio('res/audio/osborne-1/key5.mp3'),
+			new Audio('res/audio/osborne-1/key6.mp3'),
+			new Audio('res/audio/osborne-1/key7.mp3'),
+			new Audio('res/audio/osborne-1/key8.mp3'),
+			new Audio('res/audio/osborne-1/key9.mp3'),
+			new Audio('res/audio/osborne-1/key10.mp3'),
+			new Audio('res/audio/osborne-1/key11.mp3'),
+			new Audio('res/audio/osborne-1/key12.mp3'),
+			new Audio('res/audio/osborne-1/key13.mp3'),
+			new Audio('res/audio/osborne-1/key14.mp3')
+		];
+		var keyAudioLoop=0;
+		var keyAudioPath=[0,1,2,3,4,5,6,7,8,9,10,11,12,13];
 		function shuffle(array) {
 			var currentIndex = array.length, temporaryValue, randomIndex;
 			while (0 !== currentIndex) {
@@ -36,9 +46,7 @@
 			}
 			return array;
 		};
-		var audioLoop=0;
-		var audioPath=[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14];
-		audioPath=shuffle(audioPath);
+		keyAudioPath=shuffle(keyAudioPath);
 		if(getCookie('page')=='gui') {
 			window.location.href='gui.html';
 		}
@@ -74,7 +82,7 @@
 			 window.open("https://www.linkedin.com/in/blake-karbon/");
 		},popupBlocked,changeColor,cc0,cc1,cc2,graphicalInterface,finishedProjects,currentProjects];
 		var terminalBuffer=[];
-		var typeRate=100;
+		var typeRate=50;
 		var terminalCanvas=document.createElement("canvas");
 		var terminalContext=terminalCanvas.getContext("2d");
 		terminalCanvas.width=500;
@@ -350,11 +358,11 @@
 						} else {
 							setTimeout(function() {
 								writeCallback();
-								keyAudio[audioPath[audioLoop]].play();
-								audioLoop++;
-								if(audioLoop>14) {
-									audioLoop=0;
-									audioPath=shuffle(audioPath);
+								keyAudio[keyAudioPath[keyAudioLoop]].play();
+								keyAudioLoop++;
+								if(keyAudioLoop>=keyAudioPath.length) {
+									keyAudioLoop=0;
+									keyAudioPath=shuffle(keyAudioPath);
 								}
 								render();
 							},cc*typeRate);
@@ -380,6 +388,7 @@
 				runningCommand=true;
 				write('cat "Permission Issues.txt"\n',0,false);
 				setTimeout(function() {
+					floppyAudio[4].play();
 					write('If you are reading this you must enable popups for this page in your browser!\n',0,true);
 					writeTerminalCursor();
 					runningCommand=false;
@@ -392,6 +401,7 @@
 				runningCommand=true;
 				write('./changeColor.bin -lc\n',0,false);
 				setTimeout(function() {
+					floppyAudio[0].play();
 					write('Colors:\n',0,true);
 					write('green\n',10,true);
 					write('white\n',11,true);
@@ -407,13 +417,14 @@
 				runningCommand=true;
 				write('./"Graphical Interface"/start.bin\n',0,false);
 				setTimeout(function() {
+					floppyAudio[0].play();
 					write('Loading GUI.',0,true);
 					setTimeout(function() {
 						write('.',0,true);
 						setTimeout(function() {
-							write('.',0,true);
+							write('.\n',0,true);
 							setTimeout(function() {
-								write('.\n',0,true);
+								write('Opening GUI.\n',0,true);
 								setTimeout(function() {
 									writeTerminalCursor();
 									runningCommand=false;
@@ -432,6 +443,7 @@
 				runningCommand=true;
 				write('./changeColor.bin -c green\n',0,false);
 				setTimeout(function() {
+					floppyAudio[0].play();
 					setTerminalColor(0);
 					writeTerminalCursor();
 					runningCommand=false;
@@ -444,6 +456,7 @@
 				runningCommand=true;
 				write('./changeColor.bin -c white\n',0,false);
 				setTimeout(function() {
+					floppyAudio[0].play();
 					setTerminalColor(1);
 					writeTerminalCursor();
 					runningCommand=false;
@@ -456,6 +469,7 @@
 				runningCommand=true;
 				write('./changeColor.bin -c orange\n',0,false);
 				setTimeout(function() {
+					floppyAudio[0].play();
 					setTerminalColor(2);
 					writeTerminalCursor();
 					runningCommand=false;
@@ -468,6 +482,7 @@
 				runningCommand=true;
 				write('cat "About Me.txt"\n',0,false);
 				setTimeout(function() {
+					floppyAudio[2].play();
 					loadFile("res/text/lang/eng/about-me.txt",null,function(fileData) {
 						write(fileData.responseText+'\n',0,true);
 						writeTerminalCursor();
@@ -482,6 +497,7 @@
 				runningCommand=true;
 				write('cat "Contact Info.txt"\n',0,false);
 				setTimeout(function() {
+					floppyAudio[3].play();
 					write('Cellular: 720-404-0695\n',0,true);
 					write('Email: blakekarbon@gmail.com\n',0,true);
 					write('GitHub: ',0,true);
@@ -499,6 +515,7 @@
 				runningCommand=true;
 				write('less Resume.pdf > /dev/tty2\n',0,false);
 				setTimeout(function() {
+					floppyAudio[0].play();
 					var newWin = window.open('res/text/lang/eng/2019 Resume.pdf');
 					if(!newWin || newWin.closed || typeof newWin.closed=='undefined') {
 						write('bash: /dev/tty2: ',0,true);
@@ -521,6 +538,7 @@
 				runningCommand=true;
 				write('ls projects/current/\n',0,false);
 				setTimeout(function() {
+					floppyAudio[1].play();
 					write('DIY Computer Architectures\n',0,true);
 					write('International Harvester\n',0,true);
 					write('Vintage Computers\n',0,true);
@@ -535,6 +553,7 @@
 				runningCommand=true;
 				write('ls projects/finished/\n',0,false);
 				setTimeout(function() {
+					floppyAudio[1].play();
 					write('DIY Neural Network',0,true);
 					terminalCursor.x=cols/2;
 					write('This Website\n',0,true);
@@ -558,6 +577,7 @@
 				runningCommand=true;
 				write('ls projects\n',0,false);
 				setTimeout(function() {
+					floppyAudio[2].play();
 					write('finished',14,true);
 					terminalCursor.x=cols/2;
 					write('current\n',15,true);
@@ -572,6 +592,7 @@
 				runningCommand=true;
 				write('ls\n',0,false);
 				setTimeout(function() {
+					floppyAudio[2].play();
 					write("'About Me.txt'",2,true);
 					terminalCursor.x=cols/2;
 					write("'Contact Info.txt'\n",3,true);
