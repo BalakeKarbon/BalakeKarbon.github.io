@@ -8,6 +8,37 @@
 	<noscript>You are extra cool because whatever you are viewing this on does not support javascript! Click <a href='nojs.html'>here</a> to go to the pure HTML site suitable for terminals.</noscript>
 	<script src="/base.js"></script>
 	<script>
+		var keyAudio = [
+			new Audio('res/audio/key0.mp3'),
+			new Audio('res/audio/key1.mp3'),
+			new Audio('res/audio/key2.mp3'),
+			new Audio('res/audio/key3.mp3'),
+			new Audio('res/audio/key4.mp3'),
+			new Audio('res/audio/key5.mp3'),
+			new Audio('res/audio/key6.mp3'),
+			new Audio('res/audio/key7.mp3'),
+			new Audio('res/audio/key8.mp3'),
+			new Audio('res/audio/key9.mp3'),
+			new Audio('res/audio/key10.mp3'),
+			new Audio('res/audio/key11.mp3'),
+			new Audio('res/audio/key12.mp3'),
+			new Audio('res/audio/key13.mp3'),
+			new Audio('res/audio/key14.mp3')
+		];
+		function shuffle(array) {
+			var currentIndex = array.length, temporaryValue, randomIndex;
+			while (0 !== currentIndex) {
+			  randomIndex = Math.floor(Math.random() * currentIndex);
+			  currentIndex -= 1;
+			  temporaryValue = array[currentIndex];
+			  array[currentIndex] = array[randomIndex];
+			  array[randomIndex] = temporaryValue;
+			}
+			return array;
+		};
+		var audioLoop=0;
+		var audioPath=[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14];
+		audioPath=shuffle(audioPath);
 		if(getCookie('page')=='gui') {
 			window.location.href='gui.html';
 		}
@@ -43,7 +74,7 @@
 			 window.open("https://www.linkedin.com/in/blake-karbon/");
 		},popupBlocked,changeColor,cc0,cc1,cc2,graphicalInterface,finishedProjects,currentProjects];
 		var terminalBuffer=[];
-		var typeRate=50;
+		var typeRate=100;
 		var terminalCanvas=document.createElement("canvas");
 		var terminalContext=terminalCanvas.getContext("2d");
 		terminalCanvas.width=500;
@@ -319,6 +350,12 @@
 						} else {
 							setTimeout(function() {
 								writeCallback();
+								keyAudio[audioPath[audioLoop]].play();
+								audioLoop++;
+								if(audioLoop>14) {
+									audioLoop=0;
+									audioPath=shuffle(audioPath);
+								}
 								render();
 							},cc*typeRate);
 							cc++;
@@ -485,6 +522,8 @@
 				write('ls projects/current/\n',0,false);
 				setTimeout(function() {
 					write('DIY Computer Architectures\n',0,true);
+					write('International Harvester\n',0,true);
+					write('Vintage Computers\n',0,true);
 					writeTerminalCursor();
 					runningCommand=false;
 				},21*typeRate);
@@ -505,7 +544,7 @@
 					write('fileToBitmap',0,true);
 					terminalCursor.x=cols/2;
 					write('School Security System\n',0,true);
-					write('Daily Drivers',0,true);
+					write('Daily Driver',0,true);
 					terminalCursor.x=cols/2;
 					write('Lunchbox Laptop\n',0,true);
 					writeTerminalCursor();
