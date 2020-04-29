@@ -93,10 +93,12 @@
 		}
 		function adjustScale() {
 			if(window.innerHeight < (window.innerWidth*0.75)) {
+				document.getElementById('terminal-container').style.marginTop='0%';
 				document.getElementById('terminal-container').style.width=window.innerHeight*1.3333333333333333;
 				document.getElementById('terminal-container').style.height=window.innerHeight;
 				document.getElementById('terminal-container').style.marginLeft=((window.innerWidth-(window.innerHeight*1.3333333333333333))/2)+'px';
 			} else {
+				document.getElementById('terminal-container').style.marginTop=Math.floor((window.innerHeight-document.getElementById('terminal-container').clientHeight)/2)+'px';
 				document.getElementById('terminal-container').style.width=window.innerWidth;
 				document.getElementById('terminal-container').style.height=window.innerWidth*0.75;
 				document.getElementById('terminal-container').style.marginLeft='0%';
@@ -115,6 +117,8 @@
 		},popupBlocked,changeColor,cc0,cc1,cc2,graphicalInterface,finishedProjects,currentProjects];
 		var terminalBuffer=[];
 		var typeRate=50;
+		var desk=document.createElement('div');
+		var chord=document.createElement('div');
 		var terminalCanvas=document.createElement("canvas");
 		var terminalContext=terminalCanvas.getContext("2d");
 		terminalCanvas.width=500;
@@ -700,7 +704,7 @@
 			}
 		}
 		var sc=false;
-		window.addEventListener('wheel', function(event) {
+		/*window.addEventListener('wheel', function(event) {
 			if(!runningCommand && !writingString && !writingChar) {
 				if(event.deltaY>0){
 					if(!sc) {
@@ -726,7 +730,7 @@
 					}
 				}
 			}
-		});
+		});*/
 		function start() {
 			login();
 		}
@@ -748,6 +752,30 @@
 			floppyLight.setAttribute('style','fill:rgb(255,0,0);');
 			floppyLight.setAttribute('visibility','hidden');
 			document.getElementById('terminal').appendChild(floppyLight);
+			desk.style.position='absolute';
+			desk.style.zIndex='-3';
+			desk.style.width='100%';
+			desk.style.height='100%';
+			desk.style.top='90%';
+			desk.style.left='-40%';
+			loadFile("res/img/desk.svg",null,function(fileData) {
+				desk.innerHTML=fileData.responseText;
+				document.getElementById('desk').setAttribute('width','180%');
+				document.getElementById('desk').setAttribute('height','180%');
+			});
+			document.getElementById('terminal-container').appendChild(desk);
+			chord.style.position='absolute';
+			chord.style.zIndex='1';
+			chord.style.width='100%';
+			chord.style.height='100%';
+			chord.style.top='90%';
+			chord.style.left='0%';
+			loadFile("res/img/chord.svg",null,function(fileData) {
+				chord.innerHTML=fileData.responseText;
+				document.getElementById('chord').setAttribute('width','180%');
+				document.getElementById('chord').setAttribute('height','180%');
+			});
+			document.getElementById('terminal-container').appendChild(chord);
 			setTerminalColor(getCookie('terminalColor'));
 			if(local_unifont!=null) {
 				local_unifont.load().then(function(loaded_face) {
@@ -766,6 +794,7 @@
 	<style>
 		body {
 			margin: 0px 0px 0px 0px;
+			background-color: #dddddd;
 		}
 		#terminal-container {
 			position: absolute;
