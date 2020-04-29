@@ -58,6 +58,7 @@
 			return array;
 		};
 		keyAudioPath=shuffle(keyAudioPath);
+		var diskAccess=[];
 		function playFloppyAudio(index) {
 			if(audioOn) {
 				try {
@@ -69,6 +70,14 @@
 					console.log(error);
 				}
 			}
+			floppyLight.setAttribute('visibility','visible');
+			diskAccess.push(index);
+			setTimeout(function() {
+				if(diskAccess.length==1) {
+					floppyLight.setAttribute('visibility','hidden');
+				}
+				diskAccess.pop();
+			},floppyAudio[index].duration*1000);
 		}
 		if(getCookie('page')=='gui') {
 			window.location.href='gui.html';
@@ -192,6 +201,7 @@
 				terminalLines.push(newLine);
 			}
 		}
+		var floppyLight=document.createElementNS('http://www.w3.org/2000/svg','rect');
 		function adjustFont(newSize) {
 			fontSize=newSize;
 			rows=(400-(terminalScreenBorder*2))/fontSize;
@@ -731,6 +741,13 @@
 			terminalContext.font=fontSize+'px localUnifont';
 			terminalContext.fillStyle = 'rgb(0,40,0)';
 			initTerminalLines();
+			floppyLight.setAttribute('x',90);
+			floppyLight.setAttribute('y',560);
+			floppyLight.setAttribute('width',20);
+			floppyLight.setAttribute('height',10);
+			floppyLight.setAttribute('style','fill:rgb(255,0,0);');
+			floppyLight.setAttribute('visibility','hidden');
+			document.getElementById('terminal').appendChild(floppyLight);
 			setTerminalColor(getCookie('terminalColor'));
 			if(local_unifont!=null) {
 				local_unifont.load().then(function(loaded_face) {
