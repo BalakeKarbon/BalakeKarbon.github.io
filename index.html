@@ -11,6 +11,15 @@
 	<script>
 		var audioOn=true;
 		var canvasRender=true;
+		if(!!navigator.platform && /iPad|iPhone|iPod/.test(navigator.platform)) {
+			canvasRender=false;
+		}
+		var ua = navigator.userAgent.toLowerCase();
+		if (ua.indexOf('safari') != -1) {
+		  if (!(ua.indexOf('chrome') > -1)) {
+		    canvasRender=false;
+		  }
+		}
 		var floppyAudio = [
 			new Audio('res/audio/osborne-1/floppy1.mp3'),
 			new Audio('res/audio/osborne-1/floppy3.mp3'),
