@@ -52,8 +52,9 @@
 		function playFloppyAudio(index) {
 			if(audioOn) {
 				try {
-					if(floppyAudio[index].paused) {
-						floppyAudio[index].play();
+					var fAudioPromise=floppyAudio[index].play();
+					if (fAudioPromise !== null){
+						fAudioPromise.catch(() => { floppyAudio[index].play(); });
 					}
 				} catch(error) {
 					console.log(error);
@@ -400,8 +401,9 @@
 								writeCallback();
 								if(audioOn) {
 									try {
-										if(keyAudio[keyAudioPath[keyAudioLoop]].paused) {
-											keyAudio[keyAudioPath[keyAudioLoop]].play();
+										var audioPromise=keyAudio[keyAudioPath[keyAudioLoop]].play();
+										if (audioPromise !== null){
+											audioPromise.catch(() => { keyAudio[keyAudioPath[keyAudioLoop]].play(); });
 										}
 									} catch(error) {
 										console.log(error);
