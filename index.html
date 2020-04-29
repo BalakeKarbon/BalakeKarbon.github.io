@@ -1,7 +1,7 @@
 <html lang="eng">
 <head>
 	<meta charset="utf-8"/>
-	<title>web-portfolio</title>
+	<title>Blake Karbon's Web Portfolio</title>
 	<link rel="icon" href="res/img/favicon.png" sizes="128x128" type="image/png">
 </head>
 <body>
@@ -9,6 +9,8 @@
 	<noscript>You are extra cool because whatever you are viewing this on does not support javascript! Click <a href='nojs.html'>here</a> to go to the pure HTML site suitable for terminals.</noscript>
 	<script src="/base.js"></script>
 	<script>
+		var audioOn=true;
+		var canvasRender=true;
 		var floppyAudio = [
 			new Audio('res/audio/osborne-1/floppy1.mp3'),
 			new Audio('res/audio/osborne-1/floppy3.mp3'),
@@ -47,6 +49,17 @@
 			return array;
 		};
 		keyAudioPath=shuffle(keyAudioPath);
+		function playFloppyAudio(index) {
+			if(audioOn) {
+				try {
+					if(floppyAudio[index].paused) {
+						floppyAudio[index].play();
+					}
+				} catch(error) {
+					console.log(error);
+				}
+			}
+		}
 		if(getCookie('page')=='gui') {
 			window.location.href='gui.html';
 		}
@@ -119,13 +132,32 @@
 		  }
 		  terminalContext.putImageData(screenImageData,0,0);
 		}
-		terminalContext.fillStyle = "#00FF00";
+		terminalContext.fillStyle = 'rgb('+rrgb[0]+','+rrgb[1]+','+rrgb[2]+')';
 		terminalContext.fillRect(0, 0, terminalCanvas.width, terminalCanvas.height);
-		setInterval(function() {
+		var depleteInterval = setInterval(function() {
 			if(!writingString) {
 				deplete();
 			}
 		},depletionInterval);
+		if(!canvasRender) {
+			clearInterval(depleteInterval);
+		}
+		function canvasOn(state) {
+			if(state) {
+				canvasRender=true;
+				depleteInterval = setInterval(function() {
+					if(!writingString) {
+						deplete();
+					}
+				},depletionInterval);
+			} else {
+				canvasRender=false;
+				clearInterval(depleteInterval);
+				terminalContext.fillStyle = 'rgb('+rrgb[0]+','+rrgb[1]+','+rrgb[2]+')';
+				terminalContext.fillRect(0, 0, terminalCanvas.width, terminalCanvas.height);
+			}
+		}
+		canvasOn(canvasRender);
 		var terminalCursor = {
 			x:0,
 			y:0
@@ -163,7 +195,9 @@
 		var regularColor='#00ff00';
 		var linkColor='#00aa00';
 		function render() {
-			deplete();
+			if(canvasRender) {
+				deplete();
+			}
 			if(terminalBuffer.length<=rows) {
 				scroll=0;
 			}
@@ -181,14 +215,20 @@
 
 						var newLink = document.createElementNS('http://www.w3.org/2000/svg','tspan');
 						newLink.setAttribute('fill',regularColor);
-						terminalContext.fillStyle = regularColor;
+						if(canvasRender) {
+							terminalContext.fillStyle = regularColor;
+						}
 						if(curText[1][curChar]!=0) {
 							newLink.onclick=terminalLinks[curText[1][curChar]];
 							newLink.setAttribute('fill',linkColor);
 							newLink.setAttribute('text-decoration','underline');
-							terminalContext.fillStyle = linkColor;
+							if(canvasRender) {
+								terminalContext.fillStyle = linkColor;
+							}
 						}
-						terminalContext.fillText(curText[0][curChar],terminalScreenBorder+((fontSize/2)*curChar),(terminalScreenBorder+((lineIndex-lineStop)*fontSize))+fontSize);
+						if(canvasRender) {
+							terminalContext.fillText(curText[0][curChar],terminalScreenBorder+((fontSize/2)*curChar),(terminalScreenBorder+((lineIndex-lineStop)*fontSize))+fontSize);
+						}
 						if(curText[0].charAt(curChar)==' ') {
 							newLink.innerHTML+='&nbsp;';
 						} else {
@@ -205,7 +245,7 @@
 				rrgb=[0,40,0];
 				regularColor='#00ff00';
 				linkColor='#00aa00';
-				terminalContext.fillStyle = "#00ff00";
+				terminalContext.fillStyle = 'rgb('+rrgb[0]+','+rrgb[1]+','+rrgb[2]+')';
 				terminalContext.fillRect(0, 0, terminalCanvas.width, terminalCanvas.height);
 				render();
 				tabColor.setAttribute('name','theme-color');
@@ -215,7 +255,7 @@
 				rrgb=[40,40,40];
 				regularColor='#ffffff';
 				linkColor='#bbbbbb';
-				terminalContext.fillStyle = "#ffffff";
+				terminalContext.fillStyle = 'rgb('+rrgb[0]+','+rrgb[1]+','+rrgb[2]+')';
 				terminalContext.fillRect(0, 0, terminalCanvas.width, terminalCanvas.height);
 				render();
 				tabColor.setAttribute('name','theme-color');
@@ -225,7 +265,7 @@
 				rrgb=[107,89,37];
 				regularColor='#f9bc04';
 				linkColor='#dda704';
-				terminalContext.fillStyle = "#f9bc04";
+				terminalContext.fillStyle = 'rgb('+rrgb[0]+','+rrgb[1]+','+rrgb[2]+')';
 				terminalContext.fillRect(0, 0, terminalCanvas.width, terminalCanvas.height);
 				render();
 				tabColor.setAttribute('name','theme-color');
@@ -358,11 +398,19 @@
 						} else {
 							setTimeout(function() {
 								writeCallback();
-								keyAudio[keyAudioPath[keyAudioLoop]].play();
-								keyAudioLoop++;
-								if(keyAudioLoop>=keyAudioPath.length) {
-									keyAudioLoop=0;
-									keyAudioPath=shuffle(keyAudioPath);
+								if(audioOn) {
+									try {
+										if(keyAudio[keyAudioPath[keyAudioLoop]].paused) {
+											keyAudio[keyAudioPath[keyAudioLoop]].play();
+										}
+									} catch(error) {
+										console.log(error);
+									}
+									keyAudioLoop++;
+									if(keyAudioLoop>=keyAudioPath.length) {
+										keyAudioLoop=0;
+										keyAudioPath=shuffle(keyAudioPath);
+									}
 								}
 								render();
 							},cc*typeRate);
@@ -388,7 +436,7 @@
 				runningCommand=true;
 				write('cat "Permission Issues.txt"\n',0,false);
 				setTimeout(function() {
-					floppyAudio[4].play();
+					playFloppyAudio(4);
 					write('If you are reading this you must enable popups for this page in your browser!\n',0,true);
 					writeTerminalCursor();
 					runningCommand=false;
@@ -401,7 +449,7 @@
 				runningCommand=true;
 				write('./changeColor.bin -lc\n',0,false);
 				setTimeout(function() {
-					floppyAudio[0].play();
+					playFloppyAudio(0);
 					write('Colors:\n',0,true);
 					write('green\n',10,true);
 					write('white\n',11,true);
@@ -417,7 +465,7 @@
 				runningCommand=true;
 				write('./"Graphical Interface"/start.bin\n',0,false);
 				setTimeout(function() {
-					floppyAudio[0].play();
+					playFloppyAudio(0);
 					write('Loading GUI.',0,true);
 					setTimeout(function() {
 						write('.',0,true);
@@ -443,7 +491,7 @@
 				runningCommand=true;
 				write('./changeColor.bin -c green\n',0,false);
 				setTimeout(function() {
-					floppyAudio[0].play();
+					playFloppyAudio(0);
 					setTerminalColor(0);
 					writeTerminalCursor();
 					runningCommand=false;
@@ -456,7 +504,7 @@
 				runningCommand=true;
 				write('./changeColor.bin -c white\n',0,false);
 				setTimeout(function() {
-					floppyAudio[0].play();
+					playFloppyAudio(0);
 					setTerminalColor(1);
 					writeTerminalCursor();
 					runningCommand=false;
@@ -469,7 +517,7 @@
 				runningCommand=true;
 				write('./changeColor.bin -c orange\n',0,false);
 				setTimeout(function() {
-					floppyAudio[0].play();
+					playFloppyAudio(0);
 					setTerminalColor(2);
 					writeTerminalCursor();
 					runningCommand=false;
@@ -482,7 +530,7 @@
 				runningCommand=true;
 				write('cat "About Me.txt"\n',0,false);
 				setTimeout(function() {
-					floppyAudio[2].play();
+					playFloppyAudio(2);
 					loadFile("res/text/lang/eng/about-me.txt",null,function(fileData) {
 						write(fileData.responseText+'\n',0,true);
 						writeTerminalCursor();
@@ -497,7 +545,7 @@
 				runningCommand=true;
 				write('cat "Contact Info.txt"\n',0,false);
 				setTimeout(function() {
-					floppyAudio[3].play();
+					playFloppyAudio(3);
 					write('Cellular: 720-404-0695\n',0,true);
 					write('Email: blakekarbon@gmail.com\n',0,true);
 					write('GitHub: ',0,true);
@@ -515,7 +563,7 @@
 				runningCommand=true;
 				write('less Resume.pdf > /dev/tty2\n',0,false);
 				setTimeout(function() {
-					floppyAudio[0].play();
+					playFloppyAudio(0);
 					var newWin = window.open('res/text/lang/eng/2019 Resume.pdf');
 					if(!newWin || newWin.closed || typeof newWin.closed=='undefined') {
 						write('bash: /dev/tty2: ',0,true);
@@ -538,7 +586,7 @@
 				runningCommand=true;
 				write('ls projects/current/\n',0,false);
 				setTimeout(function() {
-					floppyAudio[1].play();
+					playFloppyAudio(1);
 					write('DIY Computer Architectures\n',0,true);
 					write('International Harvester\n',0,true);
 					write('Vintage Computers\n',0,true);
@@ -553,7 +601,7 @@
 				runningCommand=true;
 				write('ls projects/finished/\n',0,false);
 				setTimeout(function() {
-					floppyAudio[1].play();
+					playFloppyAudio(1);
 					write('DIY Neural Network',0,true);
 					terminalCursor.x=cols/2;
 					write('This Website\n',0,true);
@@ -577,7 +625,7 @@
 				runningCommand=true;
 				write('ls projects\n',0,false);
 				setTimeout(function() {
-					floppyAudio[2].play();
+					playFloppyAudio(2);
 					write('finished',14,true);
 					terminalCursor.x=cols/2;
 					write('current\n',15,true);
@@ -592,7 +640,7 @@
 				runningCommand=true;
 				write('ls\n',0,false);
 				setTimeout(function() {
-					floppyAudio[2].play();
+					playFloppyAudio(2);
 					write("'About Me.txt'",2,true);
 					terminalCursor.x=cols/2;
 					write("'Contact Info.txt'\n",3,true);
@@ -670,7 +718,7 @@
 			document.getElementById('terminal-container').insertBefore(terminalCanvas,document.getElementById('terminal-container').firstChild);
 			terminalCanvas.style.zIndex='-2';
 			terminalContext.font=fontSize+'px localUnifont';
-			terminalContext.fillStyle = '#00ff00';
+			terminalContext.fillStyle = 'rgb(0,40,0)';
 			initTerminalLines();
 			setTerminalColor(getCookie('terminalColor'));
 			if(local_unifont!=null) {
