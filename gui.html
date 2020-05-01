@@ -5,19 +5,26 @@
 	<link rel="icon" href="res/img/favicon.png" sizes="128x128" type="image/png">
 </head>
 <body>
-	<noscript>You are extra cool because whatever you are viewing this on does not support javascript! Click <a href='nojs.html'>here</a> to go to the pure HTML site suitable for terminals.</noscript>
+<noscript>If you are reading this you may be visiting the site from a terminal connected to a DEC PDP-8. That or your browser does not support javascript and you will likley benefit from the pure HTML version of this site suitable for terminals <a href='nojs.html'>here</a>!</noscript>
+	<div>Some test text.</div>
 	<script src="/base.js"></script>
 	<script>
 	if(getCookie('page')=='term') {
 		window.location.href='index.html';
 	}
-	var link=document.createElement('div');
-	link.onclick=function() {
+	function switchToTerminal() {
 		setCookie('page','term',100);
 		window.location.href='index.html';
 	}
-	link.innerHTML="Testing!"
-	document.body.appendChild(link);
 	</script>
+	<div id='backToTerm' onclick='switchToTerminal();'>Click here to switch back to the terminal interface!</div>
 </body>
+<style>
+	#backToTerm {
+		position: fixed;
+		font-size: 30pt;
+		right: 0px;
+		top: 0px;
+	}
+</style>
 </html>
