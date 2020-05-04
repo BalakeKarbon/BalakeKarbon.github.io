@@ -26,7 +26,7 @@
 			new Audio('res/audio/osborne-1/floppy2.mp3'),
 			new Audio('res/audio/osborne-1/floppy4.mp3'),
 			new Audio('res/audio/osborne-1/floppy6.mp3'),
-			new Audio('res/audio/osborne-1/floppy5.mp3'),
+			new Audio('res/audio/osborne-1/floppy5.mp3')
 		];
 		var keyAudio = [
 			new Audio('res/audio/osborne-1/key1.mp3'),
@@ -79,9 +79,9 @@
 				diskAccess.pop();
 			},floppyAudio[index].duration*1000);
 		}
-		if(getCookie('page')=='gui') {
+		/*if(getCookie('page')=='gui') {
 			window.location.href='gui.html';
-		}
+		}*/
 		var tabColor = document.createElement('meta');
 		document.getElementsByTagName('head')[0].appendChild(tabColor);
 		try {
@@ -114,7 +114,7 @@
 			 window.open("https://github.com/BalakeKarbon/");
 		},function() {
 			 window.open("https://www.linkedin.com/in/blake-karbon/");
-		},popupBlocked,changeColor,cc0,cc1,cc2,graphicalInterface,finishedProjects,currentProjects];
+		},popupBlocked,changeColor,cc0,cc1,cc2,finishedProjects,currentProjects];
 		var terminalBuffer=[];
 		var typeRate=50;
 		var desk=document.createElement('div');
@@ -484,7 +484,7 @@
 				},21*typeRate);
 			}
 		}
-		function graphicalInterface() {
+		/*function graphicalInterface() {
 			if(!runningCommand) {
 				scroll=0;
 				runningCommand=true;
@@ -507,7 +507,7 @@
 					},1000);
 				},34*typeRate);
 			}
-		}
+		}*/
 		function cc0() {
 			if(!runningCommand) {
 				scroll=0;
@@ -649,9 +649,9 @@
 				write('ls projects\n',0,false);
 				setTimeout(function() {
 					playFloppyAudio(2);
-					write('finished',14,true);
+					write('finished',13,true);
 					terminalCursor.x=cols/2;
-					write('current\n',15,true);
+					write('current\n',14,true);
 					writeTerminalCursor();
 					runningCommand=false;
 				},12*typeRate);
@@ -673,7 +673,6 @@
 					write('projects',5,true);
 					terminalCursor.x=cols/2;
 					write('changeColor.bin\n',9,true);
-					write("'Graphical Interface'\n",13,true);
 					writeTerminalCursor();
 					runningCommand=false;
 				},3*typeRate);
