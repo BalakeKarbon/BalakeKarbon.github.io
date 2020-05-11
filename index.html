@@ -114,7 +114,7 @@
 			 window.open("https://github.com/BalakeKarbon/");
 		},function() {
 			 window.open("https://www.linkedin.com/in/blake-karbon/");
-		},popupBlocked,changeColor,cc0,cc1,cc2,finishedProjects,currentProjects];
+		},popupBlocked,changeColor,cc0,cc1,cc2,finishedProjects,currentProjects,interests];
 		var terminalBuffer=[];
 		var typeRate=50;
 		var desk=document.createElement('div');
@@ -547,20 +547,26 @@
 				},28*typeRate);
 			}
 		}
-		function aboutMe() {
+		function readFile(filePath,fileName) {
 			if(!runningCommand) {
 				scroll=0;
 				runningCommand=true;
-				write('cat "About Me.txt"\n',0,false);
-				setTimeout(function() {
-					playFloppyAudio(2);
-					loadFile("res/text/lang/eng/about-me.txt",null,function(fileData) {
+				write('cat '+fileName+'\n',0,false);
+				setTimeout(function () {
+					playFloppyAudio(3);
+					loadFile(filePath, null, function(fileData) {
 						write(fileData.responseText+'\n',0,true);
 						writeTerminalCursor();
 						runningCommand=false;
 					});
-				},19*typeRate);
+				},(fileName.length+5)*typeRate);
 			}
+		}
+		function interests() {
+			readFile('res/text/lang/eng/interests.txt','Interests.txt');
+		}
+		function aboutMe() {
+			readFile('res/text/lang/eng/about-me.txt','"About Me.txt"');
 		}
 		function contactInfo() {
 			if(!runningCommand) {
@@ -670,7 +676,8 @@
 					write('Resume.pdf',4,true);
 					terminalCursor.x=cols/2;
 					write("'Permission Issues.txt'\n",0,true);
-					write('projects',5,true);
+					//write('projects',5,true);
+					write('Interests.txt',15,true);
 					terminalCursor.x=cols/2;
 					write('changeColor.bin\n',9,true);
 					writeTerminalCursor();
