@@ -110,11 +110,11 @@
 		var rows=(400-(terminalScreenBorder*2))/fontSize;
 		var cols=(500-(terminalScreenBorder*2))/(fontSize/2);
 		var scroll=0;
-		var terminalLinks=[null,lsHome,aboutMe,contactInfo,resume,lsProjects,function() {
+		var terminalLinks=[null,lsHome,aboutMe,contactInfo,resume,function() {
 			 window.open("https://github.com/BalakeKarbon/");
 		},function() {
 			 window.open("https://www.linkedin.com/in/blake-karbon/");
-		},popupBlocked,changeColor,cc0,cc1,cc2,finishedProjects,currentProjects,interests];
+		},popupBlocked,changeColor,cc0,cc1,cc2];
 		var terminalBuffer=[];
 		var typeRate=50;
 		var desk=document.createElement('div');
@@ -455,6 +455,60 @@
 			write('~/Blake Karbon',1,true);
 			write(']$',0,true);
 		}
+		function commandReturn(path) {
+			loadFile(path, null, function(fileData) {
+				//write(fileData.responseText+'\n',0,true);
+				var textSections=[];
+				var section=0;
+				var state=0;
+				var linkInt=0;
+				for(var cc=0;cc<fileData.responseText.length;cc++) {
+					if(state==0) {
+						if(fileData.responseText[cc]=='[') {
+							state=1;
+						} else {
+							if(textSections.length==0) {
+								textSections.push([fileData.responseText[cc],0]);
+							} else if(section>(textSections.length-1)) {
+								textSections.push([fileData.responseText[cc],0]);
+							} else {
+								textSections[section][0]+=fileData.responseText[cc];
+							}
+						}
+					} else if(state==1) {
+						if(fileData.responseText[cc-1]=='[') {
+							textSections.push([fileData.responseText[cc],0]);
+							section=textSections.length-1;
+						} else if(fileData.responseText[cc]==']') {
+							linkInt=parseInt(fileData.responseText.substr(fileData.responseText.indexOf('(',cc)+1,(fileData.responseText.indexOf(')',cc)-fileData.responseText.indexOf('(',cc))-1));
+							textSections[section][1]=linkInt;
+							cc=fileData.responseText.indexOf(')',cc);
+							state=0;
+							section++;
+						} else {
+							textSections[section][0]+=fileData.responseText[cc];
+						}
+					}
+				}
+				for(var s=0;s<textSections.length;s++) {
+					write(textSections[s][0],textSections[s][1],true);
+				}
+				write('\n',0,true);
+				writeTerminalCursor();
+				runningCommand=false;
+			});
+		}
+		function genericCommand(command,returnPage,audio) {
+			if(!runningCommand) {
+				scroll=0;
+				runningCommand=true;
+				write(command+'\n',0,false);
+				setTimeout(function () {
+					playFloppyAudio(audio);
+					commandReturn(returnPage);
+				},(command.length+1)*typeRate);
+			}
+		}
 		function popupBlocked() {
 			if(!runningCommand) {
 				scroll=0;
@@ -462,7 +516,7 @@
 				write('cat "Permission Issues.txt"\n',0,false);
 				setTimeout(function() {
 					playFloppyAudio(4);
-					write('If you are reading this you must enable popups for this page in your browser!\n',0,true);
+					write('If you are reading this you must enable popups\nfor this page in your browser!\n',0,true);
 					writeTerminalCursor();
 					runningCommand=false;
 				},28*typeRate);
@@ -476,9 +530,9 @@
 				setTimeout(function() {
 					playFloppyAudio(0);
 					write('Colors:\n',0,true);
-					write('green\n',10,true);
-					write('white\n',11,true);
-					write('orange\n',12,true);
+					write('green\n',9,true);
+					write('white\n',10,true);
+					write('orange\n',11,true);
 					writeTerminalCursor();
 					runningCommand=false;
 				},21*typeRate);
@@ -562,29 +616,11 @@
 				},(fileName.length+5)*typeRate);
 			}
 		}
-		function interests() {
-			readFile('res/text/lang/eng/interests.txt','Interests.txt');
-		}
 		function aboutMe() {
-			readFile('res/text/lang/eng/about-me.txt','"About Me.txt"');
+			genericCommand('cat "About Me.txt"','res/text/lang/eng/about-me.md',3);
 		}
 		function contactInfo() {
-			if(!runningCommand) {
-				scroll=0;
-				runningCommand=true;
-				write('cat "Contact Info.txt"\n',0,false);
-				setTimeout(function() {
-					playFloppyAudio(3);
-					write('Cellular: 720-404-0695\n',0,true);
-					write('Email: blakekarbon@gmail.com\n',0,true);
-					write('GitHub: ',0,true);
-					write('https://github.com/BalakeKarbon/\n',6,true);
-					write('LinkedIn: ',0,true);
-					write('https://www.linkedin.com/in/blake-karbon/\n',7,true);
-					writeTerminalCursor();
-					runningCommand=false;
-				},23*typeRate);
-			}
+			genericCommand('cat "Contact Info.txt"','res/text/lang/eng/contact-info.md',3);
 		}
 		function resume() {
 			if(!runningCommand) {
@@ -596,7 +632,7 @@
 					var newWin = window.open('res/text/lang/eng/2019 Resume.pdf');
 					if(!newWin || newWin.closed || typeof newWin.closed=='undefined') {
 						write('bash: /dev/tty2: ',0,true);
-						write('Permission denied\n',8,true);
+						write('Permission denied\n',7,true);
 						writeTerminalCursor();
 						setTimeout(function() {
 							runningCommand=false;
@@ -609,60 +645,6 @@
 				},28*typeRate);
 			}
 		}
-		function currentProjects() {
-			if(!runningCommand) {
-				scroll=0;
-				runningCommand=true;
-				write('ls projects/current/\n',0,false);
-				setTimeout(function() {
-					playFloppyAudio(1);
-					write('DIY Computer Architectures\n',0,true);
-					write('International Harvester\n',0,true);
-					write('Vintage Computers\n',0,true);
-					writeTerminalCursor();
-					runningCommand=false;
-				},21*typeRate);
-			}
-		}
-		function finishedProjects() {
-			if(!runningCommand) {
-				scroll=0;
-				runningCommand=true;
-				write('ls projects/finished/\n',0,false);
-				setTimeout(function() {
-					playFloppyAudio(1);
-					write('DIY Neural Network',0,true);
-					terminalCursor.x=cols/2;
-					write('This Website\n',0,true);
-					write('ObiCOOL Website',0,true);
-					terminalCursor.x=cols/2;
-					write('Bluecalf Website\n',0,true);
-					write('fileToBitmap',0,true);
-					terminalCursor.x=cols/2;
-					write('School Security System\n',0,true);
-					write('Daily Driver',0,true);
-					terminalCursor.x=cols/2;
-					write('Lunchbox Laptop\n',0,true);
-					writeTerminalCursor();
-					runningCommand=false;
-				},22*typeRate);
-			}
-		}
-		function lsProjects() {
-			if(!runningCommand) {
-				scroll=0;
-				runningCommand=true;
-				write('ls projects\n',0,false);
-				setTimeout(function() {
-					playFloppyAudio(2);
-					write('finished',13,true);
-					terminalCursor.x=cols/2;
-					write('current\n',14,true);
-					writeTerminalCursor();
-					runningCommand=false;
-				},12*typeRate);
-			}
-		}
 		function lsHome() {
 			if(!runningCommand) {
 				scroll=0;
@@ -670,18 +652,7 @@
 				write('ls\n',0,false);
 				setTimeout(function() {
 					playFloppyAudio(2);
-					write("'About Me.txt'",2,true);
-					terminalCursor.x=cols/2;
-					write("'Contact Info.txt'\n",3,true);
-					write('Resume.pdf',4,true);
-					terminalCursor.x=cols/2;
-					write("'Permission Issues.txt'\n",0,true);
-					//write('projects',5,true);
-					write('Interests.txt',15,true);
-					terminalCursor.x=cols/2;
-					write('changeColor.bin\n',9,true);
-					writeTerminalCursor();
-					runningCommand=false;
+					commandReturn('res/text/lang/eng/homePage.md');
 				},3*typeRate);
 			}
 		}
@@ -694,6 +665,7 @@
 					write('futureClient\n',0,false);
 					setTimeout(function() {
 						write('Password:',0,true);
+						write('            ',0,false);
 						setTimeout(function(){
 							//write('\nWelcome!\nLast login: Mon Mar 22 1965 on tty\n\n',0,true); Release date of the PDP-8 computer!
 							write('\nWelcome!\nLast login: Thu Jan 1 1970 00:00:00 on tty\n\n',0,true);
@@ -750,6 +722,69 @@
 				}
 			}
 		});
+		var touchInterval=null;
+		var scd=0;
+		window.addEventListener('touchstart', function(event) {
+			if(touchInterval==null) {
+				var tc=document.getElementById('terminal-container');
+				if(event.touches[0].pageY>=parseInt(tc.offsetTop+(tc.offsetHeight-(tc.offsetHeight*0.29167)))) {
+					touchInterval=setInterval(scrollDown,0);
+					scd=-1;
+				} else if(event.touches[0].pageY<=parseInt(tc.offsetTop+(tc.offsetHeight*0.04167))) {
+					touchInterval=setInterval(scrollUp,0);
+					scd=1;
+				} else if(event.touches[0].pageX<=parseInt(tc.offsetLeft+(tc.offsetWidth*0.09375)) || event.touches[0].pageX>=parseInt(tc.offsetLeft+(tc.offsetWidth-(tc.offsetWidth*0.2825)))) {
+					if(event.touches[0].pageY>parseInt(tc.offsetTop+(tc.offsetWidth*0.36))) {
+						touchInterval=setInterval(scrollDown,0);
+						scd=-1;
+					} else {
+						touchInterval=setInterval(scrollUp,0);
+						scd=1;
+					}
+				}
+			}
+		});
+		window.addEventListener('touchmove', function(event) {
+			var tc=document.getElementById('terminal-container');
+			if(event.touches[0].pageY>=parseInt(tc.offsetTop+(tc.offsetHeight-(tc.offsetHeight*0.29167)))) {
+				if(scd!=-1) {
+					clearInterval(touchInterval);
+					touchInterval=null;
+					touchInterval=setInterval(scrollDown,0);
+					scd=-1;
+				}
+			} else if(event.touches[0].pageY<=parseInt(tc.offsetTop+(tc.offsetHeight*0.04167))) {
+				if(scd!=1) {
+					clearInterval(touchInterval);
+					touchInterval=null;
+					touchInterval=setInterval(scrollUp,0);
+					scd=1;
+				}
+			} else if(event.touches[0].pageX<=parseInt(tc.offsetLeft+(tc.offsetWidth*0.09375)) || event.touches[0].pageX>=parseInt(tc.offsetLeft+(tc.offsetWidth-(tc.offsetWidth*0.2825)))) {
+				if(event.touches[0].pageY>parseInt(tc.offsetTop+(tc.offsetWidth*0.36))) {
+					if(scd!=-1) {
+						clearInterval(touchInterval);
+						touchInterval=null;
+						touchInterval=setInterval(scrollDown,0);
+						scd=-1;
+					}
+				} else {
+					if(scd!=1) {
+						clearInterval(touchInterval);
+						touchInterval=null;
+						touchInterval=setInterval(scrollUp,0);
+						scd=1;
+					}
+				}
+			}
+		});
+		window.addEventListener('touchend', function(event) {
+			if(touchInterval!=null) {
+				clearInterval(touchInterval);
+				touchInterval=null;
+				scd=0;
+			}
+ 		});
 		function start() {
 			login();
 		}
