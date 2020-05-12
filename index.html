@@ -9,6 +9,8 @@
 	<noscript>If you are reading this you may be visiting the site from a terminal connected to a DEC PDP-8. That or your browser does not support javascript and you will likley benefit from the pure HTML version of this site suitable for terminals <a href='nojs.html'>here</a>!</noscript>
 	<script src="/base.js"></script>
 	<script>
+		var allowCookies=getCookie('cookieConsent');
+		var cTime=365;
 		var audioOn=true;
 		var canvasRender=true;
 		if(!!navigator.platform && /iPad|iPhone|iPod/.test(navigator.platform)) {
@@ -79,9 +81,6 @@
 				diskAccess.pop();
 			},floppyAudio[index].duration*1000);
 		}
-		/*if(getCookie('page')=='gui') {
-			window.location.href='gui.html';
-		}*/
 		var tabColor = document.createElement('meta');
 		document.getElementsByTagName('head')[0].appendChild(tabColor);
 		try {
@@ -114,7 +113,7 @@
 			 window.open("https://github.com/BalakeKarbon/");
 		},function() {
 			 window.open("https://www.linkedin.com/in/blake-karbon/");
-		},popupBlocked,changeColor,cc0,cc1,cc2];
+		},popupBlocked,changeColor,cc0,cc1,cc2,cookieYes,cookieNo,interests,dodgeImage1];
 		var terminalBuffer=[];
 		var typeRate=50;
 		var desk=document.createElement('div');
@@ -274,7 +273,9 @@
 				render();
 				tabColor.setAttribute('name','theme-color');
 				tabColor.setAttribute('content','#00ff00');
-				setCookie('terminalColor',0,100);
+				if(allowCookies=='yes') {
+					setCookie('terminalColor',0,cTime);
+				}
 			} else if(color==1) {
 				rrgb=[40,40,40];
 				regularColor='#ffffff';
@@ -284,7 +285,9 @@
 				render();
 				tabColor.setAttribute('name','theme-color');
 				tabColor.setAttribute('content','#ffffff');
-				setCookie('terminalColor',1,100);
+				if(allowCookies=='yes') {
+					setCookie('terminalColor',1,cTime);
+				}
 			} else if(color==2) {
 				rrgb=[107,89,37];
 				regularColor='#f9bc04';
@@ -294,7 +297,9 @@
 				render();
 				tabColor.setAttribute('name','theme-color');
 				tabColor.setAttribute('content','#f9bc04');
-				setCookie('terminalColor',2,100);
+				if(allowCookies=='yes') {
+					setCookie('terminalColor',2,cTime);
+				}
 			}
 		}
 		function getCurrentLine() {
@@ -526,7 +531,7 @@
 			if(!runningCommand) {
 				scroll=0;
 				runningCommand=true;
-				write('./changeColor.bin -lc\n',0,false);
+				write('./changeColor.bin -l\n',0,false);
 				setTimeout(function() {
 					playFloppyAudio(0);
 					write('Colors:\n',0,true);
@@ -535,33 +540,9 @@
 					write('orange\n',11,true);
 					writeTerminalCursor();
 					runningCommand=false;
-				},21*typeRate);
+				},20*typeRate);
 			}
 		}
-		/*function graphicalInterface() {
-			if(!runningCommand) {
-				scroll=0;
-				runningCommand=true;
-				write('./"Graphical Interface"/start.bin\n',0,false);
-				setTimeout(function() {
-					playFloppyAudio(0);
-					write('Loading GUI.',0,true);
-					setTimeout(function() {
-						write('.',0,true);
-						setTimeout(function() {
-							write('.\n',0,true);
-							setTimeout(function() {
-								write('Segmentation fault (core dumped)\n',0,true);
-								writeTerminalCursor();
-								runningCommand=false;
-								setCookie('page','gui',100);
-								window.location.href='gui.html';
-							},1000);
-						},1000);
-					},1000);
-				},34*typeRate);
-			}
-		}*/
 		function cc0() {
 			if(!runningCommand) {
 				scroll=0;
@@ -645,6 +626,32 @@
 				},28*typeRate);
 			}
 		}
+		function interests() {
+			genericCommand('ls interests/','res/text/lang/eng/pages/interests-page.md',4);
+		}
+		function dodgeImage1() {
+			if(!runningCommand) {
+				scroll=0;
+				runningCommand=true;
+				write('hostImage interests/Dodge.jpg\n',0,false);
+				setTimeout(function() {
+					playFloppyAudio(1);
+					var newWin = window.open('res/img/dodge.jpg');
+					if(!newWin || newWin.closed || typeof newWin.closed=='undefined') {
+						write('Error hosting image: ',0,true);
+						write('Permission denied\n',7,true);
+						writeTerminalCursor();
+						setTimeout(function() {
+							runningCommand=false;
+							popupBlocked();
+						},1000);
+					} else {
+						writeTerminalCursor();
+						runningCommand=false;
+					}
+				},30*typeRate);
+			}
+		}
 		function lsHome() {
 			if(!runningCommand) {
 				scroll=0;
@@ -652,9 +659,38 @@
 				write('ls\n',0,false);
 				setTimeout(function() {
 					playFloppyAudio(2);
-					commandReturn('res/text/lang/eng/homePage.md');
+					commandReturn('res/text/lang/eng/pages/home-page.md');
 				},3*typeRate);
 			}
+		}
+		function cookieYes() {
+			terminalLinks[12]=null;
+			terminalLinks[13]=null;
+			write('yes\n',0,false);
+			setTimeout(function () {
+				write('Cookies enabled!\n',0,true);
+				writeTerminalCursor();
+				playFloppyAudio(5);
+				setTimeout(function() {
+					runningCommand=false;
+					setCookie('cookieConsent','yes',cTime);
+					allowCookies='yes';
+					lsHome();
+				},600);
+			},4*typeRate);
+		}
+		function cookieNo() {
+			terminalLinks[12]=null;
+			terminalLinks[13]=null;
+			write('no\n',0,false);
+			setTimeout(function () {
+				write('Cookies disabled.\n',0,true);
+				writeTerminalCursor();
+				setTimeout(function() {
+					runningCommand=false;
+					lsHome();
+				},600);
+			},3*typeRate);
 		}
 		function login() {
 			if(!runningCommand) {
@@ -678,8 +714,20 @@
 								setTimeout(function(){
 									writeTerminalCursor();
 									setTimeout(function() {
-										runningCommand=false;
-										lsHome();
+										if(allowCookies!='yes') {
+											write('./cookies.py\n',0,false);
+											setTimeout(function() {
+												playFloppyAudio(4);
+												write('This site uses cookies.\nIs that okay? (',0,true);
+												write('yes',12,true);
+												write('/',0,true);
+												write('no',13,true);
+												write('):',0,true);
+											},14*typeRate);
+										} else {
+											runningCommand=false;
+											lsHome();
+										}
 									},600);
 								},18*typeRate);
 							},600);
