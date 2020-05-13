@@ -116,7 +116,7 @@
 		},popupBlocked,changeColor,cc0,cc1,cc2,cookieYes,cookieNo,interests,dodgeImage1,function() {
 			tapKey();
 			playFloppyAudio(5);
-		},checkScroll,tutorialCheck];
+		},checkScroll,tutorialCheck,screenSaver,endScreenSaver];
 		var terminalBuffer=[];
 		var typeRate=50;
 		var desk=document.createElement('div');
@@ -130,7 +130,7 @@
 		terminalCanvas.style.left='9.375%';
 		terminalCanvas.style.width='62.5%';
 		terminalCanvas.style.height='66.66666666666667%';
-		var depletionInterval=20;
+		var depletionInterval=30;
 		var depletionSize=10;
 		var rrgb=[0,30,0];
 		function deplete() {
@@ -741,6 +741,40 @@
 					});
 				},15*typeRate);
 			}
+		}
+		var ssi=null;
+		function screenSaver() {
+			if(!runningCommand) {
+				runningCommand=true;
+				terminalLinks[20]=endScreenSaver;
+				write('./screensaver.bin\n',0,false);
+				sc=true;
+				setTimeout(function() {
+					ssi=setInterval(function() {
+						terminalCursor.x=Math.floor(Math.random() * Math.floor(cols+1));
+						terminalCursor.y=Math.floor(Math.random() * Math.floor(rows+1));
+						var rn=Math.floor(Math.random() * Math.floor(3));
+						if(rn==1) {
+							setChar('•',20);
+						} else if(rn==2) {
+							setChar('.',20);
+						} else {
+							setChar(' ',20);
+						}
+						render();
+					},10);
+				},18*typeRate);
+			}
+		}
+		function endScreenSaver() {
+			terminalLinks[20]=null;
+			clearInterval(ssi);
+			ssi=null;
+			terminalCursor.x=0;
+			terminalCursor.y=rows;
+			writeTerminalCursor(true);
+			sc=false;
+			runningCommand=false;
 		}
 		function login() {
 			if(!runningCommand) {
