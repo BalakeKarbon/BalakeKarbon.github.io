@@ -116,7 +116,7 @@
 		},popupBlocked,changeColor,cc0,cc1,cc2,cookieYes,cookieNo,interests,dodgeImage1,function() {
 			tapKey();
 			playFloppyAudio(5);
-		},checkScroll,tutorialCheck,screenSaver,endScreenSaver];
+		},checkScroll,tutorialCheck,screenSaver,endScreenSaver,myOffice];
 		var terminalBuffer=[];
 		var typeRate=50;
 		var desk=document.createElement('div');
@@ -525,6 +525,9 @@
 				},(command.length+1)*typeRate);
 			}
 		}
+		function myOffice() {
+			genericCommand('cat "interests/My Office.txt"','res/text/lang/eng/my-office.md',4);
+		}
 		function popupBlocked() {
 			if(!runningCommand) {
 				scroll=0;
@@ -755,11 +758,11 @@
 						terminalCursor.y=Math.floor(Math.random() * Math.floor(rows+1));
 						var rn=Math.floor(Math.random() * Math.floor(3));
 						if(rn==1) {
-							setChar('•',20);
+						        setChar('•',20);
 						} else if(rn==2) {
-							setChar('.',20);
+						        setChar('.',20);
 						} else {
-							setChar(' ',20);
+						        setChar(' ',20);
 						}
 						render();
 					},10);
