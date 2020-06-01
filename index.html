@@ -116,7 +116,7 @@
 		},popupBlocked,changeColor,cc0,cc1,cc2,cookieYes,cookieNo,interests,dodgeImage1,function() {
 			tapKey();
 			playFloppyAudio(5);
-		},checkScroll,tutorialCheck,screenSaver,endScreenSaver,myOffice];
+		},checkScroll,tutorialCheck,screenSaver,endScreenSaver,myOffice,myLaptop,myRide];
 		var terminalBuffer=[];
 		var typeRate=50;
 		var desk=document.createElement('div');
@@ -514,19 +514,37 @@
 				}
 			});
 		}
-		function genericCommand(command,returnPage,audio) {
+		function genericCommand(command,returnPage,audio,callback) {
 			if(!runningCommand) {
 				scroll=0;
 				runningCommand=true;
 				write(command+'\n',0,false);
 				setTimeout(function () {
 					playFloppyAudio(audio);
-					commandReturn(returnPage,null);
+					commandReturn(returnPage,callback);
 				},(command.length+1)*typeRate);
 			}
 		}
 		function myOffice() {
-			genericCommand('cat "interests/My Office.txt"','res/text/lang/eng/my-office.md',4);
+			genericCommand('cat "interests/My Office.txt"','res/text/lang/eng/my-office-base.md',4,function() {
+				scroll=0;
+				writeTerminalCursor(true);
+				runningCommand=0;
+			});
+		}
+		function myLaptop() {
+			genericCommand('cat "interests/My Laptop.txt"','res/text/lang/eng/my-laptop-base.md',4,function() {
+				scroll=5;
+				writeTerminalCursor(true);
+				runningCommand=0;
+			});
+		}
+		function myRide() {
+			genericCommand('cat "interests/What I Drive.txt"','res/text/lang/eng/what-i-drive-base.md',4,function() {
+				scroll=0;
+				writeTerminalCursor(true);
+				runningCommand=0;
+			});
 		}
 		function popupBlocked() {
 			if(!runningCommand) {
@@ -612,10 +630,10 @@
 			}
 		}
 		function aboutMe() {
-			genericCommand('cat "About Me.txt"','res/text/lang/eng/about-me.md',3);
+			genericCommand('cat "About Me.txt"','res/text/lang/eng/about-me.md',3,null);
 		}
 		function contactInfo() {
-			genericCommand('cat "Contact Info.txt"','res/text/lang/eng/contact-info.md',3);
+			genericCommand('cat "Contact Info.txt"','res/text/lang/eng/contact-info.md',3,null);
 		}
 		function resume() {
 			if(!runningCommand) {
@@ -641,7 +659,7 @@
 			}
 		}
 		function interests() {
-			genericCommand('ls interests/','res/text/lang/eng/pages/interests-page.md',4);
+			genericCommand('ls interests/','res/text/lang/eng/pages/interests-page.md',4,null);
 		}
 		function dodgeImage1() {
 			if(!runningCommand) {
