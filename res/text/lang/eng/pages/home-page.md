@@ -1,5 +1,4 @@
 ['About Me.txt'](2)         ['Contact Info.txt'](3)
-[interests](14)             ['Permission Issues.txt'](0)
+[tutorial.bin](18)           ['Permission Issues.txt'](0)
 [Resume.pdf](4)             [changeColor.bin](8)
-[cookies.py](0)             [tutorial.bin](18)
-[screensaver.bin](19)
+cookies.py

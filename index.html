@@ -9,6 +9,7 @@
 	<noscript>If you are reading this you may be visiting the site from a terminal connected to a DEC PDP-8. That or your browser does not support javascript and you will likley benefit from the pure HTML version of this site suitable for terminals <a href='nojs.html'>here</a>!</noscript>
 	<script src="/base.js"></script>
 	<script>
+		//TO-DO: Add ability to configure graphics manually to speed page up!
 		var allowCookies=getCookie('cookieConsent');
 		var cTime=365;
 		var audioOn=true;
@@ -533,15 +534,15 @@
 			});
 		}
 		function myLaptop() {
-			genericCommand('cat "interests/My Laptop.txt"','res/text/lang/eng/my-laptop-base.md',4,function() {
-				scroll=5;
+			genericCommand('cat "interests/My Laptop.txt"','res/text/lang/eng/my-laptop.md',4,function() {
+				scroll=4;
 				writeTerminalCursor(true);
 				runningCommand=0;
 			});
 		}
 		function myRide() {
-			genericCommand('cat "interests/What I Drive.txt"','res/text/lang/eng/what-i-drive-base.md',4,function() {
-				scroll=0;
+			genericCommand('cat "interests/What I Drive.txt"','res/text/lang/eng/what-i-drive.md',4,function() {
+				scroll=8;
 				writeTerminalCursor(true);
 				runningCommand=0;
 			});
