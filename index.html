@@ -117,7 +117,7 @@
 		},popupBlocked,changeColor,cc0,cc1,cc2,cookieYes,cookieNo,interests,dodgeImage1,function() {
 			tapKey();
 			playFloppyAudio(5);
-		},checkScroll,tutorialCheck,screenSaver,endScreenSaver,myOffice,myLaptop,myRide];
+		},checkScroll,tutorialCheck,screenSaver,endScreenSaver,myOffice,myLaptop,myRide,goToCompanySite];
 		var terminalBuffer=[];
 		var typeRate=50;
 		var desk=document.createElement('div');
@@ -546,6 +546,32 @@
 				writeTerminalCursor(true);
 				runningCommand=0;
 			});
+		}
+		function goToCompanySite() {
+			if(!runningCommand) {
+				scroll=0;
+				runningCommand=true;
+				write("./'Lunchbox Studios.sh'\n",0,false);
+				setTimeout(function() {
+					playFloppyAudio(0);
+					write("\nConnecting to Lunchbox Studios...\n\n",0,true);
+					setTimeout(function() {
+						var newWin = window.open('http://www.lunchboxstudios.com');
+						if(!newWin || newWin.closed || typeof newWin.closed=='undefined') {
+							write('Error connecting to server: ',0,true);
+							write('Permission denied\n',7,true);
+							writeTerminalCursor(true);
+							setTimeout(function() {
+								runningCommand=false;
+								popupBlocked();
+							},1000);
+						} else {
+							writeTerminalCursor(true);
+							runningCommand=false;
+						}
+					},1000);
+				},25*typeRate);
+			}
 		}
 		function popupBlocked() {
 			if(!runningCommand) {
