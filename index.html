@@ -7,7 +7,7 @@
 <body>
 	<div id='terminal-container'></div>
 	<noscript>If you are reading this you may be visiting the site from a terminal connected to a DEC PDP-8. That or your browser does not support javascript and you will likley benefit from the pure HTML version of this site suitable for terminals <a href='nojs.html'>here</a>!</noscript>
-	<script src="/base.js"></script>
+	<script src="base.js"></script>
 	<script>
 		//TO-DO: Add ability to configure graphics manually to speed page up!
 		var allowCookies=getCookie('cookieConsent');
@@ -85,10 +85,10 @@
 		var tabColor = document.createElement('meta');
 		document.getElementsByTagName('head')[0].appendChild(tabColor);
 		try {
-			var local_unifont = new FontFace('localUnifont', 'url(/res/text/fonts/unifont-13.0.01.ttf)');
+			var local_unifont = new FontFace('localUnifont', 'url(res/text/fonts/unifont-13.0.01.ttf)');
 		}
 		catch(error) {
-			document.body.innerHTML+='<style>@font-face { font-family: localUnifont; src: url(/res/text/fonts/unifont-13.0.01.ttf); }</style>';
+			document.body.innerHTML+='<style>@font-face { font-family: localUnifont; src: url(res/text/fonts/unifont-13.0.01.ttf); }</style>';
 			var local_inufont = null;
 		}
 		function adjustScale() {
