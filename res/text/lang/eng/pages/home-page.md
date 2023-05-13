@@ -1,4 +1,4 @@
-['About Me.txt'](2)         ['Contact Info.txt'](3)
-[tutorial.bin](18)           ['Permission Issues.txt'](0)
-[Resume.pdf](4)             [changeColor.bin](8)
-cookies.py             ['Lunchbox Studios.sh'](24)
+['About Me.txt'](2)              ['Contact Info.txt'](3)
+cookiescfg.sh               [changeColor.bin](8)
+['Permission Issues.txt'](0)     [project.links](25)
+[Resume.pdf](4)                  [tutorial.bin](18)

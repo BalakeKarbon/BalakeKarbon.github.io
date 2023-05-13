@@ -117,7 +117,7 @@
 		},popupBlocked,changeColor,cc0,cc1,cc2,cookieYes,cookieNo,interests,dodgeImage1,function() {
 			tapKey();
 			playFloppyAudio(5);
-		},checkScroll,tutorialCheck,screenSaver,endScreenSaver,myOffice,myLaptop,myRide,goToCompanySite];
+		},checkScroll,tutorialCheck,screenSaver,endScreenSaver,myOffice,myLaptop,myRide,goToCompanySite,projects,github];
 		var terminalBuffer=[];
 		var typeRate=50;
 		var desk=document.createElement('div');
@@ -460,7 +460,7 @@
 		var runningCommand=false;
 		function writeTerminalCursor(linked) {
 			write('[',0,true);
-			write('futureClient@Web_Portfolio ',0,true);
+			write('futureClient@mainframe ',0,true);
 			if(linked) {
 				write('~/Blake Karbon',1,true);
 			} else {
@@ -666,10 +666,10 @@
 			if(!runningCommand) {
 				scroll=0;
 				runningCommand=true;
-				write('less Resume.pdf > /dev/tty2\n',0,false);
+				write('open Resume.pdf\n',0,false);
 				setTimeout(function() {
 					playFloppyAudio(0);
-					var newWin = window.open('res/text/lang/eng/2020 Resume.pdf');
+					var newWin = window.open('res/text/lang/eng/5-6-2023 Resume.pdf');
 					if(!newWin || newWin.closed || typeof newWin.closed=='undefined') {
 						write('bash: /dev/tty2: ',0,true);
 						write('Permission denied\n',7,true);
@@ -687,6 +687,35 @@
 		}
 		function interests() {
 			genericCommand('ls interests/','res/text/lang/eng/pages/interests-page.md',4,null);
+		}
+		function projects() {
+			genericCommand('cat project.links','res/text/lang/eng/projects.md',4,null);
+		}
+		function github() {
+			if(!runningCommand) {
+				scroll=0;
+				runningCommand=true;
+				write("telnet  github.com/BalakeKarbon\n",0,false);
+				setTimeout(function() {
+					playFloppyAudio(0);
+					write("\nConnecting to BBS...\n\n",0,true);
+					setTimeout(function() {
+						var newWin = window.open('https://www.github.com/BalakeKarbon');
+						if(!newWin || newWin.closed || typeof newWin.closed=='undefined') {
+							write('Error connecting to server: ',0,true);
+							write('Permission denied\n',7,true);
+							writeTerminalCursor(true);
+							setTimeout(function() {
+								runningCommand=false;
+								popupBlocked();
+							},1000);
+						} else {
+							writeTerminalCursor(true);
+							runningCommand=false;
+						}
+					},1000);
+				},31*typeRate);
+			}
 		}
 		function dodgeImage1() {
 			if(!runningCommand) {
@@ -723,7 +752,7 @@
 			}
 		}
 		function cookieAsk() {
-			write('./cookies.py\n',0,false);
+			write('./cookiescfg.sh\n',0,false);
 			setTimeout(function() {
 				playFloppyAudio(4);
 				write('This site uses cookies.\nIs that okay? (',0,true);
@@ -828,7 +857,7 @@
 			if(!runningCommand) {
 				scroll=0;
 				runningCommand=true;
-				write('Web_Portfolio login:',0,true);
+				write('mainframe login:',0,true);
 				setTimeout(function() {
 					write('futureClient\n',0,false);
 					setTimeout(function() {
@@ -838,7 +867,7 @@
 							//write('\nWelcome!\nLast login: Mon Mar 22 1965 on tty\n\n',0,true); Release date of the PDP-8 computer!
 							write('\nWelcome!\nLast login: Thu Jan 1 1970 00:00:00 on tty\n\n',0,true);
 							write('[',0,true);
-							write('futureClient@Web_Portfolio ',0,true);
+							write('futureClient@mainframe ',0,true);
 							write('~/',0,true);
 							write(']$',0,true);
 							setTimeout(function(){
