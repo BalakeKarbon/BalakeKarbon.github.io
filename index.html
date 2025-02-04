@@ -669,7 +669,7 @@
 				write('open Resume.pdf\n',0,false);
 				setTimeout(function() {
 					playFloppyAudio(0);
-					var newWin = window.open('res/text/lang/eng/5-6-2023 Resume.pdf');
+					var newWin = window.open('res/text/lang/eng/Resume.pdf');
 					if(!newWin || newWin.closed || typeof newWin.closed=='undefined') {
 						write('bash: /dev/tty2: ',0,true);
 						write('Permission denied\n',7,true);
