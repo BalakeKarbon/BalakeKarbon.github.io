@@ -9,12 +9,86 @@
 000900 DATA DIVISION.
 001000 FILE SECTION.
 001100 WORKING-STORAGE SECTION.
-001200 01 WS-DOCBOD PIC X(4) VALUE 'body'.
-001300 01 WS-NULL-BYTE PIC X(1) VALUE X'00'.
-001400 01 WS-RETURN PIC S9.
-001500 LINKAGE SECTION.
-001600 PROCEDURE DIVISION.
-001700 EXAMPLE SECTION.
-001800 ENTRY 'MAIN'.
-001900   DISPLAY 'hi'.
-002000   GOBACK.
+001200 01 WS-NULL-BYTE PIC X(1) VALUE X'00'.
+001300 01 WS-RETURN PIC S9.
+001400 01 WS-COOKIE-ALLOWED PIC X.
+001500 01 WS-LANG PIC XX.
+001600 LINKAGE SECTION.
+001700 PROCEDURE DIVISION.
+001800 EXAMPLE SECTION.
+001900 ENTRY 'MAIN'.
+002000   CALL 'cobdom_get_cookie' USING BY REFERENCE WS-COOKIE-ALLOWED,
+002100     'allowCookies' RETURNING WS-RETURN.
+002200   IF WS-COOKIE-ALLOWED = 'y' THEN
+002300     PERFORM LANG-CHECK
+002400   ELSE
+002500     PERFORM COOKIE-ASK
+002600   END-IF.
+002700 GOBACK.
+002800 LANG-CHECK.
+002900   CALL 'cobdom_get_cookie' USING BY REFERENCE WS-LANG,
+003000     'lang' RETURNING WS-RETURN.
+003100   IF WS-LANG = WS-NULL-BYTE THEN
+003200     CALL 'cobdom_set_cookie' USING 'en', 'lang'
+003300       RETURNING WS-RETURN
+003400   END-IF.
+003500   CONTINUE.
+003600 COOKIE-ASK.
+003700   CALL 'cobdom_create_element' USING 'cookieDiv', 'div'
+003800     RETURNING WS-RETURN.
+003900   CALL 'cobdom_style' USING 'cookieDiv', 'position', 'fixed'
+004000     RETURNING WS-RETURN.
+004100   CALL 'cobdom_style' USING 'cookieDiv', 'bottom', '0'
+004200     RETURNING WS-RETURN.
+004300   CALL 'cobdom_style' USING 'cookieDiv', 'left', '0'
+004400     RETURNING WS-RETURN.
+004500   CALL 'cobdom_style' USING 'cookieDiv', 'width', '100%'
+004600     RETURNING WS-RETURN.
+004700   CALL 'cobdom_style' USING 'cookieDiv', 'backgroundColor', 
+004800     '#00ff00' RETURNING WS-RETURN.
+004900   CALL 'cobdom_style' USING 'cookieDiv', 'textAlign', 
+005000     'center' RETURNING WS-RETURN.
+005100   CALL 'cobdom_inner_html' USING 'cookieDiv','Would you like to a
+005200-'llow cookies to store your preferences such as language?&nbsp;'
+005300     RETURNING WS-RETURN.
+005400   CALL 'cobdom_create_element' USING 'cookieYes', 'span'
+005500     RETURNING WS-RETURN.
+005600   CALL 'cobdom_set_class' USING 'cookieYes', 'cookieButton'
+005700     RETURNING WS-RETURN.
+005800   CALL 'cobdom_inner_html' USING 'cookieYes', 'Yes&nbsp;'
+005900     RETURNING WS-RETURN.
+006000   CALL 'cobdom_create_element' USING 'cookieNo', 'span'
+006100     RETURNING WS-RETURN.
+006200   CALL 'cobdom_set_class' USING 'cookieNo', 'cookieButton'
+006300     RETURNING WS-RETURN.
+006400   CALL 'cobdom_inner_html' USING 'cookieNo', 'No'
+006500     RETURNING WS-RETURN.
+006600   CALL 'cobdom_add_event_listener' USING 'cookieYes', 'click',
+006700     'COOKIEACCEPT' RETURNING WS-RETURN.
+006800   CALL 'cobdom_add_event_listener' USING 'cookieNo', 'click',
+006900     'COOKIEDENY' RETURNING WS-RETURN.
+007000   CALL 'cobdom_append_child' USING 'cookieYes', 'cookieDiv'
+007100     RETURNING WS-RETURN.
+007200   CALL 'cobdom_append_child' USING 'cookieNo', 'cookieDiv'
+007300     RETURNING WS-RETURN.
+007400   CALL 'cobdom_append_child' USING 'cookieDiv', 'body'
+007500     RETURNING WS-RETURN.
+007600*Note this must be called after the elements are added to the
+007700*document because it must search for them.
+007800   CALL 'cobdom_class_style' USING 'cookieButton', 
+007900     'backgroundColor', '#ff0000' RETURNING WS-RETURN.
+008000   CONTINUE.
+008100 COOKIEACCEPT SECTION.
+008200 ENTRY 'COOKIEACCEPT'.
+008300   CALL 'cobdom_style' USING 'cookieDiv', 'display', 'none'
+008400     RETURNING WS-RETURN.
+008500   CALL 'cobdom_set_cookie' USING 'y', 'allowCookies' 
+008600     RETURNING WS-RETURN.
+008700   MOVE 'y' TO WS-COOKIE-ALLOWED.
+008800   GOBACK.
+008900 COOKIEDENY SECTION.
+009000 ENTRY 'COOKIEDENY'.
+009100   CALL 'cobdom_style' USING 'cookieDiv', 'display', 'none'
+009200     RETURNING WS-RETURN.
+009300   MOVE 'n' TO WS-COOKIE-ALLOWED.
+009400   GOBACK.

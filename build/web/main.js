@@ -311,7 +311,7 @@ function dbg(...args) {
   var h16 = new Int16Array(1);
   var h8 = new Int8Array(h16.buffer);
   h16[0] = 0x6373;
-  if (h8[0] !== 0x73 || h8[1] !== 0x63) throw 'Runtime error: expected the system to be little-endian! (Run with -sSUPPORT_BIG_ENDIAN to bypass)';
+  if (h8[0] !== 0x73 || h8[1] !== 0x63) abort('Runtime error: expected the system to be little-endian! (Run with -sSUPPORT_BIG_ENDIAN to bypass)');
 })();
 
 function consumedModuleProp(prop) {
@@ -352,9 +352,12 @@ function isExportedByForceFilesystem(name) {
 }
 
 /**
- * Intercept access to a global symbol.  This enables us to give informative
- * warnings/errors when folks attempt to use symbols they did not include in
- * their build, or no symbols that no longer exist.
+ * Intercept access to a symbols in the global symbol.  This enables us to give
+ * informative warnings/errors when folks attempt to use symbols they did not
+ * include in their build, or no symbols that no longer exist.
+ *
+ * We don't define this in MODULARIZE mode since in that mode emscripten symbols
+ * are never placed in the global scope.
  */
 function hookGlobalSymbolAccess(sym, func) {
   if (typeof globalThis != 'undefined' && !Object.getOwnPropertyDescriptor(globalThis, sym)) {
@@ -370,7 +373,7 @@ function hookGlobalSymbolAccess(sym, func) {
 
 function missingGlobal(sym, msg) {
   hookGlobalSymbolAccess(sym, () => {
-    warnOnce(`\`${sym}\` is not longer defined by emscripten. ${msg}`);
+    warnOnce(`\`${sym}\` is no longer defined by emscripten. ${msg}`);
   });
 }
 
@@ -519,73 +522,6 @@ function postRun() {
   // End ATPOSTRUNS hooks
 }
 
-// A counter of dependencies for calling run(). If we need to
-// do asynchronous work before running, increment this and
-// decrement it. Incrementing must happen in a place like
-// Module.preRun (used by emcc to add file preloading).
-// Note that you can add dependencies in preRun, even though
-// it happens right before run - run will be postponed until
-// the dependencies are met.
-var runDependencies = 0;
-var dependenciesFulfilled = null; // overridden to take different actions when all run dependencies are fulfilled
-var runDependencyTracking = {};
-var runDependencyWatcher = null;
-
-function addRunDependency(id) {
-  runDependencies++;
-
-  Module['monitorRunDependencies']?.(runDependencies);
-
-  assert(id, 'addRunDependency requires an ID')
-  assert(!runDependencyTracking[id]);
-  runDependencyTracking[id] = 1;
-  if (runDependencyWatcher === null && typeof setInterval != 'undefined') {
-    // Check for missing dependencies every few seconds
-    runDependencyWatcher = setInterval(() => {
-      if (ABORT) {
-        clearInterval(runDependencyWatcher);
-        runDependencyWatcher = null;
-        return;
-      }
-      var shown = false;
-      for (var dep in runDependencyTracking) {
-        if (!shown) {
-          shown = true;
-          err('still waiting on run dependencies:');
-        }
-        err(`dependency: ${dep}`);
-      }
-      if (shown) {
-        err('(end of list)');
-      }
-    }, 10000);
-    // Prevent this timer from keeping the runtime alive if nothing
-    // else is.
-    runDependencyWatcher.unref?.()
-  }
-}
-
-function removeRunDependency(id) {
-  runDependencies--;
-
-  Module['monitorRunDependencies']?.(runDependencies);
-
-  assert(id, 'removeRunDependency requires an ID');
-  assert(runDependencyTracking[id]);
-  delete runDependencyTracking[id];
-  if (runDependencies == 0) {
-    if (runDependencyWatcher !== null) {
-      clearInterval(runDependencyWatcher);
-      runDependencyWatcher = null;
-    }
-    if (dependenciesFulfilled) {
-      var callback = dependenciesFulfilled;
-      dependenciesFulfilled = null;
-      callback(); // can add another dependenciesFulfilled
-    }
-  }
-}
-
 /** @param {string|number=} what */
 function abort(what) {
   Module['onAbort']?.(what);
@@ -643,6 +579,8 @@ function getBinarySync(file) {
   if (readBinary) {
     return readBinary(file);
   }
+  // Throwing a plain string here, even though it not normally adviables since
+  // this gets turning into an `abort` in instantiateArrayBuffer.
   throw 'both async and sync fetching of the wasm failed';
 }
 
@@ -671,8 +609,8 @@ async function instantiateArrayBuffer(binaryFile, imports) {
     err(`failed to asynchronously prepare wasm: ${reason}`);
 
     // Warn on some common problems.
-    if (isFileURI(wasmBinaryFile)) {
-      err(`warning: Loading from a file URI (${wasmBinaryFile}) is not supported in most browsers. See https://emscripten.org/docs/getting_started/FAQ.html#how-do-i-run-a-local-webserver-for-testing-why-does-my-program-stall-in-downloading-or-preparing`);
+    if (isFileURI(binaryFile)) {
+      err(`warning: Loading from a file URI (${binaryFile}) is not supported in most browsers. See https://emscripten.org/docs/getting_started/FAQ.html#how-do-i-run-a-local-webserver-for-testing-why-does-my-program-stall-in-downloading-or-preparing`);
     }
     abort(reason);
   }
@@ -738,7 +676,6 @@ async function createWasm() {
     removeRunDependency('wasm-instantiate');
     return wasmExports;
   }
-  // wait for the pthread pool (if any)
   addRunDependency('wasm-instantiate');
 
   // Prefer streaming instantiation if available.
@@ -808,6 +745,71 @@ async function createWasm() {
   var onPreRuns = [];
   var addOnPreRun = (cb) => onPreRuns.push(cb);
 
+  var runDependencies = 0;
+  
+  
+  var dependenciesFulfilled = null;
+  
+  var runDependencyTracking = {
+  };
+  
+  var runDependencyWatcher = null;
+  var removeRunDependency = (id) => {
+      runDependencies--;
+  
+      Module['monitorRunDependencies']?.(runDependencies);
+  
+      assert(id, 'removeRunDependency requires an ID');
+      assert(runDependencyTracking[id]);
+      delete runDependencyTracking[id];
+      if (runDependencies == 0) {
+        if (runDependencyWatcher !== null) {
+          clearInterval(runDependencyWatcher);
+          runDependencyWatcher = null;
+        }
+        if (dependenciesFulfilled) {
+          var callback = dependenciesFulfilled;
+          dependenciesFulfilled = null;
+          callback(); // can add another dependenciesFulfilled
+        }
+      }
+    };
+  
+  
+  var addRunDependency = (id) => {
+      runDependencies++;
+  
+      Module['monitorRunDependencies']?.(runDependencies);
+  
+      assert(id, 'addRunDependency requires an ID')
+      assert(!runDependencyTracking[id]);
+      runDependencyTracking[id] = 1;
+      if (runDependencyWatcher === null && typeof setInterval != 'undefined') {
+        // Check for missing dependencies every few seconds
+        runDependencyWatcher = setInterval(() => {
+          if (ABORT) {
+            clearInterval(runDependencyWatcher);
+            runDependencyWatcher = null;
+            return;
+          }
+          var shown = false;
+          for (var dep in runDependencyTracking) {
+            if (!shown) {
+              shown = true;
+              err('still waiting on run dependencies:');
+            }
+            err(`dependency: ${dep}`);
+          }
+          if (shown) {
+            err('(end of list)');
+          }
+        }, 10000);
+        // Prevent this timer from keeping the runtime alive if nothing
+        // else is.
+        runDependencyWatcher.unref?.()
+      }
+    };
+
 
   
     /**
@@ -833,10 +835,11 @@ async function createWasm() {
 
   var ptrToString = (ptr) => {
       assert(typeof ptr === 'number');
-      // With CAN_ADDRESS_2GB or MEMORY64, pointers are already unsigned.
+      // Convert to 32-bit unsigned value
       ptr >>>= 0;
       return '0x' + ptr.toString(16).padStart(8, '0');
     };
+
 
   
     /**
@@ -1855,6 +1858,8 @@ async function createWasm() {
         id = orig + Math.random();
       }
     };
+  
+  
   
   var preloadPlugins = [];
   var FS_handledByPreloadPlugin = async (byteArray, fullname) => {
@@ -3048,7 +3053,7 @@ async function createWasm() {
         opts.flags = opts.flags || 0;
         opts.encoding = opts.encoding || 'binary';
         if (opts.encoding !== 'utf8' && opts.encoding !== 'binary') {
-          throw new Error(`Invalid encoding type "${opts.encoding}"`);
+          abort(`Invalid encoding type "${opts.encoding}"`);
         }
         var stream = FS.open(path, opts.flags);
         var stat = FS.stat(path);
@@ -3070,7 +3075,7 @@ async function createWasm() {
         if (ArrayBuffer.isView(data)) {
           FS.write(stream, data, 0, data.byteLength, undefined, opts.canOwn);
         } else {
-          throw new Error('Unsupported data type');
+          abort('Unsupported data type');
         }
         FS.close(stream);
       },
@@ -3366,11 +3371,10 @@ async function createWasm() {
   forceLoadFile(obj) {
         if (obj.isDevice || obj.isFolder || obj.link || obj.contents) return true;
         if (typeof XMLHttpRequest != 'undefined') {
-          throw new Error("Lazy loading should have been performed (contents set) in createLazyFile, but it was not. Lazy loading only works in web workers. Use --embed-file or --preload-file in emcc on the main thread.");
+          abort("Lazy loading should have been performed (contents set) in createLazyFile, but it was not. Lazy loading only works in web workers. Use --embed-file or --preload-file in emcc on the main thread.");
         } else { // Command-line.
           try {
             obj.contents = readBinary(obj.url);
-            obj.usedBytes = obj.contents.length;
           } catch (e) {
             throw new FS.ErrnoError(29);
           }
@@ -3398,7 +3402,7 @@ async function createWasm() {
             var xhr = new XMLHttpRequest();
             xhr.open('HEAD', url, false);
             xhr.send(null);
-            if (!(xhr.status >= 200 && xhr.status < 300 || xhr.status === 304)) throw new Error("Couldn't load " + url + ". Status: " + xhr.status);
+            if (!(xhr.status >= 200 && xhr.status < 300 || xhr.status === 304)) abort("Couldn't load " + url + ". Status: " + xhr.status);
             var datalength = Number(xhr.getResponseHeader("Content-length"));
             var header;
             var hasByteServing = (header = xhr.getResponseHeader("Accept-Ranges")) && header === "bytes";
@@ -3410,8 +3414,8 @@ async function createWasm() {
   
             // Function to get a range from the remote URL.
             var doXHR = (from, to) => {
-              if (from > to) throw new Error("invalid range (" + from + ", " + to + ") or no bytes requested!");
-              if (to > datalength-1) throw new Error("only " + datalength + " bytes available! programmer error!");
+              if (from > to) abort("invalid range (" + from + ", " + to + ") or no bytes requested!");
+              if (to > datalength-1) abort("only " + datalength + " bytes available! programmer error!");
   
               // TODO: Use mozResponseArrayBuffer, responseStream, etc. if available.
               var xhr = new XMLHttpRequest();
@@ -3425,7 +3429,7 @@ async function createWasm() {
               }
   
               xhr.send(null);
-              if (!(xhr.status >= 200 && xhr.status < 300 || xhr.status === 304)) throw new Error("Couldn't load " + url + ". Status: " + xhr.status);
+              if (!(xhr.status >= 200 && xhr.status < 300 || xhr.status === 304)) abort("Couldn't load " + url + ". Status: " + xhr.status);
               if (xhr.response !== undefined) {
                 return new Uint8Array(/** @type{Array<number>} */(xhr.response || []));
               }
@@ -3439,7 +3443,7 @@ async function createWasm() {
               if (typeof lazyArray.chunks[chunkNum] == 'undefined') {
                 lazyArray.chunks[chunkNum] = doXHR(start, end);
               }
-              if (typeof lazyArray.chunks[chunkNum] == 'undefined') throw new Error('doXHR failed!');
+              if (typeof lazyArray.chunks[chunkNum] == 'undefined') abort('doXHR failed!');
               return lazyArray.chunks[chunkNum];
             });
   
@@ -3470,7 +3474,7 @@ async function createWasm() {
         }
   
         if (typeof XMLHttpRequest != 'undefined') {
-          if (!ENVIRONMENT_IS_WORKER) throw 'Cannot do synchronous binary XHRs outside webworkers in modern browsers. Use --embed-file or --preload-file in emcc';
+          if (!ENVIRONMENT_IS_WORKER) abort('Cannot do synchronous binary XHRs outside webworkers in modern browsers. Use --embed-file or --preload-file in emcc');
           var lazyArray = new LazyUint8Array();
           var properties = { isDevice: false, contents: lazyArray };
         } else {
@@ -4616,6 +4620,13 @@ if (Module['wasmBinary']) wasmBinary = Module['wasmBinary'];
   assert(typeof Module['wasmMemory'] == 'undefined', 'Use of `wasmMemory` detected.  Use -sIMPORTED_MEMORY to define wasmMemory externally');
   assert(typeof Module['INITIAL_MEMORY'] == 'undefined', 'Detected runtime INITIAL_MEMORY setting.  Use -sIMPORTED_MEMORY to define wasmMemory dynamically');
 
+  if (Module['preInit']) {
+    if (typeof Module['preInit'] == 'function') Module['preInit'] = [Module['preInit']];
+    while (Module['preInit'].length > 0) {
+      Module['preInit'].shift()();
+    }
+  }
+  consumedModuleProp('preInit');
 }
 
 // Begin runtime exports
@@ -4778,8 +4789,6 @@ missingLibrarySymbols.forEach(missingLibrarySymbol)
 
   var unexportedSymbols = [
   'run',
-  'addRunDependency',
-  'removeRunDependency',
   'out',
   'err',
   'callMain',
@@ -4825,6 +4834,8 @@ missingLibrarySymbols.forEach(missingLibrarySymbol)
   'wasmTable',
   'getUniqueRunDependency',
   'noExitRuntime',
+  'addRunDependency',
+  'removeRunDependency',
   'addOnPreRun',
   'addOnPostRun',
   'freeTableIndexes',
@@ -5034,9 +5045,25 @@ unexportedSymbols.forEach(unexportedRuntimeSymbol);
 function checkIncomingModuleAPI() {
   ignoredModuleProp('fetchSettings');
 }
+function cd_test_string(my_string) { try { let myString = UTF8ToString(my_string); console.error(myString + "-end."); return 1; } catch (e) { console.error('CobDOMinate Error:'); console.error('  Test string: ' + e); return -1; } }
+function cd_create_element(variable_name,element_type) { try { let variableName = UTF8ToString(variable_name); let elementType = UTF8ToString(element_type); window[variableName] = document.createElement(elementType); return 1; } catch (e) { console.error('CobDOMinate Error:'); console.error('  Create element: ' + e); return -1; } }
+function cd_append_child(variable_name,parent_name) { try { let variableName = UTF8ToString(variable_name); let parentName = UTF8ToString(parent_name); if (parentName == 'body') { document.body.appendChild(window[variableName]); } else { window[parentName].appendChild(window[variableName]); } return 1; } catch (e) { console.error('CobDOMinate Error:'); console.error('  Append child: ' + e); return -1; } }
+function cd_remove_child(variable_name,parent_name) { try { let variableName = UTF8ToString(variable_name); let parentName = UTF8ToString(parent_name); if (parentName == 'body') { document.body.removeChild(window[variableName]); } else { window[parentName].removeChild(window[variableName]); } return 1; } catch (e) { console.error('CobDOMinate Error:'); console.error('  Remove child: ' + e); return -1; } }
+function cd_inner_html(variable_name,html_content) { try { let variableName = UTF8ToString(variable_name); let htmlContent = UTF8ToString(html_content); window[variableName].innerHTML=htmlContent; return 1; } catch (e) { console.error('CobDOMinate Error:'); console.error('  Inner HTML: ' + e); return -1; } }
+function cd_add_event_listener(variable_name,event_type,cobol_func) { try { let variableName = UTF8ToString(variable_name); let eventType = UTF8ToString(event_type); let cobolFunc = UTF8ToString(cobol_func); let handler = function () { Module.ccall(cobolFunc, null, [], []); }; if (!window._cobHandlers) window._cobHandlers = {}; let handlerKey = variableName + ':' + eventType; window._cobHandlers[handlerKey] = handler; window[variableName].addEventListener(eventType,handler); return 1; } catch (e) { console.error('CobDOMinate Error:'); console.error('  Add event listener: ' + e); return -1; } }
+function cd_remove_event_listener(variable_name,event_type) { try { let variableName = UTF8ToString(variable_name); let eventType = UTF8ToString(event_type); let handlerKey = variableName + ':' + eventType; if (window._cobHandler && window._cobHandler[handlerKey]) { window[variableName].removeEventListener(eventType,window._cobHandler[handlerKey]); delete window._cobHandlers[handlerKey]; return 1; } else { console.error('CobDOMinate Error:'); console.error('  No handler found for remove event listener: ' + e); return -1; } } catch (e) { console.error('CobDOMinate Error:'); console.error('  Remove event listener: ' + e); return -1; } }
+function cd_set_class(variable_name,class_name) { try { let variableName = UTF8ToString(variable_name); let nameClass = UTF8ToString(class_name); window[variableName].className=nameClass; return 1; } catch (e) { console.error('CobDOMinate Error:'); console.error('  Set class: ' + e); return -1; } }
+function cd_style(variable_name,style_key,style_value) { try { let variableName = UTF8ToString(variable_name); let styleKey = UTF8ToString(style_key); let styleValue = UTF8ToString(style_value); window[variableName].style[styleKey]=styleValue; return 1; } catch (e) { console.error('CobDOMinate Error:'); console.error('  Style: ' + e); return -1; } }
+function cd_class_style(class_name,style_key,style_value) { try { let className = UTF8ToString(class_name); let styleKey = UTF8ToString(style_key); let styleValue = UTF8ToString(style_value); document.querySelectorAll('.' + className).forEach(el => { el.style[styleKey] = styleValue; }); return 1; } catch (e) { console.error('CobDOMinate Error:'); console.error('  Style: ' + e); return -1; } }
+function cd_set_cookie(data,cookie_name) { try { let cookieName = UTF8ToString(cookie_name); let content = UTF8ToString(data); document.cookie=cookieName +'='+ content; return 1; } catch (e) { console.error('CobDOMinate Error:'); console.error('  Set cookie: ' + e); return -1; } }
+function cd_get_cookie(data,cookie_name) { try { let cookieName = UTF8ToString(cookie_name); let content = document.cookie.split('; ').find(row => row.startsWith(cookieName + '='))?.split('=')[1] || ''; stringToUTF8(content, data, 1024); return 1; } catch (e) { console.error('CobDOMinate Error:'); console.error('  Get cookie: ' + e); return -1; } }
+function cd_fetch(func,url,method,body) { try { let requestURL = UTF8ToString(url); let cobolFunc = UTF8ToString(func); let methodString = UTF8ToString(method); let bodyString = UTF8ToString(body); let fetchOptions = { method: methodString }; if (methodString === 'POST') { fetchOptions.body = bodyString; } fetch(requestURL, fetchOptions).then(response => { if(!response.ok) { throw new Error(error); } return response.arrayBuffer(); }).then(data => { Module.ccall(cobolFunc, null, ['string','string'], [data.byteLength.toString().padStart(10,'0'),new TextDecoder().decode(data)]); }).catch(error => { throw new Error(error); }); return 1; } catch (e) { console.error('CobDOMinate Error:'); console.error('  Fetch: ' + e); return -1; } }
+function cd_href(variable_name,href) { try { let variableName = UTF8ToString(variable_name); let hrefString = UTF8ToString(href); window[variableName].href=hrefString; return 1; } catch (e) { console.error('CobDOMinate Error:'); console.error('  Href: ' + e); return -1; } }
 
 // Imports from the Wasm binary.
 var _MAIN = Module['_MAIN'] = makeInvalidEarlyAccess('_MAIN');
+var _COOKIEACCEPT = Module['_COOKIEACCEPT'] = makeInvalidEarlyAccess('_COOKIEACCEPT');
+var _COOKIEDENY = Module['_COOKIEDENY'] = makeInvalidEarlyAccess('_COOKIEDENY');
 var _fflush = makeInvalidEarlyAccess('_fflush');
 var _cob_init = Module['_cob_init'] = makeInvalidEarlyAccess('_cob_init');
 var _strerror = makeInvalidEarlyAccess('_strerror');
@@ -5052,6 +5079,8 @@ var _emscripten_stack_get_current = makeInvalidEarlyAccess('_emscripten_stack_ge
 
 function assignWasmExports(wasmExports) {
   Module['_MAIN'] = _MAIN = createExportWrapper('MAIN', 0);
+  Module['_COOKIEACCEPT'] = _COOKIEACCEPT = createExportWrapper('COOKIEACCEPT', 0);
+  Module['_COOKIEDENY'] = _COOKIEDENY = createExportWrapper('COOKIEDENY', 0);
   _fflush = createExportWrapper('fflush', 1);
   Module['_cob_init'] = _cob_init = createExportWrapper('cob_init', 2);
   _strerror = createExportWrapper('strerror', 1);
@@ -5119,6 +5148,24 @@ var wasmImports = {
   /** @export */
   _tzset_js: __tzset_js,
   /** @export */
+  cd_add_event_listener,
+  /** @export */
+  cd_append_child,
+  /** @export */
+  cd_class_style,
+  /** @export */
+  cd_create_element,
+  /** @export */
+  cd_get_cookie,
+  /** @export */
+  cd_inner_html,
+  /** @export */
+  cd_set_class,
+  /** @export */
+  cd_set_cookie,
+  /** @export */
+  cd_style,
+  /** @export */
   clock_time_get: _clock_time_get,
   /** @export */
   emscripten_date_now: _emscripten_date_now,
@@ -5143,8 +5190,6 @@ var wasmImports = {
   /** @export */
   proc_exit: _proc_exit
 };
-var wasmExports;
-createWasm();
 
 
 // include: postamble.js
@@ -5249,17 +5294,12 @@ function checkUnflushedContent() {
   }
 }
 
-function preInit() {
-  if (Module['preInit']) {
-    if (typeof Module['preInit'] == 'function') Module['preInit'] = [Module['preInit']];
-    while (Module['preInit'].length > 0) {
-      Module['preInit'].shift()();
-    }
-  }
-  consumedModuleProp('preInit');
-}
+var wasmExports;
 
-preInit();
+// With async instantation wasmExports is assigned asynchronously when the
+// instance is received.
+createWasm();
+
 run();
 
 // end include: postamble.js

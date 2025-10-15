@@ -13,10 +13,10 @@ $(BUILD_DIR)/web: $(BUILD_DIR)
 	mkdir -p $(BUILD_DIR)/web
 
 $(BUILD_DIR)/main.c: $(BUILD_DIR)
-	cobc -C -o $@ $(SRC_DIR)/main.cob $(COB_EXPORT_FLAGS)
+	cobc -C -o $@ $(SRC_DIR)/main.cob $(COB_EXPORT_FLAGS) -K COOKIEACCEPT -K COOKIEDENY
 
 $(BUILD_DIR)/web/main.js: $(BUILD_DIR)/main.c $(BUILD_DIR)/web
-	emcc -o $@ $< -lgmp -lcob -lcobdom -s EXPORTED_FUNCTIONS=_cob_init,_MAIN -s EXPORTED_RUNTIME_METHODS=ccall,cwrap
+	emcc -o $@ $< -lgmp -lcob -lcobdom -s EXPORTED_FUNCTIONS=_cob_init,_MAIN,_COOKIEACCEPT,_COOKIEDENY -s EXPORTED_RUNTIME_METHODS=ccall,cwrap
 
 clean:
 	rm -rf $(BUILD_DIR)
