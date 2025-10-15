@@ -5053,7 +5053,7 @@ function cd_inner_html(variable_name,html_content) { try { let variableName = UT
 function cd_add_event_listener(variable_name,event_type,cobol_func) { try { let variableName = UTF8ToString(variable_name); let eventType = UTF8ToString(event_type); let cobolFunc = UTF8ToString(cobol_func); let handler = function () { Module.ccall(cobolFunc, null, [], []); }; if (!window._cobHandlers) window._cobHandlers = {}; let handlerKey = variableName + ':' + eventType; window._cobHandlers[handlerKey] = handler; window[variableName].addEventListener(eventType,handler); return 1; } catch (e) { console.error('CobDOMinate Error:'); console.error('  Add event listener: ' + e); return -1; } }
 function cd_remove_event_listener(variable_name,event_type) { try { let variableName = UTF8ToString(variable_name); let eventType = UTF8ToString(event_type); let handlerKey = variableName + ':' + eventType; if (window._cobHandler && window._cobHandler[handlerKey]) { window[variableName].removeEventListener(eventType,window._cobHandler[handlerKey]); delete window._cobHandlers[handlerKey]; return 1; } else { console.error('CobDOMinate Error:'); console.error('  No handler found for remove event listener: ' + e); return -1; } } catch (e) { console.error('CobDOMinate Error:'); console.error('  Remove event listener: ' + e); return -1; } }
 function cd_set_class(variable_name,class_name) { try { let variableName = UTF8ToString(variable_name); let nameClass = UTF8ToString(class_name); window[variableName].className=nameClass; return 1; } catch (e) { console.error('CobDOMinate Error:'); console.error('  Set class: ' + e); return -1; } }
-function cd_style(variable_name,style_key,style_value) { try { let variableName = UTF8ToString(variable_name); let styleKey = UTF8ToString(style_key); let styleValue = UTF8ToString(style_value); window[variableName].style[styleKey]=styleValue; return 1; } catch (e) { console.error('CobDOMinate Error:'); console.error('  Style: ' + e); return -1; } }
+function cd_style(variable_name,style_key,style_value) { try { let variableName = UTF8ToString(variable_name); let styleKey = UTF8ToString(style_key); let styleValue = UTF8ToString(style_value); if (variableName == 'body') { document.body.style[styleKey]=styleValue; } else { window[variableName].style[styleKey]=styleValue; } return 1; } catch (e) { console.error('CobDOMinate Error:'); console.error('  Style: ' + e); return -1; } }
 function cd_class_style(class_name,style_key,style_value) { try { let className = UTF8ToString(class_name); let styleKey = UTF8ToString(style_key); let styleValue = UTF8ToString(style_value); document.querySelectorAll('.' + className).forEach(el => { el.style[styleKey] = styleValue; }); return 1; } catch (e) { console.error('CobDOMinate Error:'); console.error('  Style: ' + e); return -1; } }
 function cd_set_cookie(data,cookie_name) { try { let cookieName = UTF8ToString(cookie_name); let content = UTF8ToString(data); document.cookie=cookieName +'='+ content; return 1; } catch (e) { console.error('CobDOMinate Error:'); console.error('  Set cookie: ' + e); return -1; } }
 function cd_get_cookie(data,cookie_name) { try { let cookieName = UTF8ToString(cookie_name); let content = document.cookie.split('; ').find(row => row.startsWith(cookieName + '='))?.split('=')[1] || ''; stringToUTF8(content, data, 1024); return 1; } catch (e) { console.error('CobDOMinate Error:'); console.error('  Get cookie: ' + e); return -1; } }
@@ -5064,6 +5064,7 @@ function cd_href(variable_name,href) { try { let variableName = UTF8ToString(var
 var _MAIN = Module['_MAIN'] = makeInvalidEarlyAccess('_MAIN');
 var _COOKIEACCEPT = Module['_COOKIEACCEPT'] = makeInvalidEarlyAccess('_COOKIEACCEPT');
 var _COOKIEDENY = Module['_COOKIEDENY'] = makeInvalidEarlyAccess('_COOKIEDENY');
+var _SETPERCENTCOBOL = Module['_SETPERCENTCOBOL'] = makeInvalidEarlyAccess('_SETPERCENTCOBOL');
 var _fflush = makeInvalidEarlyAccess('_fflush');
 var _cob_init = Module['_cob_init'] = makeInvalidEarlyAccess('_cob_init');
 var _strerror = makeInvalidEarlyAccess('_strerror');
@@ -5081,6 +5082,7 @@ function assignWasmExports(wasmExports) {
   Module['_MAIN'] = _MAIN = createExportWrapper('MAIN', 0);
   Module['_COOKIEACCEPT'] = _COOKIEACCEPT = createExportWrapper('COOKIEACCEPT', 0);
   Module['_COOKIEDENY'] = _COOKIEDENY = createExportWrapper('COOKIEDENY', 0);
+  Module['_SETPERCENTCOBOL'] = _SETPERCENTCOBOL = createExportWrapper('SETPERCENTCOBOL', 2);
   _fflush = createExportWrapper('fflush', 1);
   Module['_cob_init'] = _cob_init = createExportWrapper('cob_init', 2);
   _strerror = createExportWrapper('strerror', 1);
@@ -5155,6 +5157,8 @@ var wasmImports = {
   cd_class_style,
   /** @export */
   cd_create_element,
+  /** @export */
+  cd_fetch,
   /** @export */
   cd_get_cookie,
   /** @export */
