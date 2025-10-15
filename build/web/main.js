@@ -240,9 +240,6 @@ function assert(condition, text) {
 
 // We used to include malloc/free by default in the past. Show a helpful error in
 // builds with assertions.
-function _malloc() {
-  abort('malloc() called but not included in the build - add `_malloc` to EXPORTED_FUNCTIONS');
-}
 function _free() {
   // Show a helpful error since we used to include free by default in the past.
   abort('free() called but not included in the build - add `_free` to EXPORTED_FUNCTIONS');
@@ -456,7 +453,7 @@ var runtimeInitialized = false;
 
 function updateMemoryViews() {
   var b = wasmMemory.buffer;
-  HEAP8 = new Int8Array(b);
+  Module['HEAP8'] = HEAP8 = new Int8Array(b);
   HEAP16 = new Int16Array(b);
   HEAPU8 = new Uint8Array(b);
   HEAPU16 = new Uint16Array(b);
@@ -4797,7 +4794,6 @@ missingLibrarySymbols.forEach(missingLibrarySymbol)
   'wasmExports',
   'HEAPF32',
   'HEAPF64',
-  'HEAP8',
   'HEAPU8',
   'HEAP16',
   'HEAPU16',
@@ -5057,14 +5053,16 @@ function cd_style(variable_name,style_key,style_value) { try { let variableName 
 function cd_class_style(class_name,style_key,style_value) { try { let className = UTF8ToString(class_name); let styleKey = UTF8ToString(style_key); let styleValue = UTF8ToString(style_value); document.querySelectorAll('.' + className).forEach(el => { el.style[styleKey] = styleValue; }); return 1; } catch (e) { console.error('CobDOMinate Error:'); console.error('  Style: ' + e); return -1; } }
 function cd_set_cookie(data,cookie_name) { try { let cookieName = UTF8ToString(cookie_name); let content = UTF8ToString(data); document.cookie=cookieName +'='+ content; return 1; } catch (e) { console.error('CobDOMinate Error:'); console.error('  Set cookie: ' + e); return -1; } }
 function cd_get_cookie(data,cookie_name) { try { let cookieName = UTF8ToString(cookie_name); let content = document.cookie.split('; ').find(row => row.startsWith(cookieName + '='))?.split('=')[1] || ''; stringToUTF8(content, data, 1024); return 1; } catch (e) { console.error('CobDOMinate Error:'); console.error('  Get cookie: ' + e); return -1; } }
-function cd_fetch(func,url,method,body) { try { let requestURL = UTF8ToString(url); let cobolFunc = UTF8ToString(func); let methodString = UTF8ToString(method); let bodyString = UTF8ToString(body); let fetchOptions = { method: methodString }; if (methodString === 'POST') { fetchOptions.body = bodyString; } fetch(requestURL, fetchOptions).then(response => { if(!response.ok) { throw new Error(error); } return response.arrayBuffer(); }).then(data => { Module.ccall(cobolFunc, null, ['string','string'], [data.byteLength.toString().padStart(10,'0'),new TextDecoder().decode(data)]); }).catch(error => { throw new Error(error); }); return 1; } catch (e) { console.error('CobDOMinate Error:'); console.error('  Fetch: ' + e); return -1; } }
+function cd_fetch(func,url,method,body) { try { let requestURL = UTF8ToString(url); let cobolFunc = UTF8ToString(func); let methodString = UTF8ToString(method); let bodyString = UTF8ToString(body); let fetchOptions = { method: methodString }; if (methodString === 'POST') { fetchOptions.body = bodyString; } fetch(requestURL, fetchOptions).then(response => { if(!response.ok) { throw new Error(error); } return response.arrayBuffer(); }).then(data => { let len = data.byteLength; let ptr = _malloc(len); if (ptr === 0) throw new Error("  Fetch: Malloc failed"); let heapBytes = new Uint8Array(Module.HEAP8.buffer, ptr, len); heapBytes.set(new Uint8Array(data)); Module.ccall(cobolFunc, null, ['string','number'], [len.toString().padStart(10,'0'),ptr]); }).catch(error => { throw new Error(error); }); return 1; } catch (e) { console.error('CobDOMinate Error:'); console.error('  Fetch: ' + e); return -1; } }
 function cd_href(variable_name,href) { try { let variableName = UTF8ToString(variable_name); let hrefString = UTF8ToString(href); window[variableName].href=hrefString; return 1; } catch (e) { console.error('CobDOMinate Error:'); console.error('  Href: ' + e); return -1; } }
+function cd_src(variable_name,src) { try { let variableName = UTF8ToString(variable_name); let srcString = UTF8ToString(src); window[variableName].src=srcString; return 1; } catch (e) { console.error('CobDOMinate Error:'); console.error('  SRC: ' + e); return -1; } }
 
 // Imports from the Wasm binary.
 var _MAIN = Module['_MAIN'] = makeInvalidEarlyAccess('_MAIN');
 var _COOKIEACCEPT = Module['_COOKIEACCEPT'] = makeInvalidEarlyAccess('_COOKIEACCEPT');
 var _COOKIEDENY = Module['_COOKIEDENY'] = makeInvalidEarlyAccess('_COOKIEDENY');
 var _SETPERCENTCOBOL = Module['_SETPERCENTCOBOL'] = makeInvalidEarlyAccess('_SETPERCENTCOBOL');
+var _malloc = Module['_malloc'] = makeInvalidEarlyAccess('_malloc');
 var _fflush = makeInvalidEarlyAccess('_fflush');
 var _cob_init = Module['_cob_init'] = makeInvalidEarlyAccess('_cob_init');
 var _strerror = makeInvalidEarlyAccess('_strerror');
@@ -5083,6 +5081,7 @@ function assignWasmExports(wasmExports) {
   Module['_COOKIEACCEPT'] = _COOKIEACCEPT = createExportWrapper('COOKIEACCEPT', 0);
   Module['_COOKIEDENY'] = _COOKIEDENY = createExportWrapper('COOKIEDENY', 0);
   Module['_SETPERCENTCOBOL'] = _SETPERCENTCOBOL = createExportWrapper('SETPERCENTCOBOL', 2);
+  Module['_malloc'] = _malloc = createExportWrapper('malloc', 1);
   _fflush = createExportWrapper('fflush', 1);
   Module['_cob_init'] = _cob_init = createExportWrapper('cob_init', 2);
   _strerror = createExportWrapper('strerror', 1);
@@ -5167,6 +5166,8 @@ var wasmImports = {
   cd_set_class,
   /** @export */
   cd_set_cookie,
+  /** @export */
+  cd_src,
   /** @export */
   cd_style,
   /** @export */
