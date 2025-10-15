@@ -5058,10 +5058,13 @@ function cd_href(variable_name,href) { try { let variableName = UTF8ToString(var
 function cd_src(variable_name,src) { try { let variableName = UTF8ToString(variable_name); let srcString = UTF8ToString(src); window[variableName].src=srcString; return 1; } catch (e) { console.error('CobDOMinate Error:'); console.error('  SRC: ' + e); return -1; } }
 
 // Imports from the Wasm binary.
+var _SETLANG = Module['_SETLANG'] = makeInvalidEarlyAccess('_SETLANG');
 var _MAIN = Module['_MAIN'] = makeInvalidEarlyAccess('_MAIN');
 var _COOKIEACCEPT = Module['_COOKIEACCEPT'] = makeInvalidEarlyAccess('_COOKIEACCEPT');
 var _COOKIEDENY = Module['_COOKIEDENY'] = makeInvalidEarlyAccess('_COOKIEDENY');
 var _SETPERCENTCOBOL = Module['_SETPERCENTCOBOL'] = makeInvalidEarlyAccess('_SETPERCENTCOBOL');
+var _SETLANGUS = Module['_SETLANGUS'] = makeInvalidEarlyAccess('_SETLANGUS');
+var _SETLANGES = Module['_SETLANGES'] = makeInvalidEarlyAccess('_SETLANGES');
 var _malloc = Module['_malloc'] = makeInvalidEarlyAccess('_malloc');
 var _fflush = makeInvalidEarlyAccess('_fflush');
 var _cob_init = Module['_cob_init'] = makeInvalidEarlyAccess('_cob_init');
@@ -5077,10 +5080,13 @@ var __emscripten_stack_alloc = makeInvalidEarlyAccess('__emscripten_stack_alloc'
 var _emscripten_stack_get_current = makeInvalidEarlyAccess('_emscripten_stack_get_current');
 
 function assignWasmExports(wasmExports) {
+  Module['_SETLANG'] = _SETLANG = createExportWrapper('SETLANG', 1);
   Module['_MAIN'] = _MAIN = createExportWrapper('MAIN', 0);
   Module['_COOKIEACCEPT'] = _COOKIEACCEPT = createExportWrapper('COOKIEACCEPT', 0);
   Module['_COOKIEDENY'] = _COOKIEDENY = createExportWrapper('COOKIEDENY', 0);
   Module['_SETPERCENTCOBOL'] = _SETPERCENTCOBOL = createExportWrapper('SETPERCENTCOBOL', 2);
+  Module['_SETLANGUS'] = _SETLANGUS = createExportWrapper('SETLANGUS', 0);
+  Module['_SETLANGES'] = _SETLANGES = createExportWrapper('SETLANGES', 0);
   Module['_malloc'] = _malloc = createExportWrapper('malloc', 1);
   _fflush = createExportWrapper('fflush', 1);
   Module['_cob_init'] = _cob_init = createExportWrapper('cob_init', 2);
