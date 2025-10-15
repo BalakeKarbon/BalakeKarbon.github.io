@@ -36,13 +36,13 @@
 003600   CALL 'cobdom_fetch' USING 'SETPERCENTCOBOL',
 003700     '/res/percent.txt', 'GET', WS-NULL-BYTE, RETURNING WS-RETURN.
 003800   PERFORM BUILD-MENUBAR.
-003900   CALL 'cobdom_style' USING 'body', 'fontSize', '3rem'
+003900   CALL 'cobdom_style' USING 'body', 'fontSize', '4rem'
 004000     RETURNING WS-RETURN.
 004100   CALL 'cobdom_create_element' USING 'contentDiv', 'div'
 004200     RETURNING WS-RETURN.
-004300   CALL 'cobdom_style' USING 'contentDiv', 'paddingTop', '3rem'
+004300   CALL 'cobdom_style' USING 'contentDiv', 'paddingTop', '4rem'
 004400     RETURNING WS-RETURN.
-004600*  CALL 'cobdom_append_child' USING 'percentCobol', 'contentDiv'
+004500*  CALL 'cobdom_append_child' USING 'percentCobol', 'contentDiv'
 004600*    RETURNING WS-RETURN.
 004700   CALL 'cobdom_append_child' USING 'contentDiv', 'body'
 004800     RETURNING WS-RETURN.
@@ -144,5 +144,6 @@
 014400   MOVE LS-BLOB(1:LS-BLOB-SIZE) TO WS-PERCENT-COBOL.
 014500   CALL 'cobdom_inner_html' USING 'percentCobol', WS-PERCENT-COBOL
 014600     RETURNING WS-RETURN.
-014700   DISPLAY WS-PERCENT-COBOL '% COBOL code.'.
-014800   GOBACK.
+014700   DISPLAY 'Currently this website is written in ' 
+014800     WS-PERCENT-COBOL '% COBOL.'.
+014900   GOBACK.
