@@ -9,255 +9,281 @@
 000900 DATA DIVISION.
 001000 FILE SECTION.
 001100 WORKING-STORAGE SECTION.
-001200 01 WS-NULL-BYTE PIC X(1) VALUE X'00'.
-001300 01 WS-RETURN PIC S9.
-001400 01 WS-COOKIE-ALLOWED PIC X.
-001500 01 WS-LANG PIC XX.
-001600 01 WS-COPYRIGHT.
-001700   05 SYM PIC X(2) VALUE X"C2A9".
-001800   05 TXT VALUE ' Blake Karbon. All rights reserved.'.
-001900 01 WS-PERCENT-COBOL PIC X(5).
-002000 01 WS-SVG-US PIC X(650).
-002100 01 WS-SVG-ES PIC X(82149).
-002200 01 WS-LANG-SELECT-TOGGLE PIC 9 VALUE 0.
-002300 LINKAGE SECTION.
-002400 01 LS-BLOB PIC X(100000).
-002500 01 LS-BLOB-SIZE PIC 9(10).
-002600 01 LS-LANG-CHOICE PIC XX.
-002700 PROCEDURE DIVISION.
-002800 EXAMPLE SECTION.
-002900 ENTRY 'MAIN'.
-003000   PERFORM BUILD-MENUBAR.
-003100   CALL 'cobdom_get_cookie' USING BY REFERENCE WS-COOKIE-ALLOWED,
-003200     'allowCookies' RETURNING WS-RETURN.
-003300   IF WS-COOKIE-ALLOWED = 'y' THEN
-003400     PERFORM LANG-CHECK
-003500   ELSE
-003600     PERFORM COOKIE-ASK
-003700     MOVE 'us' TO WS-LANG
-003800     PERFORM SET-ACTIVE-FLAG
-003900   END-IF.
-004000   CALL 'cobdom_create_element' USING 'percentCobol', 'span'
-004100     RETURNING WS-RETURN.
-004200   CALL 'cobdom_fetch' USING 'SETPERCENTCOBOL',
-004300     '/res/percent.txt', 'GET', WS-NULL-BYTE RETURNING WS-RETURN.
-004400   CALL 'cobdom_style' USING 'body', 'fontSize', '4rem'
-004500     RETURNING WS-RETURN.
-004600   CALL 'cobdom_create_element' USING 'contentDiv', 'div'
-004700     RETURNING WS-RETURN.
-004800   CALL 'cobdom_style' USING 'contentDiv', 'paddingTop', '4rem'
-004900     RETURNING WS-RETURN.
-005000*  CALL 'cobdom_append_child' USING 'percentCobol', 'contentDiv'
-005100*    RETURNING WS-RETURN.
-005200   CALL 'cobdom_append_child' USING 'contentDiv', 'body'
-005300     RETURNING WS-RETURN.
-005400   CALL 'cobdom_create_element' USING 'copyrightDiv', 'div'
-005500     RETURNING WS-RETURN.
-005600   CALL 'cobdom_inner_html' USING 'copyrightDiv', WS-COPYRIGHT
-005700     RETURNING WS-RETURN.
-005800   CALL 'cobdom_append_child' USING 'copyrightDiv', 'body'
+001200 01 WS-BLOB PIC X(100000).
+001300 01 WS-BLOB-SIZE PIC 9(10).
+001400 01 WS-NULL-BYTE PIC X(1) VALUE X'00'.
+001500 01 WS-RETURN PIC S9.
+001600 01 WS-COOKIE-ALLOWED PIC X.
+001700 01 WS-LANG PIC XX.
+001800 01 WS-COPYRIGHT.
+001900   05 SYM PIC X(2) VALUE X"C2A9".
+002000   05 TXT VALUE ' Blake Karbon. All rights reserved.'.
+002100 01 WS-PERCENT-COBOL PIC X(5).
+002200 01 WS-SVG-US PIC X(650).
+002300 01 WS-SVG-ES PIC X(82149).
+002400 01 WS-LANG-SELECT-TOGGLE PIC 9 VALUE 0.
+002500 01 WS-WINDOW-HEIGHT PIC 9(10).
+002600 01 WS-WINDOW-WIDTH PIC 9(10).
+002700 01 WS-TERM-AREA.
+002800   05 WIDTH PIC -(9)9.
+002900   05 PX PIC XX VALUE 'px'.
+003000   05 NB PIC X(1) VALUE X'00'.
+003100   05 HEIGHT PIC -(9)9.
+003200   05 PX PIC XX VALUE 'px'.
+003300   05 NB PIC X(1) VALUE X'00'.
+003400   05 RATIO PIC 9V999 VALUE 0.625.
+003500   05 RATIO-INV PIC 9V999 VALUE 1.600.
+003600*40 by 25
+003700 LINKAGE SECTION.
+003800 01 LS-BLOB PIC X(100000).
+003900 01 LS-BLOB-SIZE PIC 9(10).
+004000 01 LS-LANG-CHOICE PIC XX.
+004100 PROCEDURE DIVISION.
+004200 EXAMPLE SECTION.
+004300 ENTRY 'MAIN'.
+004400   PERFORM SETUP-TERMINAL.
+004500   CALL 'cobdom_add_event_listener' USING 'window', 'resize', 
+004600     'WINDOWCHANGE' RETURNING WS-RETURN.
+004700   CALL 'cobdom_add_event_listener' USING 'window', 
+004800     'orientationchange', 'WINDOWCHANGE' RETURNING WS-RETURN.
+004900   CALL 'cobdom_get_cookie' USING BY REFERENCE WS-COOKIE-ALLOWED,
+005000     'allowCookies' RETURNING WS-RETURN.
+005100   IF WS-COOKIE-ALLOWED = 'y' THEN
+005200     PERFORM LANG-CHECK
+005300   ELSE
+005400     PERFORM COOKIE-ASK
+005500     MOVE 'us' TO WS-LANG
+005600     PERFORM SET-ACTIVE-FLAG
+005700   END-IF.
+005800   CALL 'cobdom_create_element' USING 'percentCobol', 'span'
 005900     RETURNING WS-RETURN.
-006000 GOBACK.
-006100 SET-ACTIVE-FLAG.
-006300   IF WS-LANG = 'us' THEN
-006300     CALL 'cobdom_style' USING 'langES', 'display', 'none'
-006400       RETURNING WS-RETURN
-006500   ELSE
-006600     CALL 'cobdom_style' USING 'langUS', 'display', 'none'
-006700       RETURNING WS-RETURN
-006800   END-IF.
-006900   CONTINUE.
-007000 BUILD-MENUBAR.
-007100   CALL 'cobdom_create_element' USING 'menuDiv', 'div'
+006000   CALL 'cobdom_fetch' USING 'SETPERCENTCOBOL',
+006100     '/res/percent.txt', 'GET', WS-NULL-BYTE RETURNING WS-RETURN.
+006200*  CALL 'cobdom_style' USING 'body', 'fontSize', '4rem'
+006300*    RETURNING WS-RETURN.
+006400   CALL 'WINDOWCHANGE'.
+006500   GOBACK.
+006600 SETUP-TERMINAL.
+006700   CALL 'cobdom_create_element' USING 'termArea', 'div'
+006800     RETURNING WS-RETURN.
+006900   CALL 'cobdom_style' USING 'termArea', 'backgroundColor',
+007000     '#00ff00' RETURNING WS-RETURN.
+007100   CALL 'cobdom_style' USING 'termArea', 'position', 'fixed'
 007200     RETURNING WS-RETURN.
-007300   CALL 'cobdom_style' USING 'menuDiv', 'position', 'fixed'
+007300   CALL 'cobdom_style' USING 'termArea', 'bottom', '0'
 007400     RETURNING WS-RETURN.
-007500   CALL 'cobdom_style' USING 'menuDiv', 'display', 'flex'
+007500   CALL 'cobdom_style' USING 'termArea', 'right', '0'
 007600     RETURNING WS-RETURN.
-007700   CALL 'cobdom_style' USING 'menuDiv', 'justifyContent', 
-007800     'space-between' RETURNING WS-RETURN.
-007900   CALL 'cobdom_style' USING 'menuDiv', 'top', '0'
+007700   CALL 'cobdom_style' USING 'termArea', 'overflow', 'scroll'
+007800     RETURNING WS-RETURN.
+007900   CALL 'cobdom_append_child' USING 'termArea', 'body'
 008000     RETURNING WS-RETURN.
-008100   CALL 'cobdom_style' USING 'menuDiv', 'left', '0'
-008200     RETURNING WS-RETURN.
-008300   CALL 'cobdom_style' USING 'menuDiv', 'width', '100%'
-008400     RETURNING WS-RETURN.
-008500   CALL 'cobdom_style' USING 'menuDiv', 'backgroundColor',
-008600     '#919191' RETURNING WS-RETURN.
-008700   CALL 'cobdom_inner_html' USING 'menuDiv', 'Menu'
-008800     RETURNING WS-RETURN.
-008900   CALL 'cobdom_append_child' USING 'menuDiv', 'body'
-009000     RETURNING WS-RETURN.
-009100*Setup language selector
-009200   CALL 'cobdom_create_element' USING 'langSelector', 'span'
-009300     RETURNING WS-RETURN.
-009400   CALL 'cobdom_style' USING 'langSelector', 'marginLeft', 'auto'
-009500     RETURNING WS-RETURN.
-009600   CALL 'cobdom_create_element' USING 'langUS', 'img'
-009700     RETURNING WS-RETURN.
-009800   CALL 'cobdom_create_element' USING 'langES', 'img'
-009900     RETURNING WS-RETURN.
-010000   CALL 'cobdom_src' USING 'langUS', '/res/icons/us.svg'
-010100     RETURNING WS-RETURN.
-010200   CALL 'cobdom_style' USING 'langUS', 'width', '3rem'
-010300     RETURNING WS-RETURN.
-010400   CALL 'cobdom_style' USING 'langUS', 'height', '3rem'
-010500     RETURNING WS-RETURN. 
-010600   CALL 'cobdom_src' USING 'langES', '/res/icons/es.svg'
-010700     RETURNING WS-RETURN.
-010800   CALL 'cobdom_style' USING 'langES', 'width', '3rem'
-010900     RETURNING WS-RETURN.
-011000   CALL 'cobdom_style' USING 'langES', 'height', '3rem'
-011100     RETURNING WS-RETURN. 
-011200*  CALL 'cobdom_fetch' USING 'LOADSVGUS',
-011300*    '/res/icons/us.svg', 'GET', WS-NULL-BYTE
-011400*     RETURNING WS-RETURN.
-011500*  CALL 'cobdom_fetch' USING 'LOADSVGES',
-011600*    '/res/icons/es.svg', 'GET', WS-NULL-BYTE
-011700*    RETURNING WS-RETURN.
-011800   CALL 'cobdom_append_child' USING 'langUS', 'langSelector'
-011900     RETURNING WS-RETURN.
-012000   CALL 'cobdom_add_event_listener' USING 'langUS', 'click', 
-012100     'SETLANGUS' RETURNING WS-RETURN.
-012200   CALL 'cobdom_append_child' USING 'langES', 'langSelector'
-012300     RETURNING WS-RETURN.
-012400   CALL 'cobdom_add_event_listener' USING 'langES', 'click', 
-012500     'SETLANGES' RETURNING WS-RETURN.
-012600   CALL 'cobdom_append_child' USING 'langSelector', 'menuDiv'
-012700     RETURNING WS-RETURN.
-012800   CONTINUE.
-012900 LANG-CHECK.
-013000   CALL 'cobdom_get_cookie' USING BY REFERENCE WS-LANG,
-013100     'lang' RETURNING WS-RETURN.
-013200   IF WS-LANG = WS-NULL-BYTE THEN
-013300     CALL 'cobdom_set_cookie' USING 'us', 'lang'
-013400       RETURNING WS-RETURN
-013500     MOVE 'us' TO WS-LANG
-013600   END-IF.
-013700   PERFORM SET-ACTIVE-FLAG.
-013800   CONTINUE.
-013900 COOKIE-ASK.
-014000   CALL 'cobdom_create_element' USING 'cookieDiv', 'div'
-014100     RETURNING WS-RETURN.
-014200   CALL 'cobdom_style' USING 'cookieDiv', 'position', 'fixed'
-014300     RETURNING WS-RETURN.
-014400   CALL 'cobdom_style' USING 'cookieDiv', 'bottom', '0'
-014500     RETURNING WS-RETURN.
-014600   CALL 'cobdom_style' USING 'cookieDiv', 'left', '0'
-014700     RETURNING WS-RETURN.
-014800   CALL 'cobdom_style' USING 'cookieDiv', 'width', '100%'
-014900     RETURNING WS-RETURN.
-015000   CALL 'cobdom_style' USING 'cookieDiv', 'backgroundColor', 
-015100     '#00ff00' RETURNING WS-RETURN.
-015200   CALL 'cobdom_style' USING 'cookieDiv', 'textAlign', 
-015300     'center' RETURNING WS-RETURN.
-015400   CALL 'cobdom_inner_html' USING 'cookieDiv','Would you like to a
-015500-'llow cookies to store your preferences such as language?&nbsp;'
-015600     RETURNING WS-RETURN.
-015700   CALL 'cobdom_create_element' USING 'cookieYes', 'span'
-015800     RETURNING WS-RETURN.
-015900   CALL 'cobdom_set_class' USING 'cookieYes', 'cookieButton'
-016000     RETURNING WS-RETURN.
-016100   CALL 'cobdom_inner_html' USING 'cookieYes', 'Yes&nbsp;'
-016200     RETURNING WS-RETURN.
-016300   CALL 'cobdom_create_element' USING 'cookieNo', 'span'
-016400     RETURNING WS-RETURN.
-016500   CALL 'cobdom_set_class' USING 'cookieNo', 'cookieButton'
-016600     RETURNING WS-RETURN.
-016700   CALL 'cobdom_inner_html' USING 'cookieNo', 'No'
-016800     RETURNING WS-RETURN.
-016900   CALL 'cobdom_add_event_listener' USING 'cookieYes', 'click',
-017000     'COOKIEACCEPT' RETURNING WS-RETURN.
-017100   CALL 'cobdom_add_event_listener' USING 'cookieNo', 'click',
-017200     'COOKIEDENY' RETURNING WS-RETURN.
-017300   CALL 'cobdom_append_child' USING 'cookieYes', 'cookieDiv'
-017400     RETURNING WS-RETURN.
-017500   CALL 'cobdom_append_child' USING 'cookieNo', 'cookieDiv'
-017600     RETURNING WS-RETURN.
-017700   CALL 'cobdom_append_child' USING 'cookieDiv', 'body'
-017800     RETURNING WS-RETURN.
-017900*Note this must be called after the elements are added to the
-018000*document because it must search for them.
-018100   CALL 'cobdom_class_style' USING 'cookieButton', 
-018200     'backgroundColor', '#ff0000' RETURNING WS-RETURN.
-018300   CONTINUE.
-018400 COOKIEACCEPT SECTION.
-018500 ENTRY 'COOKIEACCEPT'.
-018600   CALL 'cobdom_style' USING 'cookieDiv', 'display', 'none'
-018700     RETURNING WS-RETURN.
-018800   CALL 'cobdom_set_cookie' USING 'y', 'allowCookies' 
-018900     RETURNING WS-RETURN.
-019000   MOVE 'y' TO WS-COOKIE-ALLOWED.
-019100   GOBACK.
-019200 COOKIEDENY SECTION.
-019300 ENTRY 'COOKIEDENY'.
-019400   CALL 'cobdom_style' USING 'cookieDiv', 'display', 'none'
-019500     RETURNING WS-RETURN.
-019600   MOVE 'n' TO WS-COOKIE-ALLOWED.
-019700   GOBACK.
-019800 SETPERCENTCOBOL SECTION.
-019900 ENTRY 'SETPERCENTCOBOL' USING BY REFERENCE LS-BLOB-SIZE,LS-BLOB.
-020000   MOVE LS-BLOB(1:LS-BLOB-SIZE) TO WS-PERCENT-COBOL.
-020100   CALL 'cobdom_inner_html' USING 'percentCobol', WS-PERCENT-COBOL
-020200     RETURNING WS-RETURN.
-020300   DISPLAY 'Currently this website is written in ' 
-020400     WS-PERCENT-COBOL '% COBOL.'.
-020500   GOBACK.
-020600 SETLANG SECTION.
-020700 ENTRY 'SETLANG' USING LS-LANG-CHOICE.
-020800   if WS-LANG-SELECT-TOGGLE = 0 THEN
-020900     MOVE 1 TO WS-LANG-SELECT-TOGGLE
-021000     IF WS-LANG = 'us' THEN
-021100       CALL 'cobdom_style' USING 'langES', 'display', 'inline'
-021200         RETURNING WS-RETURN
-021300     ELSE
-021400       CALL 'cobdom_style' USING 'langUS', 'display', 'inline'
-021500         RETURNING WS-RETURN
-021600     END-IF
-021700   ELSE
-021800     MOVE 0 TO WS-LANG-SELECT-TOGGLE
-021900     IF WS-COOKIE-ALLOWED = 'y' THEN
-022000       IF LS-LANG-CHOICE = 'us' THEN
-022100         CALL 'cobdom_set_cookie' USING 'us', 'lang'
-022200           RETURNING WS-RETURN
-022300         MOVE 'us' TO WS-LANG
-022400       ELSE
-022500         CALL 'cobdom_set_cookie' USING 'es', 'lang'
-022600           RETURNING WS-RETURN
-022700         MOVE 'es' TO WS-LANG
-022800       END-IF
-022900       PERFORM SET-ACTIVE-FLAG
-023000     ELSE
-023100       MOVE LS-LANG-CHOICE TO WS-LANG
-023200       PERFORM SET-ACTIVE-FLAG 
-023300     END-IF
-023400   END-IF.
-023500   GOBACK.
-023600 SETLANGUS SECTION.
-023700 ENTRY 'SETLANGUS'.
-023800   CALL 'SETLANG' USING 'us'.
-023900   GOBACK.
-024000 SETLANGES SECTION.
-024100 ENTRY 'SETLANGES'.
-024200   CALL 'SETLANG' USING 'es'.
-024300   GOBACK.
-024400*LOADSVGUS SECTION.
-024500*ENTRY 'LOADSVGUS' USING BY REFERENCE LS-BLOB-SIZE,LS-BLOB.
-024600*  MOVE LS-BLOB(1:LS-BLOB-SIZE) TO WS-SVG-US.
-024700*  CALL 'cobdom_inner_html' USING 'langUS', WS-SVG-US
-024800*    RETURNING WS-RETURN.
-024900*  CALL 'cobdom_style' USING 'langUS', 'width', '20px'
-025000*    RETURNING WS-RETURN.
-025100*  CALL 'cobdom_style' USING 'langUS', 'height', '20px'
-025200*    RETURNING WS-RETURN.
-025300*  GOBACK.
-025400*LOADSVGES SECTION.
-025500*ENTRY 'LOADSVGES' USING BY REFERENCE LS-BLOB-SIZE,LS-BLOB.
-025600*  MOVE LS-BLOB(1:LS-BLOB-SIZE) TO WS-SVG-ES.
-025700*  CALL 'cobdom_inner_html' USING 'langES', WS-SVG-ES
-025800*    RETURNING WS-RETURN.
-025900*  CALL 'cobdom_style' USING 'langES', 'width', '20px'
-026000*    RETURNING WS-RETURN.
-026100*  CALL 'cobdom_style' USING 'langES', 'height', '20px'
-026200*    RETURNING WS-RETURN. 
-026300*  GOBACK.
+008100   CONTINUE.
+008200 SET-ACTIVE-FLAG.
+008300   IF WS-LANG = 'us' THEN
+008400     DISPLAY 'us'
+008500*    CALL 'cobdom_style' USING 'langES', 'display', 'none'
+008600*      RETURNING WS-RETURN
+008700   ELSE
+008800     DISPLAY 'es'
+008900*    CALL 'cobdom_style' USING 'langUS', 'display', 'none'
+009000*      RETURNING WS-RETURN
+009100   END-IF.
+009200   CONTINUE.
+009300*Setup language selector
+009400*  CALL 'cobdom_create_element' USING 'langSelector', 'span'
+009500*    RETURNING WS-RETURN.
+009600*  CALL 'cobdom_style' USING 'langSelector', 'marginLeft', 'auto'
+009700*    RETURNING WS-RETURN.
+009800*  CALL 'cobdom_create_element' USING 'langUS', 'img'
+009900*    RETURNING WS-RETURN.
+010000*  CALL 'cobdom_create_element' USING 'langES', 'img'
+010100*    RETURNING WS-RETURN.
+010200*  CALL 'cobdom_src' USING 'langUS', '/res/icons/us.svg'
+010300*    RETURNING WS-RETURN.
+010400*  CALL 'cobdom_style' USING 'langUS', 'width', '3rem'
+010500*    RETURNING WS-RETURN.
+010600*  CALL 'cobdom_style' USING 'langUS', 'height', '3rem'
+010700*    RETURNING WS-RETURN. 
+010800*  CALL 'cobdom_src' USING 'langES', '/res/icons/es.svg'
+010900*    RETURNING WS-RETURN.
+011000*  CALL 'cobdom_style' USING 'langES', 'width', '3rem'
+011100*    RETURNING WS-RETURN.
+011200*  CALL 'cobdom_style' USING 'langES', 'height', '3rem'
+011300*    RETURNING WS-RETURN. 
+011400*  CALL 'cobdom_append_child' USING 'langUS', 'langSelector'
+011500*    RETURNING WS-RETURN.
+011600*  CALL 'cobdom_add_event_listener' USING 'langUS', 'click', 
+011700*    'SETLANGUS' RETURNING WS-RETURN.
+011800*  CALL 'cobdom_append_child' USING 'langES', 'langSelector'
+011900*    RETURNING WS-RETURN.
+012000*  CALL 'cobdom_add_event_listener' USING 'langES', 'click', 
+012100*    'SETLANGES' RETURNING WS-RETURN.
+012200*  CALL 'cobdom_append_child' USING 'langSelector', 'menuDiv'
+012300*    RETURNING WS-RETURN.
+012400 LANG-CHECK.
+012500   CALL 'cobdom_get_cookie' USING BY REFERENCE WS-LANG,
+012600     'lang' RETURNING WS-RETURN.
+012700   IF WS-LANG = WS-NULL-BYTE THEN
+012800     CALL 'cobdom_set_cookie' USING 'us', 'lang'
+012900       RETURNING WS-RETURN
+013000     MOVE 'us' TO WS-LANG
+013100   END-IF.
+013200   PERFORM SET-ACTIVE-FLAG.
+013300   CONTINUE.
+013400 COOKIE-ASK.
+013500   CALL 'cobdom_create_element' USING 'cookieDiv', 'div'
+013600     RETURNING WS-RETURN.
+013700   CALL 'cobdom_style' USING 'cookieDiv', 'position', 'fixed'
+013800     RETURNING WS-RETURN.
+013900   CALL 'cobdom_style' USING 'cookieDiv', 'bottom', '0'
+014000     RETURNING WS-RETURN.
+014100   CALL 'cobdom_style' USING 'cookieDiv', 'left', '0'
+014200     RETURNING WS-RETURN.
+014300   CALL 'cobdom_style' USING 'cookieDiv', 'width', '100%'
+014400     RETURNING WS-RETURN.
+014500   CALL 'cobdom_style' USING 'cookieDiv', 'backgroundColor', 
+014600     '#00ff00' RETURNING WS-RETURN.
+014700   CALL 'cobdom_style' USING 'cookieDiv', 'textAlign', 
+014800     'center' RETURNING WS-RETURN.
+014900   CALL 'cobdom_inner_html' USING 'cookieDiv','Would you like to a
+015000-'llow cookies to store your preferences such as language?&nbsp;'
+015100     RETURNING WS-RETURN.
+015200   CALL 'cobdom_create_element' USING 'cookieYes', 'span'
+015300     RETURNING WS-RETURN.
+015400   CALL 'cobdom_set_class' USING 'cookieYes', 'cookieButton'
+015500     RETURNING WS-RETURN.
+015600   CALL 'cobdom_inner_html' USING 'cookieYes', 'Yes&nbsp;'
+015700     RETURNING WS-RETURN.
+015800   CALL 'cobdom_create_element' USING 'cookieNo', 'span'
+015900     RETURNING WS-RETURN.
+016000   CALL 'cobdom_set_class' USING 'cookieNo', 'cookieButton'
+016100     RETURNING WS-RETURN.
+016200   CALL 'cobdom_inner_html' USING 'cookieNo', 'No'
+016300     RETURNING WS-RETURN.
+016400   CALL 'cobdom_add_event_listener' USING 'cookieYes', 'click',
+016500     'COOKIEACCEPT' RETURNING WS-RETURN.
+016600   CALL 'cobdom_add_event_listener' USING 'cookieNo', 'click',
+016700     'COOKIEDENY' RETURNING WS-RETURN.
+016800   CALL 'cobdom_append_child' USING 'cookieYes', 'cookieDiv'
+016900     RETURNING WS-RETURN.
+017000   CALL 'cobdom_append_child' USING 'cookieNo', 'cookieDiv'
+017100     RETURNING WS-RETURN.
+017200   CALL 'cobdom_append_child' USING 'cookieDiv', 'body'
+017300     RETURNING WS-RETURN.
+017400*Note this must be called after the elements are added to the
+017500*document because it must search for them.
+017600   CALL 'cobdom_class_style' USING 'cookieButton', 
+017700     'backgroundColor', '#ff0000' RETURNING WS-RETURN.
+017800   CONTINUE.
+017900 COOKIEACCEPT SECTION.
+018000 ENTRY 'COOKIEACCEPT'.
+018100   CALL 'cobdom_style' USING 'cookieDiv', 'display', 'none'
+018200     RETURNING WS-RETURN.
+018300   CALL 'cobdom_set_cookie' USING 'y', 'allowCookies' 
+018400     RETURNING WS-RETURN.
+018500   MOVE 'y' TO WS-COOKIE-ALLOWED.
+018600   GOBACK.
+018700 COOKIEDENY SECTION.
+018800 ENTRY 'COOKIEDENY'.
+018900   CALL 'cobdom_style' USING 'cookieDiv', 'display', 'none'
+019000     RETURNING WS-RETURN.
+019100   MOVE 'n' TO WS-COOKIE-ALLOWED.
+019200   GOBACK.
+019300 SETPERCENTCOBOL SECTION.
+019400 ENTRY 'SETPERCENTCOBOL' USING BY REFERENCE LS-BLOB-SIZE,LS-BLOB.
+019500   MOVE LS-BLOB(1:LS-BLOB-SIZE) TO WS-PERCENT-COBOL.
+019600   CALL 'cobdom_inner_html' USING 'percentCobol', WS-PERCENT-COBOL
+019700     RETURNING WS-RETURN.
+019800   DISPLAY 'Currently this website is written in ' 
+019900     WS-PERCENT-COBOL '% COBOL.'.
+020000   GOBACK.
+020100 SETLANG SECTION.
+020200 ENTRY 'SETLANG' USING LS-LANG-CHOICE.
+020300   IF WS-LANG-SELECT-TOGGLE = 0 THEN
+020400     MOVE 1 TO WS-LANG-SELECT-TOGGLE
+020500     IF WS-LANG = 'us' THEN
+020600       DISPLAY 'Lang: us'
+020700*      CALL 'cobdom_style' USING 'langES', 'display', 'inline'
+020800*        RETURNING WS-RETURN
+020900     ELSE
+021000       DISPLAY 'Lang: es'
+021100*      CALL 'cobdom_style' USING 'langUS', 'display', 'inline'
+021200*        RETURNING WS-RETURN
+021300     END-IF
+021400   ELSE
+021500     MOVE 0 TO WS-LANG-SELECT-TOGGLE
+021600     IF WS-COOKIE-ALLOWED = 'y' THEN
+021700       IF LS-LANG-CHOICE = 'us' THEN
+021800         CALL 'cobdom_set_cookie' USING 'us', 'lang'
+021900           RETURNING WS-RETURN
+022000         MOVE 'us' TO WS-LANG
+022100       ELSE
+022200         CALL 'cobdom_set_cookie' USING 'es', 'lang'
+022300           RETURNING WS-RETURN
+022400         MOVE 'es' TO WS-LANG
+022500       END-IF
+022600*      PERFORM SET-ACTIVE-FLAG
+022700     ELSE
+022800       MOVE LS-LANG-CHOICE TO WS-LANG
+022900*      PERFORM SET-ACTIVE-FLAG 
+023000     END-IF
+023100   END-IF.
+023200   GOBACK.
+023300 SETLANGUS SECTION.
+023400 ENTRY 'SETLANGUS'.
+023500   CALL 'SETLANG' USING 'us'.
+023600   GOBACK.
+023700 SETLANGES SECTION.
+023800 ENTRY 'SETLANGES'.
+023900   CALL 'SETLANG' USING 'es'.
+024000   GOBACK.
+024100 WINDOWCHANGE SECTION.
+024200 ENTRY 'WINDOWCHANGE'.
+024300   CALL 'cobdom_eval' USING BY REFERENCE WS-BLOB-SIZE, WS-BLOB, 
+024400     'window.innerWidth' RETURNING WS-RETURN.
+024500   MOVE WS-BLOB(1:WS-BLOB-SIZE) TO WS-WINDOW-WIDTH.
+024600   CALL 'cobdom_eval' USING BY REFERENCE WS-BLOB-SIZE, WS-BLOB, 
+024700     'window.innerHeight' RETURNING WS-RETURN.
+024800   MOVE WS-BLOB(1:WS-BLOB-SIZE) TO WS-WINDOW-HEIGHT.
+024900*  DISPLAY 'Window Dimensions: ' WS-WINDOW-WIDTH 'x'
+025000*    WS-WINDOW-HEIGHT.
+025100   IF WS-WINDOW-WIDTH > (WS-WINDOW-HEIGHT * RATIO-INV OF 
+025200     WS-TERM-AREA) THEN
+025300     COMPUTE HEIGHT OF WS-TERM-AREA = WS-WINDOW-HEIGHT
+025400     COMPUTE WIDTH OF WS-TERM-AREA =  WS-WINDOW-HEIGHT * 
+025500       RATIO-INV OF WS-TERM-AREA
+025700     CALL 'cobdom_style' USING 'termArea', 'width',
+025700       WIDTH OF WS-TERM-AREA RETURNING WS-RETURN
+025800     CALL 'cobdom_style' USING 'termArea', 'height',
+025900       HEIGHT OF WS-TERM-AREA RETURNING WS-RETURN
+026000   ELSE
+026100     COMPUTE HEIGHT OF WS-TERM-AREA = WS-WINDOW-WIDTH *
+026200       RATIO OF WS-TERM-AREA
+026300     COMPUTE WIDTH OF WS-TERM-AREA =  WS-WINDOW-WIDTH
+026400     CALL 'cobdom_style' USING 'termArea', 'width',
+026500       WIDTH OF WS-TERM-AREA RETURNING WS-RETURN
+026600     CALL 'cobdom_style' USING 'termArea', 'height',
+026700       HEIGHT OF WS-TERM-AREA RETURNING WS-RETURN
+026800   END-IF.
+026900   GOBACK.
+027000*LOADSVGUS SECTION.
+027100*ENTRY 'LOADSVGUS' USING BY REFERENCE LS-BLOB-SIZE,LS-BLOB.
+027200*  MOVE LS-BLOB(1:LS-BLOB-SIZE) TO WS-SVG-US.
+027300*  CALL 'cobdom_inner_html' USING 'langUS', WS-SVG-US
+027400*    RETURNING WS-RETURN.
+027500*  CALL 'cobdom_style' USING 'langUS', 'width', '20px'
+027600*    RETURNING WS-RETURN.
+027700*  CALL 'cobdom_style' USING 'langUS', 'height', '20px'
+027800*    RETURNING WS-RETURN.
+027900*  GOBACK.
+028000*LOADSVGES SECTION.
+028100*ENTRY 'LOADSVGES' USING BY REFERENCE LS-BLOB-SIZE,LS-BLOB.
+028200*  MOVE LS-BLOB(1:LS-BLOB-SIZE) TO WS-SVG-ES.
+028300*  CALL 'cobdom_inner_html' USING 'langES', WS-SVG-ES
+028400*    RETURNING WS-RETURN.
+028500*  CALL 'cobdom_style' USING 'langES', 'width', '20px'
+028600*    RETURNING WS-RETURN.
+028700*  CALL 'cobdom_style' USING 'langES', 'height', '20px'
+028800*    RETURNING WS-RETURN. 
+028900*  GOBACK.
