@@ -5057,6 +5057,7 @@ function cd_fetch(func,url,method,body) { try { let requestURL = UTF8ToString(ur
 function cd_href(variable_name,href) { try { let variableName = UTF8ToString(variable_name); let hrefString = UTF8ToString(href); window[variableName].href=hrefString; return 1; } catch (e) { console.error('CobDOMinate Error:'); console.error('  Href: ' + e); return -1; } }
 function cd_src(variable_name,src) { try { let variableName = UTF8ToString(variable_name); let srcString = UTF8ToString(src); window[variableName].src=srcString; return 1; } catch (e) { console.error('CobDOMinate Error:'); console.error('  SRC: ' + e); return -1; } }
 function cd_eval(data_size,data,jscode) { try { let jsCode = UTF8ToString(jscode); let evalReturn = eval(jsCode).toString(); stringToUTF8(evalReturn, data, evalReturn.length+1); stringToUTF8(evalReturn.length.toString().padStart(10,'0'),data_size,11); return 1; } catch (e) { console.error('CobDOMinate Error:'); console.error('  Eval: ' + e); return -1; } }
+function cd_timeout(func,time) { try { let cobolFunc = UTF8ToString(func); let cobolTime = parseInt(UTF8ToString(time)); setTimeout(() => { Module.ccall(cobolFunc, null, [], []); },cobolTime); return 1; } catch (e) { console.error('CobDOMinate Error:'); console.error('  Fetch: ' + e); return -1; } }
 
 // Imports from the Wasm binary.
 var _SETLANG = Module['_SETLANG'] = makeInvalidEarlyAccess('_SETLANG');
