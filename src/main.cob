@@ -31,373 +31,417 @@
 003100   05 NUM PIC -(9)9.
 003200   05 PX PIC XX VALUE 'px'.
 003300   05 NB PIC X(1) VALUE X'00'.
-003400 01 WS-TERM-AREA.
-003500*  05 POS-X PIC 9(10).
-003600   05 POS-Y PIC 9(10).
-003700   05 WIDTH PIC 9(10).
-003800   05 HEIGHT PIC 9(10).
-003900 01 WS-READER-AREA.
-004000   05 POS-X PIC 9(10).
-004100   05 POS-Y PIC 9(10).
-004200   05 WIDTH PIC 9(10).
-004300   05 HEIGHT PIC 9(10).
-004400   05 SWAP PIC 9V9 VALUE 0.8.
-004500   05 FLIP PIC X.
-004600 01 WS-STACK-AREA.
-004700   05 POS-X PIC 9(10).
-004800   05 POS-Y PIC 9(10).
-004900   05 WIDTH PIC 9(10).
-005000   05 HEIGHT PIC 9(10).
-005100   05 RATIO PIC 9V9 VALUE 0.6.
-005200 01 WS-CUBBYS.
-005300   05 SIZE-RATIO PIC 9V99 VALUE 0.25.
-005400   05 RATIO PIC 9V9 VALUE 0.5.
-005500   05 WIDTH PIC 9(10).
-005600   05 HEIGHT PIC 9(10).
-005700   05 Y-AVAIL PIC 99.
-005800   05 X-AVAIL PIC 99.
-005900   05 TOP-LEVELS PIC 9.
-006000   05 TOP-WIDTH PIC 9.
-006100   05 TOTAL PIC 99 VALUE 12.
-006200   05 REMAIN PIC 99 VALUE 12.
-006300*THIS VALUE MUST BE SAME AS THE OCCURS.
-006400   05 CUBBY.
-006500     10 CB OCCURS 12 TIMES.
-006600       15 VAR PIC X(5).
-006700       15 NB PIC X(1) VALUE X'00'.
-006800       15 POS-X PIC 9(10).
-006900       15 POS-Y PIC 9(10).
-007000 LINKAGE SECTION.
-007100 01 LS-BLOB PIC X(100000).
-007200 01 LS-BLOB-SIZE PIC 9(10).
-007300 01 LS-LANG-CHOICE PIC XX.
-007400 PROCEDURE DIVISION.
-007500 EXAMPLE SECTION.
-007600 ENTRY 'MAIN'.
-007700*Function Notes: Okay so we need the position of the card input
-007800*side and the output side and all of the card decks
-007900*which are jsut diplicates except for the drawing on the side
-008000*is its own object that is clickable. once clicked a transform
-008100*will take place on both the stack img and the drawing img
-008200*from its location to the reader input, then once there
-008300*it will duplicate the imgs right there and then instant
-008400*transition the original images to the output side but vertically
-008500*flipped and it will make it invisible.
-008600*then it will preform a transition
-008700*clip path to shring the input side and grow the output
-008800*side, then it will do its job. from this point
-008900*if the user clicks another stack
-009000*it will rotate the stack and transform it back to
-009100*its storage spac and then perform the same with
-009200*the other stack. Note in here we have to set click permissions
-009300*properly and such.
-009400   CALL 'cobdom_style' USING 'body', 'margin', '0'.
-009500*  CALL 'cobdom_style' USING 'body', 'fontSize', '4rem'
-009600   PERFORM SETUP-TERMINAL-AREA.
-009700   PERFORM SETUP-READER-AREA.
-009800   PERFORM SETUP-STACK-AREA.
-009900*Now setup the card reader and then setup the punch card area
-010000   CALL 'cobdom_add_event_listener' USING 'window', 'resize', 
-010100     'WINDOWCHANGE'.
-010200   CALL 'cobdom_add_event_listener' USING 'window', 
-010300     'orientationchange', 'WINDOWCHANGE'.
-010400   CALL 'cobdom_get_cookie' USING BY REFERENCE WS-COOKIE-ALLOWED,
-010500     'allowCookies'.
-010600   IF WS-COOKIE-ALLOWED = 'y' THEN
-010700     PERFORM LANG-CHECK
-010800   ELSE
-010900     PERFORM COOKIE-ASK
-011000     MOVE 'us' TO WS-LANG
-011100     PERFORM SET-ACTIVE-FLAG
-011200   END-IF.
-011300   CALL 'cobdom_create_element' USING 'percentCobol', 'span'.
-011400   CALL 'cobdom_fetch' USING 'SETPERCENTCOBOL',
-011500     '/res/percent.txt', 'GET', WS-NULL-BYTE.
-011600   CALL 'WINDOWCHANGE'.
-011700   GOBACK.
-011800 SETUP-TERMINAL-AREA.
-011900   CALL 'cobdom_create_element' USING 'termArea', 'div'.
-012000   CALL 'cobdom_style' USING 'termArea', 'position', 'absolute'.
-012100   CALL 'cobdom_style' USING 'termArea', 'backgroundColor',
-012200     '#00ff00'.
-012300   CALL 'cobdom_append_child' USING 'termArea', 'body'.
-012400   CONTINUE.
-012500 SETUP-READER-AREA.
-012600   CALL 'cobdom_create_element' USING 'readerArea', 'div'.
-012700   CALL 'cobdom_style' USING 'readerArea', 'backgroundColor',
-012800     '#ff0000'.
-012900   CALL 'cobdom_style' USING 'readerArea', 'position', 'absolute'.
-013000   CALL 'cobdom_append_child' USING 'readerArea', 'body'.
-013100   CONTINUE.
-013200 SETUP-STACK-AREA.
-013300   CALL 'cobdom_create_element' USING 'stackArea', 'div'.
-013400   CALL 'cobdom_style' USING 'stackArea', 'backgroundColor',
-013500     '#0000ff'.
-013600   CALL 'cobdom_style' USING 'stackArea', 'position', 'absolute'.
-013700   CALL 'cobdom_append_child' USING 'stackArea', 'body'.
-013800   PERFORM VARYING WS-IDXA FROM 1 BY 1 UNTIL WS-IDXA > 
-013900     TOTAL OF WS-CUBBYS
-014000     STRING
-014100       'cub' DELIMITED BY SIZE
-014200       WS-IDXA DELIMITED BY SIZE
-014300     INTO VAR OF CUBBY OF WS-CUBBYS (WS-IDXA) END-STRING
-014400     CALL 'cobdom_create_element' USING
-014500       VAR OF CUBBY OF WS-CUBBYS (WS-IDXA), 'div'
-014600   END-PERFORM.
-014700   CONTINUE.
-014800 SET-ACTIVE-FLAG.
-014900   IF WS-LANG = 'us' THEN
-015000     DISPLAY 'us'
-015100*    CALL 'cobdom_style' USING 'langES', 'display', 'none'
-015200   ELSE
-015300     DISPLAY 'es'
-015400*    CALL 'cobdom_style' USING 'langUS', 'display', 'none'
-015500   END-IF.
-015600   CONTINUE.
-015700*Setup language selector
-015800*  CALL 'cobdom_create_element' USING 'langSelector', 'span'
-015900*  CALL 'cobdom_style' USING 'langSelector', 'marginLeft', 'auto'
-016000*  CALL 'cobdom_create_element' USING 'langUS', 'img'
-016100*  CALL 'cobdom_create_element' USING 'langES', 'img'
-016200*  CALL 'cobdom_src' USING 'langUS', '/res/icons/us.svg'
-016300*  CALL 'cobdom_style' USING 'langUS', 'width', '3rem'
-016400*  CALL 'cobdom_style' USING 'langUS', 'height', '3rem'
-016500*  CALL 'cobdom_src' USING 'langES', '/res/icons/es.svg'
-016600*  CALL 'cobdom_style' USING 'langES', 'width', '3rem'
-016700*  CALL 'cobdom_style' USING 'langES', 'height', '3rem'
-016800*  CALL 'cobdom_append_child' USING 'langUS', 'langSelector'
-016900*  CALL 'cobdom_add_event_listener' USING 'langUS', 'click', 
-017000*    'SETLANGUS'.
-017100*  CALL 'cobdom_append_child' USING 'langES', 'langSelector'
-017200*  CALL 'cobdom_add_event_listener' USING 'langES', 'click', 
-017300*    'SETLANGES'.
-017400*  CALL 'cobdom_append_child' USING 'langSelector', 'menuDiv'
-017500 LANG-CHECK.
-017600   CALL 'cobdom_get_cookie' USING BY REFERENCE WS-LANG,
-017700     'lang'.
-017800   IF WS-LANG = WS-NULL-BYTE THEN
-017900     CALL 'cobdom_set_cookie' USING 'us', 'lang'
-018000     MOVE 'us' TO WS-LANG
-018100   END-IF.
-018200   PERFORM SET-ACTIVE-FLAG.
-018300   CONTINUE.
-018400 COOKIE-ASK.
-018500   CALL 'cobdom_create_element' USING 'cookieDiv', 'div'.
-018600   CALL 'cobdom_style' USING 'cookieDiv', 'position', 'fixed'.
-018700   CALL 'cobdom_style' USING 'cookieDiv', 'bottom', '0'.
-018800   CALL 'cobdom_style' USING 'cookieDiv', 'left', '0'.
-018900   CALL 'cobdom_style' USING 'cookieDiv', 'width', '100%'.
-019000   CALL 'cobdom_style' USING 'cookieDiv', 'backgroundColor', 
-019100     '#00ff00'.
-019200   CALL 'cobdom_style' USING 'cookieDiv', 'textAlign', 
-019300     'center'.
-019400   CALL 'cobdom_inner_html' USING 'cookieDiv','Would you like to a
-019500-'llow cookies to store your preferences such as language?&nbsp;'.
-019600   CALL 'cobdom_create_element' USING 'cookieYes', 'span'.
-019700   CALL 'cobdom_set_class' USING 'cookieYes', 'cookieButton'.
-019800   CALL 'cobdom_inner_html' USING 'cookieYes', 'Yes&nbsp;'.
-019900   CALL 'cobdom_create_element' USING 'cookieNo', 'span'.
-020000   CALL 'cobdom_set_class' USING 'cookieNo', 'cookieButton'.
-020100   CALL 'cobdom_inner_html' USING 'cookieNo', 'No'.
-020200   CALL 'cobdom_add_event_listener' USING 'cookieYes', 'click',
-020300     'COOKIEACCEPT'.
-020400   CALL 'cobdom_add_event_listener' USING 'cookieNo', 'click',
-020500     'COOKIEDENY'.
-020600   CALL 'cobdom_append_child' USING 'cookieYes', 'cookieDiv'.
-020700   CALL 'cobdom_append_child' USING 'cookieNo', 'cookieDiv'.
-020800   CALL 'cobdom_append_child' USING 'cookieDiv', 'body'.
-020900*Note this must be called after the elements are added to the
-021000*document because it must search for them.
-021100   CALL 'cobdom_class_style' USING 'cookieButton', 
-021200     'backgroundColor', '#ff0000'.
-021300   CONTINUE.
-021400 UPDATE-TERM-AREA.
-021500   MOVE 0 TO POS-Y OF WS-TERM-AREA.
-021600   IF WS-WINDOW-WIDTH > WS-WINDOW-HEIGHT THEN
-021700     MOVE WS-WINDOW-HEIGHT TO HEIGHT OF WS-TERM-AREA
-021800     MOVE WS-WINDOW-HEIGHT TO WIDTH OF WS-TERM-AREA
-021900   ELSE
-022000     MOVE WS-WINDOW-WIDTH TO HEIGHT OF WS-TERM-AREA
-022100     MOVE WS-WINDOW-WIDTH TO WIDTH OF WS-TERM-AREA
-022200   END-IF.
-022300   COMPUTE WIDTH OF WS-CUBBYS = SIZE-RATIO OF WS-CUBBYS *
-022400     WIDTH OF WS-TERM-AREA.
-022500   COMPUTE HEIGHT OF WS-CUBBYS = WIDTH OF WS-CUBBYS *
-022600     RATIO OF WS-CUBBYS.
-022700   COMPUTE TOP-WIDTH OF WS-CUBBYS = WIDTH OF WS-TERM-AREA /
-022800     WIDTH OF WS-CUBBYS.
-022900   IF (WS-WINDOW-WIDTH - WS-WINDOW-HEIGHT) > 
-023000     SWAP OF WS-READER-AREA * WIDTH OF WS-TERM-AREA THEN
-023100     MOVE 'y' TO FLIP OF WS-READER-AREA
-023200     COMPUTE Y-AVAIL OF WS-CUBBYS = 
-023300       (WS-WINDOW-HEIGHT - HEIGHT OF WS-READER-AREA) /
-023400       HEIGHT OF WS-CUBBYS
-023500   ELSE
-023600     MOVE 'n' TO FLIP OF WS-READER-AREA
-023700     COMPUTE Y-AVAIL OF WS-CUBBYS = 
-023800       (WS-WINDOW-HEIGHT + HEIGHT OF WS-READER-AREA) / 
-023900       HEIGHT OF WS-CUBBYS
-024000   END-IF.
-024100   COMPUTE X-AVAIL OF WS-CUBBYS = 
-024200     (WS-WINDOW-WIDTH - WIDTH OF WS-TERM-AREA) /
-024300     WIDTH OF WS-CUBBYS.
-024400   MOVE 0 TO TOP-LEVELS OF WS-CUBBYS.
-024500   MOVE TOTAL OF WS-CUBBYS TO REMAIN OF WS-CUBBYS.
-024600   IF (X-AVAIL OF WS-CUBBYS) * (Y-AVAIL OF WS-CUBBYS) <
-024700     TOTAL OF WS-CUBBYS THEN
-024800     PERFORM STACK-CUBBYS
-024900   END-IF.
-025000   COMPUTE POS-Y OF WS-TERM-AREA = 
-025100     (TOP-LEVELS OF WS-CUBBYS * HEIGHT OF WS-CUBBYS).
-025200   MOVE POS-Y OF WS-TERM-AREA TO NUM OF WS-TMP.
-025300   CALL 'cobdom_style' USING 'termArea', 'top', WS-TMP.
-025400   MOVE WIDTH OF WS-TERM-AREA TO NUM OF WS-TMP.
-025500   CALL 'cobdom_style' USING 'termArea', 'width', WS-TMP.
-025600   MOVE HEIGHT OF WS-TERM-AREA TO NUM OF WS-TMP.
-025700   CALL 'cobdom_style' USING 'termArea', 'height', WS-TMP.
-025800   CONTINUE.
-025900 STACK-CUBBYS.
-026000   ADD 1 TO TOP-LEVELS OF WS-CUBBYS.
-026100   ADD 1 TO Y-AVAIL OF WS-CUBBYS.
-026200   COMPUTE REMAIN OF WS-CUBBYS = TOTAL OF WS-CUBBYS -
-026300     ((HEIGHT OF WS-TERM-AREA / WIDTH OF WS-CUBBYS) * 
-026400     TOP-LEVELS OF WS-CUBBYS).
-026500   IF REMAIN OF WS-CUBBYS > X-AVAIL OF WS-CUBBYS *
-026600     Y-AVAIL OF WS-CUBBYS THEN
-026700     PERFORM STACK-CUBBYS
-026800   END-IF.
-026900   CONTINUE.
-027000 UPDATE-READER-AREA.
-027100   COMPUTE HEIGHT OF WS-READER-AREA = .4 * 
-027200     (HEIGHT OF WS-TERM-AREA + POS-Y OF WS-TERM-AREA).
-027300   IF FLIP OF WS-READER-AREA = 'y' THEN
-027400     MOVE WIDTH OF WS-TERM-AREA TO POS-X OF WS-READER-AREA
-027500     COMPUTE POS-Y OF WS-READER-AREA = HEIGHT OF WS-READER-AREA -
-027600       HEIGHT OF WS-TERM-AREA
-027700     COMPUTE WIDTH OF WS-READER-AREA = SWAP OF WS-READER-AREA *
-027800       WIDTH OF WS-TERM-AREA
-027900   ELSE
-028000     MOVE 0 TO POS-X OF WS-READER-AREA
-028100     COMPUTE POS-Y OF WS-READER-AREA = HEIGHT OF WS-TERM-AREA +
-028200       (TOP-LEVELS OF WS-CUBBYS * HEIGHT OF WS-CUBBYS)
-028300     MOVE WIDTH OF WS-TERM-AREA TO WIDTH OF WS-READER-AREA
-028400   END-IF.
-028500   MOVE POS-Y OF WS-READER-AREA TO NUM OF WS-TMP.
-028600   CALL 'cobdom_style' USING 'readerArea', 'top', WS-TMP.
-028700   MOVE POS-X OF WS-READER-AREA TO NUM OF WS-TMP.
-028800   CALL 'cobdom_style' USING 'readerArea', 'left', WS-TMP.
-028900   MOVE WIDTH OF WS-READER-AREA TO NUM OF WS-TMP.
-029000   CALL 'cobdom_style' USING 'readerArea', 'width', WS-TMP.
-029100   MOVE HEIGHT OF WS-READER-AREA TO NUM OF WS-TMP.
-029200   CALL 'cobdom_style' USING 'readerArea', 'height', WS-TMP.
-029300   CONTINUE.
-029400 UPDATE-STACK-AREA.
-029500   MOVE TOTAL OF WS-CUBBYS TO REMAIN OF WS-CUBBYS.
-029600   PERFORM VARYING WS-IDXA FROM 1 BY 1 UNTIL WS-IDXA >
-029700     TOP-LEVELS OF WS-CUBBYS
-029800     PERFORM VARYING WS-IDXB FROM 1 BY 1 UNTIL WS-IDXB >
-029900       TOP-WIDTH OF WS-CUBBYS + X-AVAIL OF WS-CUBBYS
-030000       COMPUTE WS-OFFSET = ((WS-IDXA - 1) *
-030100         (TOP-WIDTH OF WS-CUBBYS + X-AVAIL OF WS-CUBBYS)) + 
-030200         WS-IDXB
-030300       SUBTRACT 1 FROM REMAIN OF WS-CUBBYS
-030400       IF WS-OFFSET <= TOTAL OF WS-CUBBYS THEN
-030500         DISPLAY 'TOP ' VAR OF CUBBY OF WS-CUBBYS (WS-OFFSET)
-030600       END-IF
-030700     END-PERFORM
-030800   END-PERFORM.
-030900   IF REMAIN OF WS-CUBBYS >= 1 THEN
-031000     PERFORM VARYING WS-IDXA FROM 1 BY 1 UNTIL WS-IDXA >
-031100       X-AVAIL OF WS-CUBBYS
-031200       PERFORM VARYING WS-IDXB FROM 1 BY 1 UNTIL WS-IDXB >
-031300         Y-AVAIL OF WS-CUBBYS
-031400         SUBTRACT 1 FROM REMAIN OF WS-CUBBYS
-031500         ADD 1 TO WS-OFFSET 
-031600         IF WS-OFFSET <= TOTAL OF WS-CUBBYS THEN
-031800           DISPLAY 'SID ' VAR OF CUBBY OF WS-CUBBYS (WS-OFFSET)
-031800         END-IF
-031900       END-PERFORM
-032000     END-PERFORM
-032100   END-IF.
-032200   CONTINUE.
-032300 COOKIEACCEPT SECTION.
-032400 ENTRY 'COOKIEACCEPT'.
-032500   CALL 'cobdom_style' USING 'cookieDiv', 'display', 'none'.
-032600   CALL 'cobdom_set_cookie' USING 'y', 'allowCookies' .
-032700   MOVE 'y' TO WS-COOKIE-ALLOWED.
-032800   GOBACK.
-032900 COOKIEDENY SECTION.
-033000 ENTRY 'COOKIEDENY'.
-033100   CALL 'cobdom_style' USING 'cookieDiv', 'display', 'none'.
-033200   MOVE 'n' TO WS-COOKIE-ALLOWED.
-033300   GOBACK.
-033400 SETPERCENTCOBOL SECTION.
-033500 ENTRY 'SETPERCENTCOBOL' USING BY REFERENCE LS-BLOB-SIZE,LS-BLOB.
-033600   MOVE LS-BLOB(1:LS-BLOB-SIZE) TO WS-PERCENT-COBOL.
-033700   CALL 'cobdom_inner_html' USING 'percentCobol', 
-033800     WS-PERCENT-COBOL.
-033900   DISPLAY 'Currently this website is written in ' 
-034000     WS-PERCENT-COBOL '% COBOL.'.
-034100   GOBACK.
-034200 SETLANG SECTION.
-034300 ENTRY 'SETLANG' USING LS-LANG-CHOICE.
-034400   IF WS-LANG-SELECT-TOGGLE = 0 THEN
-034500     MOVE 1 TO WS-LANG-SELECT-TOGGLE
-034600     IF WS-LANG = 'us' THEN
-034700       DISPLAY 'Lang: us'
-034800*      CALL 'cobdom_style' USING 'langES', 'display', 'inline'
-034900     ELSE
-035000       DISPLAY 'Lang: es'
-035100*      CALL 'cobdom_style' USING 'langUS', 'display', 'inline'
-035200     END-IF
-035300   ELSE
-035400     MOVE 0 TO WS-LANG-SELECT-TOGGLE
-035500     IF WS-COOKIE-ALLOWED = 'y' THEN
-035600       IF LS-LANG-CHOICE = 'us' THEN
-035700         CALL 'cobdom_set_cookie' USING 'us', 'lang'
-035800         MOVE 'us' TO WS-LANG
-035900       ELSE
-036000         CALL 'cobdom_set_cookie' USING 'es', 'lang'
-036100         MOVE 'es' TO WS-LANG
-036200       END-IF
-036300*      PERFORM SET-ACTIVE-FLAG
-036400     ELSE
-036500       MOVE LS-LANG-CHOICE TO WS-LANG
-036600*      PERFORM SET-ACTIVE-FLAG 
-036700     END-IF
-036800   END-IF.
-036900   GOBACK.
-037000 SETLANGUS SECTION.
-037100 ENTRY 'SETLANGUS'.
-037200   CALL 'SETLANG' USING 'us'.
-037300   GOBACK.
-037400 SETLANGES SECTION.
-037500 ENTRY 'SETLANGES'.
-037600   CALL 'SETLANG' USING 'es'.
+003400   05 STR PIC X(5).
+003500   05 NB PIC X(1) VALUE X'00'.
+003600 01 WS-TERM-AREA.
+003700*  05 POS-X PIC 9(10).
+003800   05 POS-Y PIC 9(10).
+003900   05 WIDTH PIC 9(10).
+004000   05 HEIGHT PIC 9(10).
+004100 01 WS-READER-AREA.
+004200   05 POS-X PIC 9(10).
+004300   05 POS-Y PIC 9(10).
+004400   05 WIDTH PIC 9(10).
+004500   05 HEIGHT PIC 9(10).
+004600   05 SWAP PIC 9V9 VALUE 0.8.
+004700   05 FLIP PIC X.
+004800 01 WS-STACK-AREA.
+004900   05 POS-X PIC 9(10).
+005000   05 POS-Y PIC 9(10).
+005100   05 WIDTH PIC 9(10).
+005200   05 HEIGHT PIC 9(10).
+005300   05 RATIO PIC 9V9 VALUE 0.6.
+005400 01 WS-CUBBYS.
+005500   05 SIZE-RATIO PIC 9V99 VALUE 0.25.
+005600   05 RATIO PIC 9V9 VALUE 0.5.
+005700   05 WIDTH PIC 9(10).
+005800   05 HEIGHT PIC 9(10).
+005900   05 Y-AVAIL PIC 99.
+006000   05 X-AVAIL PIC 99.
+006100   05 TOP-LEVELS PIC 9.
+006200   05 TOP-WIDTH PIC 9.
+006300   05 TOTAL PIC 99 VALUE 12.
+006400   05 REMAIN PIC 99 VALUE 12.
+006500*THIS VALUE MUST BE SAME AS THE OCCURS.
+006600   05 CUBBY.
+006700     10 CB OCCURS 12 TIMES.
+006800       15 VAR PIC X(5).
+006900       15 NB PIC X(1) VALUE X'00'.
+007000       15 POS-X PIC 9(10).
+007100       15 POS-Y PIC 9(10).
+007200 LINKAGE SECTION.
+007300 01 LS-BLOB PIC X(100000).
+007400 01 LS-BLOB-SIZE PIC 9(10).
+007500 01 LS-LANG-CHOICE PIC XX.
+007600 PROCEDURE DIVISION.
+007700 EXAMPLE SECTION.
+007800 ENTRY 'MAIN'.
+007900*Function Notes: Okay so we need the position of the card input
+008000*side and the output side and all of the card decks
+008100*which are jsut diplicates except for the drawing on the side
+008200*is its own object that is clickable. once clicked a transform
+008300*will take place on both the stack img and the drawing img
+008400*from its location to the reader input, then once there
+008500*it will duplicate the imgs right there and then instant
+008600*transition the original images to the output side but vertically
+008700*flipped and it will make it invisible.
+008800*then it will preform a transition
+008900*clip path to shring the input side and grow the output
+009000*side, then it will do its job. from this point
+009100*if the user clicks another stack
+009200*it will rotate the stack and transform it back to
+009300*its storage spac and then perform the same with
+009400*the other stack. Note in here we have to set click permissions
+009500*properly and such.
+009600   CALL 'cobdom_style' USING 'body', 'margin', '0'.
+009700*  CALL 'cobdom_style' USING 'body', 'fontSize', '4rem'
+009800   PERFORM SETUP-TERMINAL-AREA.
+009900   PERFORM SETUP-READER-AREA.
+010000   PERFORM SETUP-STACK-AREA.
+010100*Now setup the card reader and then setup the punch card area
+010200   CALL 'cobdom_add_event_listener' USING 'window', 'resize', 
+010300     'WINDOWCHANGE'.
+010400   CALL 'cobdom_add_event_listener' USING 'window', 
+010500     'orientationchange', 'WINDOWCHANGE'.
+010600   CALL 'cobdom_get_cookie' USING BY REFERENCE WS-COOKIE-ALLOWED,
+010700     'allowCookies'.
+010800   IF WS-COOKIE-ALLOWED = 'y' THEN
+010900     PERFORM LANG-CHECK
+011000   ELSE
+011100     PERFORM COOKIE-ASK
+011200     MOVE 'us' TO WS-LANG
+011300     PERFORM SET-ACTIVE-FLAG
+011400   END-IF.
+011500   CALL 'cobdom_create_element' USING 'percentCobol', 'span'.
+011600   CALL 'cobdom_fetch' USING 'SETPERCENTCOBOL',
+011700     '/res/percent.txt', 'GET', WS-NULL-BYTE.
+011800   CALL 'WINDOWCHANGE'.
+011900   GOBACK.
+012000 SETUP-TERMINAL-AREA.
+012100   CALL 'cobdom_create_element' USING 'termArea', 'div'.
+012200   CALL 'cobdom_style' USING 'termArea', 'position', 'absolute'.
+012300   CALL 'cobdom_style' USING 'termArea', 'backgroundColor',
+012400     '#00ff00'.
+012500   CALL 'cobdom_append_child' USING 'termArea', 'body'.
+012600   CONTINUE.
+012700 SETUP-READER-AREA.
+012800   CALL 'cobdom_create_element' USING 'readerArea', 'div'.
+012900   CALL 'cobdom_style' USING 'readerArea', 'backgroundColor',
+013000     '#ff0000'.
+013100   CALL 'cobdom_style' USING 'readerArea', 'position', 'absolute'.
+013200   CALL 'cobdom_append_child' USING 'readerArea', 'body'.
+013300   CONTINUE.
+013400 SETUP-STACK-AREA.
+013500   CALL 'cobdom_create_element' USING 'stackArea', 'div'.
+013600   CALL 'cobdom_style' USING 'stackArea', 'backgroundColor',
+013700     '#0000ff'.
+013800   CALL 'cobdom_style' USING 'stackArea', 'position', 'absolute'.
+013900   CALL 'cobdom_append_child' USING 'stackArea', 'body'.
+014000   PERFORM VARYING WS-IDXA FROM 1 BY 1 UNTIL WS-IDXA > 
+014100     TOTAL OF WS-CUBBYS
+014200     STRING
+014300       'cub' DELIMITED BY SIZE
+014400       WS-IDXA DELIMITED BY SIZE
+014500     INTO VAR OF CUBBY OF WS-CUBBYS (WS-IDXA) END-STRING
+014600     CALL 'cobdom_create_element' USING
+014700       VAR OF CUBBY OF WS-CUBBYS (WS-IDXA), 'div'
+014800     CALL 'cobdom_style' USING
+014900       VAR OF CUBBY OF WS-CUBBYS (WS-IDXA), 'position', 'absolute'
+015000     CALL 'cobdom_append_child' USING
+015100       VAR OF CUBBY OF WS-CUBBYS (WS-IDXA), 'body'
+015200   END-PERFORM.
+015300   CONTINUE.
+015400 SET-ACTIVE-FLAG.
+015500   IF WS-LANG = 'us' THEN
+015600     DISPLAY 'us'
+015700*    CALL 'cobdom_style' USING 'langES', 'display', 'none'
+015800   ELSE
+015900     DISPLAY 'es'
+016000*    CALL 'cobdom_style' USING 'langUS', 'display', 'none'
+016100   END-IF.
+016200   CONTINUE.
+016300*Setup language selector
+016400*  CALL 'cobdom_create_element' USING 'langSelector', 'span'
+016500*  CALL 'cobdom_style' USING 'langSelector', 'marginLeft', 'auto'
+016600*  CALL 'cobdom_create_element' USING 'langUS', 'img'
+016700*  CALL 'cobdom_create_element' USING 'langES', 'img'
+016800*  CALL 'cobdom_src' USING 'langUS', '/res/icons/us.svg'
+016900*  CALL 'cobdom_style' USING 'langUS', 'width', '3rem'
+017000*  CALL 'cobdom_style' USING 'langUS', 'height', '3rem'
+017100*  CALL 'cobdom_src' USING 'langES', '/res/icons/es.svg'
+017200*  CALL 'cobdom_style' USING 'langES', 'width', '3rem'
+017300*  CALL 'cobdom_style' USING 'langES', 'height', '3rem'
+017400*  CALL 'cobdom_append_child' USING 'langUS', 'langSelector'
+017500*  CALL 'cobdom_add_event_listener' USING 'langUS', 'click', 
+017600*    'SETLANGUS'.
+017700*  CALL 'cobdom_append_child' USING 'langES', 'langSelector'
+017800*  CALL 'cobdom_add_event_listener' USING 'langES', 'click', 
+017900*    'SETLANGES'.
+018000*  CALL 'cobdom_append_child' USING 'langSelector', 'menuDiv'
+018100 LANG-CHECK.
+018200   CALL 'cobdom_get_cookie' USING BY REFERENCE WS-LANG,
+018300     'lang'.
+018400   IF WS-LANG = WS-NULL-BYTE THEN
+018500     CALL 'cobdom_set_cookie' USING 'us', 'lang'
+018600     MOVE 'us' TO WS-LANG
+018700   END-IF.
+018800   PERFORM SET-ACTIVE-FLAG.
+018900   CONTINUE.
+019000 COOKIE-ASK.
+019100   CALL 'cobdom_create_element' USING 'cookieDiv', 'div'.
+019200   CALL 'cobdom_style' USING 'cookieDiv', 'position', 'fixed'.
+019300   CALL 'cobdom_style' USING 'cookieDiv', 'bottom', '0'.
+019400   CALL 'cobdom_style' USING 'cookieDiv', 'left', '0'.
+019500   CALL 'cobdom_style' USING 'cookieDiv', 'width', '100%'.
+019600   CALL 'cobdom_style' USING 'cookieDiv', 'backgroundColor', 
+019700     '#00ff00'.
+019800   CALL 'cobdom_style' USING 'cookieDiv', 'textAlign', 
+019900     'center'.
+020000   CALL 'cobdom_inner_html' USING 'cookieDiv','Would you like to a
+020100-'llow cookies to store your preferences such as language?&nbsp;'.
+020200   CALL 'cobdom_create_element' USING 'cookieYes', 'span'.
+020300   CALL 'cobdom_set_class' USING 'cookieYes', 'cookieButton'.
+020400   CALL 'cobdom_inner_html' USING 'cookieYes', 'Yes&nbsp;'.
+020500   CALL 'cobdom_create_element' USING 'cookieNo', 'span'.
+020600   CALL 'cobdom_set_class' USING 'cookieNo', 'cookieButton'.
+020700   CALL 'cobdom_inner_html' USING 'cookieNo', 'No'.
+020800   CALL 'cobdom_add_event_listener' USING 'cookieYes', 'click',
+020900     'COOKIEACCEPT'.
+021000   CALL 'cobdom_add_event_listener' USING 'cookieNo', 'click',
+021100     'COOKIEDENY'.
+021200   CALL 'cobdom_append_child' USING 'cookieYes', 'cookieDiv'.
+021300   CALL 'cobdom_append_child' USING 'cookieNo', 'cookieDiv'.
+021400   CALL 'cobdom_append_child' USING 'cookieDiv', 'body'.
+021500*Note this must be called after the elements are added to the
+021600*document because it must search for them.
+021700   CALL 'cobdom_class_style' USING 'cookieButton', 
+021800     'backgroundColor', '#ff0000'.
+021900   CONTINUE.
+022000 UPDATE-TERM-AREA.
+022100   MOVE 0 TO POS-Y OF WS-TERM-AREA.
+022200   IF WS-WINDOW-WIDTH > WS-WINDOW-HEIGHT THEN
+022300     MOVE WS-WINDOW-HEIGHT TO HEIGHT OF WS-TERM-AREA
+022400     MOVE WS-WINDOW-HEIGHT TO WIDTH OF WS-TERM-AREA
+022500   ELSE
+022600     MOVE WS-WINDOW-WIDTH TO HEIGHT OF WS-TERM-AREA
+022700     MOVE WS-WINDOW-WIDTH TO WIDTH OF WS-TERM-AREA
+022800   END-IF.
+022900   COMPUTE WIDTH OF WS-CUBBYS = SIZE-RATIO OF WS-CUBBYS *
+023000     WIDTH OF WS-TERM-AREA.
+023100   COMPUTE HEIGHT OF WS-CUBBYS = WIDTH OF WS-CUBBYS *
+023200     RATIO OF WS-CUBBYS.
+023300   COMPUTE TOP-WIDTH OF WS-CUBBYS = (WIDTH OF WS-TERM-AREA /
+023400     WIDTH OF WS-CUBBYS).
+023500   IF (WS-WINDOW-WIDTH - WS-WINDOW-HEIGHT) > 
+023600     SWAP OF WS-READER-AREA * WIDTH OF WS-TERM-AREA THEN
+023700     MOVE 'y' TO FLIP OF WS-READER-AREA
+023800     COMPUTE Y-AVAIL OF WS-CUBBYS = 
+023900       (WS-WINDOW-HEIGHT - (HEIGHT OF WS-READER-AREA)) /
+024000       HEIGHT OF WS-CUBBYS
+024100   ELSE
+024200     MOVE 'n' TO FLIP OF WS-READER-AREA
+024300     COMPUTE Y-AVAIL OF WS-CUBBYS = 
+024400       (WS-WINDOW-HEIGHT + HEIGHT OF WS-READER-AREA) / 
+024500       HEIGHT OF WS-CUBBYS
+024600   END-IF.
+024700   COMPUTE X-AVAIL OF WS-CUBBYS = 
+024800     (WS-WINDOW-WIDTH - WIDTH OF WS-TERM-AREA) /
+024900     WIDTH OF WS-CUBBYS.
+025000   MOVE 0 TO TOP-LEVELS OF WS-CUBBYS.
+025100   MOVE TOTAL OF WS-CUBBYS TO REMAIN OF WS-CUBBYS.
+025200   IF (X-AVAIL OF WS-CUBBYS) * (Y-AVAIL OF WS-CUBBYS) <
+025300     TOTAL OF WS-CUBBYS THEN
+025400     PERFORM STACK-CUBBYS
+025500   END-IF.
+025600   COMPUTE POS-Y OF WS-TERM-AREA = 
+025700     (TOP-LEVELS OF WS-CUBBYS * HEIGHT OF WS-CUBBYS).
+025800   COMPUTE HEIGHT OF WS-READER-AREA = .4 * 
+025900     (HEIGHT OF WS-TERM-AREA + POS-Y OF WS-TERM-AREA).
+026100   MOVE POS-Y OF WS-TERM-AREA TO NUM OF WS-TMP.
+026100   CALL 'cobdom_style' USING 'termArea', 'top', WS-TMP.
+026200   MOVE WIDTH OF WS-TERM-AREA TO NUM OF WS-TMP.
+026300   CALL 'cobdom_style' USING 'termArea', 'width', WS-TMP.
+026400   MOVE HEIGHT OF WS-TERM-AREA TO NUM OF WS-TMP.
+026500   CALL 'cobdom_style' USING 'termArea', 'height', WS-TMP.
+026600   CONTINUE.
+026700 STACK-CUBBYS.
+026800   ADD 1 TO TOP-LEVELS OF WS-CUBBYS.
+026900   ADD 1 TO Y-AVAIL OF WS-CUBBYS.
+027000   COMPUTE REMAIN OF WS-CUBBYS = TOTAL OF WS-CUBBYS -
+027100     ((HEIGHT OF WS-TERM-AREA / WIDTH OF WS-CUBBYS) * 
+027200     TOP-LEVELS OF WS-CUBBYS).
+027300   IF REMAIN OF WS-CUBBYS > X-AVAIL OF WS-CUBBYS *
+027400     Y-AVAIL OF WS-CUBBYS THEN
+027500     PERFORM STACK-CUBBYS
+027600   END-IF.
+027700   CONTINUE.
+027800 UPDATE-READER-AREA.
+027900   IF FLIP OF WS-READER-AREA = 'y' THEN
+028000     MOVE WIDTH OF WS-TERM-AREA TO POS-X OF WS-READER-AREA
+028100     COMPUTE POS-Y OF WS-READER-AREA = HEIGHT OF WS-READER-AREA -
+028200       HEIGHT OF WS-TERM-AREA
+028300     COMPUTE WIDTH OF WS-READER-AREA = SWAP OF WS-READER-AREA *
+028400       WIDTH OF WS-TERM-AREA
+028500   ELSE
+028600     MOVE 0 TO POS-X OF WS-READER-AREA
+028700     COMPUTE POS-Y OF WS-READER-AREA = HEIGHT OF WS-TERM-AREA +
+028800       (TOP-LEVELS OF WS-CUBBYS * HEIGHT OF WS-CUBBYS)
+028900     MOVE WIDTH OF WS-TERM-AREA TO WIDTH OF WS-READER-AREA
+029000   END-IF.
+029100   MOVE POS-Y OF WS-READER-AREA TO NUM OF WS-TMP.
+029200   CALL 'cobdom_style' USING 'readerArea', 'top', WS-TMP.
+029300   MOVE POS-X OF WS-READER-AREA TO NUM OF WS-TMP.
+029400   CALL 'cobdom_style' USING 'readerArea', 'left', WS-TMP.
+029500   MOVE WIDTH OF WS-READER-AREA TO NUM OF WS-TMP.
+029600   CALL 'cobdom_style' USING 'readerArea', 'width', WS-TMP.
+029700   MOVE HEIGHT OF WS-READER-AREA TO NUM OF WS-TMP.
+029800   CALL 'cobdom_style' USING 'readerArea', 'height', WS-TMP.
+029900   CONTINUE.
+030000 UPDATE-STACK-AREA.
+030100   MOVE TOTAL OF WS-CUBBYS TO REMAIN OF WS-CUBBYS.
+030200   PERFORM VARYING WS-IDXA FROM 1 BY 1 UNTIL WS-IDXA >
+030300     TOP-LEVELS OF WS-CUBBYS
+030400     PERFORM VARYING WS-IDXB FROM 1 BY 1 UNTIL WS-IDXB >
+030500       TOP-WIDTH OF WS-CUBBYS + X-AVAIL OF WS-CUBBYS
+030600       COMPUTE WS-OFFSET = ((WS-IDXA - 1) *
+030700         (TOP-WIDTH OF WS-CUBBYS + X-AVAIL OF WS-CUBBYS)) + 
+030800         WS-IDXB
+030900       SUBTRACT 1 FROM REMAIN OF WS-CUBBYS
+031000       IF WS-OFFSET <= TOTAL OF WS-CUBBYS THEN
+031100         COMPUTE POS-X OF CUBBY OF WS-CUBBYS (WS-OFFSET) =
+031200           (WS-IDXB - 1) * WIDTH OF WS-CUBBYS
+031300         COMPUTE POS-Y OF CUBBY OF WS-CUBBYS (WS-OFFSET) =
+031400           (WS-IDXA - 1) * HEIGHT OF WS-CUBBYS
+031500*        DISPLAY 'TOP ' VAR OF CUBBY OF WS-CUBBYS (WS-OFFSET) '-'
+031600*          POS-X OF CUBBY OF WS-CUBBYS (WS-OFFSET) 'x'
+031700*          POS-Y OF CUBBY OF WS-CUBBYS (WS-OFFSET)
+031800       END-IF
+031900     END-PERFORM
+032000   END-PERFORM.
+032100   IF REMAIN OF WS-CUBBYS >= 1 THEN
+032200     PERFORM VARYING WS-IDXA FROM 1 BY 1 UNTIL WS-IDXA >
+032300       X-AVAIL OF WS-CUBBYS
+032400       PERFORM VARYING WS-IDXB FROM 1 BY 1 UNTIL WS-IDXB >
+032500         (Y-AVAIL OF WS-CUBBYS)
+032600         SUBTRACT 1 FROM REMAIN OF WS-CUBBYS
+032700         ADD 1 TO WS-OFFSET 
+032800         IF WS-OFFSET <= TOTAL OF WS-CUBBYS THEN
+032900           COMPUTE POS-X OF CUBBY OF WS-CUBBYS (WS-OFFSET) =
+033000             ((WS-IDXA - 1) * WIDTH OF WS-CUBBYS) +
+033100             WIDTH OF WS-TERM-AREA
+033200           COMPUTE POS-Y OF CUBBY OF WS-CUBBYS (WS-OFFSET) =
+033300             ((WS-IDXB - 1) * HEIGHT OF WS-CUBBYS) + 
+033400             ((HEIGHT OF WS-CUBBYS) * (TOP-LEVELS OF WS-CUBBYS))
+033500*          DISPLAY 'TOP ' VAR OF CUBBY OF WS-CUBBYS (WS-OFFSET)
+033600*            '-' POS-X OF CUBBY OF WS-CUBBYS (WS-OFFSET) 'x'
+033700*            POS-Y OF CUBBY OF WS-CUBBYS (WS-OFFSET) 
+033800         END-IF
+033900       END-PERFORM
+034000     END-PERFORM
+034100   END-IF.
+034200   PERFORM VARYING WS-OFFSET FROM 1 BY 1 UNTIL WS-OFFSET >
+034300     TOTAL OF WS-CUBBYS
+034400     DISPLAY VAR OF CUBBY OF WS-CUBBYS (WS-OFFSET) ':'
+034500       POS-X OF CUBBY OF WS-CUBBYS (WS-OFFSET) 'x'
+034600       POS-Y OF CUBBY OF WS-CUBBYS (WS-OFFSET) 
+034700     MOVE POS-X OF CUBBY OF WS-CUBBYS (WS-OFFSET) TO NUM OF WS-TMP
+034800     CALL 'cobdom_style' USING 
+034900       VAR OF CUBBY OF WS-CUBBYS (WS-OFFSET), 'left', 
+035000       NUM OF WS-TMP
+035100     MOVE POS-Y OF CUBBY OF WS-CUBBYS (WS-OFFSET) TO NUM OF WS-TMP
+035200     CALL 'cobdom_style' USING 
+035300       VAR OF CUBBY OF WS-CUBBYS (WS-OFFSET), 'top', NUM OF WS-TMP
+035400     MOVE WIDTH OF WS-CUBBYS TO NUM OF WS-TMP
+035500     CALL 'cobdom_style' USING 
+035600       VAR OF CUBBY OF WS-CUBBYS (WS-OFFSET), 'width', 
+035700       NUM OF WS-TMP
+035800     MOVE HEIGHT OF WS-CUBBYS TO NUM OF WS-TMP
+035900     CALL 'cobdom_style' USING 
+036000       VAR OF CUBBY OF WS-CUBBYS (WS-OFFSET), 'height', 
+036100       NUM OF WS-TMP
+036200     MOVE VAR OF CUBBY OF WS-CUBBYS (WS-OFFSET) TO STR OF WS-TMP
+036300     CALL 'cobdom_inner_html' USING 
+036400       VAR OF CUBBY OF WS-CUBBYS (WS-OFFSET), STR OF WS-TMP
+036500   END-PERFORM.
+036600   CONTINUE.
+036700 COOKIEACCEPT SECTION.
+036800 ENTRY 'COOKIEACCEPT'.
+036900   CALL 'cobdom_style' USING 'cookieDiv', 'display', 'none'.
+037000   CALL 'cobdom_set_cookie' USING 'y', 'allowCookies' .
+037100   MOVE 'y' TO WS-COOKIE-ALLOWED.
+037200   GOBACK.
+037300 COOKIEDENY SECTION.
+037400 ENTRY 'COOKIEDENY'.
+037500   CALL 'cobdom_style' USING 'cookieDiv', 'display', 'none'.
+037600   MOVE 'n' TO WS-COOKIE-ALLOWED.
 037700   GOBACK.
-037800 WINDOWCHANGE SECTION.
-037900 ENTRY 'WINDOWCHANGE'.
-038000   CALL 'cobdom_eval' USING BY REFERENCE WS-BLOB-SIZE, WS-BLOB, 
-038100     'window.innerWidth'.
-038200   MOVE WS-BLOB(1:WS-BLOB-SIZE) TO WS-WINDOW-WIDTH.
-038300   CALL 'cobdom_eval' USING BY REFERENCE WS-BLOB-SIZE, WS-BLOB, 
-038400     'window.innerHeight'.
-038500   MOVE WS-BLOB(1:WS-BLOB-SIZE) TO WS-WINDOW-HEIGHT.
-038600   PERFORM UPDATE-TERM-AREA.
-038700   PERFORM UPDATE-READER-AREA.
-038800   PERFORM UPDATE-STACK-AREA.
-038900   GOBACK.
-039000*LOADSVGUS SECTION.
-039100*ENTRY 'LOADSVGUS' USING BY REFERENCE LS-BLOB-SIZE,LS-BLOB.
-039200*  MOVE LS-BLOB(1:LS-BLOB-SIZE) TO WS-SVG-US.
-039300*  CALL 'cobdom_inner_html' USING 'langUS', WS-SVG-US
-039400*  CALL 'cobdom_style' USING 'langUS', 'width', '20px'
-039500*  CALL 'cobdom_style' USING 'langUS', 'height', '20px'
-039600*  GOBACK.
-039700*LOADSVGES SECTION.
-039800*ENTRY 'LOADSVGES' USING BY REFERENCE LS-BLOB-SIZE,LS-BLOB.
-039900*  MOVE LS-BLOB(1:LS-BLOB-SIZE) TO WS-SVG-ES.
-040000*  CALL 'cobdom_inner_html' USING 'langES', WS-SVG-ES
-040100*  CALL 'cobdom_style' USING 'langES', 'width', '20px'
-040200*  CALL 'cobdom_style' USING 'langES', 'height', '20px'
-040300*  GOBACK.
+037800 SETPERCENTCOBOL SECTION.
+037900 ENTRY 'SETPERCENTCOBOL' USING BY REFERENCE LS-BLOB-SIZE,LS-BLOB.
+038000   MOVE LS-BLOB(1:LS-BLOB-SIZE) TO WS-PERCENT-COBOL.
+038100   CALL 'cobdom_inner_html' USING 'percentCobol', 
+038200     WS-PERCENT-COBOL.
+038300   DISPLAY 'Currently this website is written in ' 
+038400     WS-PERCENT-COBOL '% COBOL.'.
+038500   GOBACK.
+038600 SETLANG SECTION.
+038700 ENTRY 'SETLANG' USING LS-LANG-CHOICE.
+038800   IF WS-LANG-SELECT-TOGGLE = 0 THEN
+038900     MOVE 1 TO WS-LANG-SELECT-TOGGLE
+039000     IF WS-LANG = 'us' THEN
+039100       DISPLAY 'Lang: us'
+039200*      CALL 'cobdom_style' USING 'langES', 'display', 'inline'
+039300     ELSE
+039400       DISPLAY 'Lang: es'
+039500*      CALL 'cobdom_style' USING 'langUS', 'display', 'inline'
+039600     END-IF
+039700   ELSE
+039800     MOVE 0 TO WS-LANG-SELECT-TOGGLE
+039900     IF WS-COOKIE-ALLOWED = 'y' THEN
+040000       IF LS-LANG-CHOICE = 'us' THEN
+040100         CALL 'cobdom_set_cookie' USING 'us', 'lang'
+040200         MOVE 'us' TO WS-LANG
+040300       ELSE
+040400         CALL 'cobdom_set_cookie' USING 'es', 'lang'
+040500         MOVE 'es' TO WS-LANG
+040600       END-IF
+040700*      PERFORM SET-ACTIVE-FLAG
+040800     ELSE
+040900       MOVE LS-LANG-CHOICE TO WS-LANG
+041000*      PERFORM SET-ACTIVE-FLAG 
+041100     END-IF
+041200   END-IF.
+041300   GOBACK.
+041400 SETLANGUS SECTION.
+041500 ENTRY 'SETLANGUS'.
+041600   CALL 'SETLANG' USING 'us'.
+041700   GOBACK.
+041800 SETLANGES SECTION.
+041900 ENTRY 'SETLANGES'.
+042000   CALL 'SETLANG' USING 'es'.
+042100   GOBACK.
+042200 WINDOWCHANGE SECTION.
+042300 ENTRY 'WINDOWCHANGE'.
+042400   CALL 'cobdom_eval' USING BY REFERENCE WS-BLOB-SIZE, WS-BLOB, 
+042500     'window.innerWidth'.
+042600   MOVE WS-BLOB(1:WS-BLOB-SIZE) TO WS-WINDOW-WIDTH.
+042700   CALL 'cobdom_eval' USING BY REFERENCE WS-BLOB-SIZE, WS-BLOB, 
+042800     'window.innerHeight'.
+042900   MOVE WS-BLOB(1:WS-BLOB-SIZE) TO WS-WINDOW-HEIGHT.
+043000   PERFORM UPDATE-TERM-AREA.
+043100   PERFORM UPDATE-READER-AREA.
+043200   PERFORM UPDATE-STACK-AREA.
+043300   GOBACK.
+043400*LOADSVGUS SECTION.
+043500*ENTRY 'LOADSVGUS' USING BY REFERENCE LS-BLOB-SIZE,LS-BLOB.
+043600*  MOVE LS-BLOB(1:LS-BLOB-SIZE) TO WS-SVG-US.
+043700*  CALL 'cobdom_inner_html' USING 'langUS', WS-SVG-US
+043800*  CALL 'cobdom_style' USING 'langUS', 'width', '20px'
+043900*  CALL 'cobdom_style' USING 'langUS', 'height', '20px'
+044000*  GOBACK.
+044100*LOADSVGES SECTION.
+044200*ENTRY 'LOADSVGES' USING BY REFERENCE LS-BLOB-SIZE,LS-BLOB.
+044300*  MOVE LS-BLOB(1:LS-BLOB-SIZE) TO WS-SVG-ES.
+044400*  CALL 'cobdom_inner_html' USING 'langES', WS-SVG-ES
+044500*  CALL 'cobdom_style' USING 'langES', 'width', '20px'
+044600*  CALL 'cobdom_style' USING 'langES', 'height', '20px'
+044700*  GOBACK.
