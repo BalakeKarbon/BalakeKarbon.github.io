@@ -5186,6 +5186,8 @@ var wasmImports = {
   /** @export */
   cd_set_timeout,
   /** @export */
+  cd_src,
+  /** @export */
   cd_style,
   /** @export */
   clock_time_get: _clock_time_get,
