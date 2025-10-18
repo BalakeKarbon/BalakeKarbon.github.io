@@ -5057,12 +5057,14 @@ function cd_fetch(func,url,method,body) { try { let requestURL = UTF8ToString(ur
 function cd_href(variable_name,href) { try { let variableName = UTF8ToString(variable_name); let hrefString = UTF8ToString(href); window[variableName].href=hrefString; return 1; } catch (e) { console.error('CobDOMinate Error:'); console.error('  Href: ' + e); return -1; } }
 function cd_src(variable_name,src) { try { let variableName = UTF8ToString(variable_name); let srcString = UTF8ToString(src); window[variableName].src=srcString; return 1; } catch (e) { console.error('CobDOMinate Error:'); console.error('  SRC: ' + e); return -1; } }
 function cd_eval(data_size,data,jscode) { try { let jsCode = UTF8ToString(jscode); let evalReturn = eval(jsCode).toString(); stringToUTF8(evalReturn, data, evalReturn.length+1); stringToUTF8(evalReturn.length.toString().padStart(10,'0'),data_size,11); return 1; } catch (e) { console.error('CobDOMinate Error:'); console.error('  Eval: ' + e); return -1; } }
-function cd_timeout(func,time) { try { let cobolFunc = UTF8ToString(func); let cobolTime = parseInt(UTF8ToString(time)); setTimeout(() => { Module.ccall(cobolFunc, null, [], []); },cobolTime); return 1; } catch (e) { console.error('CobDOMinate Error:'); console.error('  Fetch: ' + e); return -1; } }
+function cd_set_timeout(variable_name,func,time) { try { let variableName = UTF8ToString(variable_name); let cobolFunc = UTF8ToString(func); let cobolTime = parseInt(UTF8ToString(time)); window[variableName] = setTimeout(() => { Module.ccall(cobolFunc, null, [], []); },cobolTime); return 1; } catch (e) { console.error('CobDOMinate Error:'); console.error('  Set Timeout: ' + e); return -1; } }
+function cd_clear_timeout(variable_name) { try { let variableName = UTF8ToString(variable_name); clearTimeout(window[variableName]); return 1; } catch (e) { console.error('CobDOMinate Error:'); console.error('  Clear Timeout: ' + e); return -1; } }
 
 // Imports from the Wasm binary.
 var _SETLANG = Module['_SETLANG'] = makeInvalidEarlyAccess('_SETLANG');
-var _WINDOWCHANGE = Module['_WINDOWCHANGE'] = makeInvalidEarlyAccess('_WINDOWCHANGE');
+var _RENDERPAGE = Module['_RENDERPAGE'] = makeInvalidEarlyAccess('_RENDERPAGE');
 var _MAIN = Module['_MAIN'] = makeInvalidEarlyAccess('_MAIN');
+var _WINDOWCHANGE = Module['_WINDOWCHANGE'] = makeInvalidEarlyAccess('_WINDOWCHANGE');
 var _COOKIEACCEPT = Module['_COOKIEACCEPT'] = makeInvalidEarlyAccess('_COOKIEACCEPT');
 var _COOKIEDENY = Module['_COOKIEDENY'] = makeInvalidEarlyAccess('_COOKIEDENY');
 var _SETPERCENTCOBOL = Module['_SETPERCENTCOBOL'] = makeInvalidEarlyAccess('_SETPERCENTCOBOL');
@@ -5084,8 +5086,9 @@ var _emscripten_stack_get_current = makeInvalidEarlyAccess('_emscripten_stack_ge
 
 function assignWasmExports(wasmExports) {
   Module['_SETLANG'] = _SETLANG = createExportWrapper('SETLANG', 1);
-  Module['_WINDOWCHANGE'] = _WINDOWCHANGE = createExportWrapper('WINDOWCHANGE', 0);
+  Module['_RENDERPAGE'] = _RENDERPAGE = createExportWrapper('RENDERPAGE', 0);
   Module['_MAIN'] = _MAIN = createExportWrapper('MAIN', 0);
+  Module['_WINDOWCHANGE'] = _WINDOWCHANGE = createExportWrapper('WINDOWCHANGE', 0);
   Module['_COOKIEACCEPT'] = _COOKIEACCEPT = createExportWrapper('COOKIEACCEPT', 0);
   Module['_COOKIEDENY'] = _COOKIEDENY = createExportWrapper('COOKIEDENY', 0);
   Module['_SETPERCENTCOBOL'] = _SETPERCENTCOBOL = createExportWrapper('SETPERCENTCOBOL', 2);
@@ -5165,6 +5168,8 @@ var wasmImports = {
   /** @export */
   cd_class_style,
   /** @export */
+  cd_clear_timeout,
+  /** @export */
   cd_create_element,
   /** @export */
   cd_eval,
@@ -5178,6 +5183,8 @@ var wasmImports = {
   cd_set_class,
   /** @export */
   cd_set_cookie,
+  /** @export */
+  cd_set_timeout,
   /** @export */
   cd_style,
   /** @export */
