@@ -5062,7 +5062,7 @@ function cd_clear_timeout(variable_name) { try { let variableName = UTF8ToString
 
 // Imports from the Wasm binary.
 var _SETLANG = Module['_SETLANG'] = makeInvalidEarlyAccess('_SETLANG');
-var _RENDERPAGE = Module['_RENDERPAGE'] = makeInvalidEarlyAccess('_RENDERPAGE');
+var _SHAPEPAGE = Module['_SHAPEPAGE'] = makeInvalidEarlyAccess('_SHAPEPAGE');
 var _MAIN = Module['_MAIN'] = makeInvalidEarlyAccess('_MAIN');
 var _WINDOWCHANGE = Module['_WINDOWCHANGE'] = makeInvalidEarlyAccess('_WINDOWCHANGE');
 var _COOKIEACCEPT = Module['_COOKIEACCEPT'] = makeInvalidEarlyAccess('_COOKIEACCEPT');
@@ -5086,7 +5086,7 @@ var _emscripten_stack_get_current = makeInvalidEarlyAccess('_emscripten_stack_ge
 
 function assignWasmExports(wasmExports) {
   Module['_SETLANG'] = _SETLANG = createExportWrapper('SETLANG', 1);
-  Module['_RENDERPAGE'] = _RENDERPAGE = createExportWrapper('RENDERPAGE', 0);
+  Module['_SHAPEPAGE'] = _SHAPEPAGE = createExportWrapper('SHAPEPAGE', 0);
   Module['_MAIN'] = _MAIN = createExportWrapper('MAIN', 0);
   Module['_WINDOWCHANGE'] = _WINDOWCHANGE = createExportWrapper('WINDOWCHANGE', 0);
   Module['_COOKIEACCEPT'] = _COOKIEACCEPT = createExportWrapper('COOKIEACCEPT', 0);
