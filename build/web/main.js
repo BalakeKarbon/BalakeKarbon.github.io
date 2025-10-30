@@ -240,10 +240,6 @@ function assert(condition, text) {
 
 // We used to include malloc/free by default in the past. Show a helpful error in
 // builds with assertions.
-function _free() {
-  // Show a helpful error since we used to include free by default in the past.
-  abort('free() called but not included in the build - add `_free` to EXPORTED_FUNCTIONS');
-}
 
 /**
  * Indicates whether filename is delivered via file protocol (as opposed to http/https)
@@ -5053,23 +5049,27 @@ function cd_style(variable_name,style_key,style_value) { try { let variableName 
 function cd_class_style(class_name,style_key,style_value) { try { let className = UTF8ToString(class_name); let styleKey = UTF8ToString(style_key); let styleValue = UTF8ToString(style_value); document.querySelectorAll('.' + className).forEach(el => { el.style[styleKey] = styleValue; }); return 1; } catch (e) { console.error('CobDOMinate Error:'); console.error('  Style: ' + e); return -1; } }
 function cd_set_cookie(data,cookie_name) { try { let cookieName = UTF8ToString(cookie_name); let content = UTF8ToString(data); document.cookie=cookieName +'='+ content; return 1; } catch (e) { console.error('CobDOMinate Error:'); console.error('  Set cookie: ' + e); return -1; } }
 function cd_get_cookie(data,cookie_name) { try { let cookieName = UTF8ToString(cookie_name); let content = document.cookie.split('; ').find(row => row.startsWith(cookieName + '='))?.split('=')[1] || ''; stringToUTF8(content, data, 1024); return 1; } catch (e) { console.error('CobDOMinate Error:'); console.error('  Get cookie: ' + e); return -1; } }
-function cd_fetch(func,url,method,body) { try { let requestURL = UTF8ToString(url); let cobolFunc = UTF8ToString(func); let methodString = UTF8ToString(method); let bodyString = UTF8ToString(body); let fetchOptions = { method: methodString }; if (methodString === 'POST') { fetchOptions.body = bodyString; } fetch(requestURL, fetchOptions).then(response => { if(!response.ok) { throw new Error(error); } return response.arrayBuffer(); }).then(data => { let len = data.byteLength; let ptr = _malloc(len); if (ptr === 0) throw new Error("Malloc failed"); let heapBytes = new Uint8Array(Module.HEAP8.buffer, ptr, len); heapBytes.set(new Uint8Array(data)); Module.ccall(cobolFunc, null, ['string','number'], [len.toString().padStart(10,'0'),ptr]); }).catch(error => { throw new Error(error); }); return 1; } catch (e) { console.error('CobDOMinate Error:'); console.error('  Fetch: ' + e); return -1; } }
+function cd_fetch(func,url,method,body) { try { let requestURL = UTF8ToString(url); let cobolFunc = UTF8ToString(func); let methodString = UTF8ToString(method); let bodyString = UTF8ToString(body); let fetchOptions = { method: methodString }; if (methodString === 'POST') { fetchOptions.body = bodyString; } fetch(requestURL, fetchOptions).then(response => { if(!response.ok) { throw new Error(error); } return response.arrayBuffer(); }).then(data => { let len = data.byteLength; let ptr = _malloc(len); if (ptr === 0) throw new Error("Malloc failed"); let heapBytes = new Uint8Array(Module.HEAP8.buffer, ptr, len); heapBytes.set(new Uint8Array(data)); Module.ccall(cobolFunc, null, ['string','number'], [len.toString().padStart(10,'0'),ptr]); _free(ptr); }).catch(error => { throw new Error(error); }); return 1; } catch (e) { console.error('CobDOMinate Error:'); console.error('  Fetch: ' + e); return -1; } }
 function cd_href(variable_name,href) { try { let variableName = UTF8ToString(variable_name); let hrefString = UTF8ToString(href); window[variableName].href=hrefString; return 1; } catch (e) { console.error('CobDOMinate Error:'); console.error('  Href: ' + e); return -1; } }
 function cd_src(variable_name,src) { try { let variableName = UTF8ToString(variable_name); let srcString = UTF8ToString(src); window[variableName].src=srcString; return 1; } catch (e) { console.error('CobDOMinate Error:'); console.error('  SRC: ' + e); return -1; } }
 function cd_eval(data_size,data,jscode) { try { let jsCode = UTF8ToString(jscode); let evalReturn = eval(jsCode).toString(); stringToUTF8(evalReturn, data, evalReturn.length+1); stringToUTF8(evalReturn.length.toString().padStart(10,'0'),data_size,11); return 1; } catch (e) { console.error('CobDOMinate Error:'); console.error('  Eval: ' + e); return -1; } }
 function cd_set_timeout(variable_name,func,time) { try { let variableName = UTF8ToString(variable_name); let cobolFunc = UTF8ToString(func); let cobolTime = parseInt(UTF8ToString(time)); window[variableName] = setTimeout(() => { Module.ccall(cobolFunc, null, [], []); },cobolTime); return 1; } catch (e) { console.error('CobDOMinate Error:'); console.error('  Set Timeout: ' + e); return -1; } }
 function cd_clear_timeout(variable_name) { try { let variableName = UTF8ToString(variable_name); clearTimeout(window[variableName]); return 1; } catch (e) { console.error('CobDOMinate Error:'); console.error('  Clear Timeout: ' + e); return -1; } }
+function cd_font_face(font_family,font_source,cobol_func) { try { let fontFamily = UTF8ToString(font_family); let fontSource = UTF8ToString(font_source); let cobolFunc = UTF8ToString(cobol_func); let newFont = new FontFace(fontFamily, fontSource); newFont.load().then(function() { Module.ccall(cobolFunc, null, [], []); }).catch(function(error) { throw new Error(error); });; document.fonts.add(newFont); return 1; } catch (e) { console.error('CobDOMinate Error:'); console.error('  Font Face: ' + e); return -1; } }
 
 // Imports from the Wasm binary.
 var _SETLANG = Module['_SETLANG'] = makeInvalidEarlyAccess('_SETLANG');
 var _SHAPEPAGE = Module['_SHAPEPAGE'] = makeInvalidEarlyAccess('_SHAPEPAGE');
 var _MAIN = Module['_MAIN'] = makeInvalidEarlyAccess('_MAIN');
+var _FONTLOADED = Module['_FONTLOADED'] = makeInvalidEarlyAccess('_FONTLOADED');
 var _WINDOWCHANGE = Module['_WINDOWCHANGE'] = makeInvalidEarlyAccess('_WINDOWCHANGE');
 var _COOKIEACCEPT = Module['_COOKIEACCEPT'] = makeInvalidEarlyAccess('_COOKIEACCEPT');
 var _COOKIEDENY = Module['_COOKIEDENY'] = makeInvalidEarlyAccess('_COOKIEDENY');
 var _SETPERCENTCOBOL = Module['_SETPERCENTCOBOL'] = makeInvalidEarlyAccess('_SETPERCENTCOBOL');
 var _SETLANGUS = Module['_SETLANGUS'] = makeInvalidEarlyAccess('_SETLANGUS');
 var _SETLANGES = Module['_SETLANGES'] = makeInvalidEarlyAccess('_SETLANGES');
+var _TERMINPUT = Module['_TERMINPUT'] = makeInvalidEarlyAccess('_TERMINPUT');
+var _free = Module['_free'] = makeInvalidEarlyAccess('_free');
 var _malloc = Module['_malloc'] = makeInvalidEarlyAccess('_malloc');
 var _fflush = makeInvalidEarlyAccess('_fflush');
 var _cob_init = Module['_cob_init'] = makeInvalidEarlyAccess('_cob_init');
@@ -5088,12 +5088,15 @@ function assignWasmExports(wasmExports) {
   Module['_SETLANG'] = _SETLANG = createExportWrapper('SETLANG', 1);
   Module['_SHAPEPAGE'] = _SHAPEPAGE = createExportWrapper('SHAPEPAGE', 0);
   Module['_MAIN'] = _MAIN = createExportWrapper('MAIN', 0);
+  Module['_FONTLOADED'] = _FONTLOADED = createExportWrapper('FONTLOADED', 0);
   Module['_WINDOWCHANGE'] = _WINDOWCHANGE = createExportWrapper('WINDOWCHANGE', 0);
   Module['_COOKIEACCEPT'] = _COOKIEACCEPT = createExportWrapper('COOKIEACCEPT', 0);
   Module['_COOKIEDENY'] = _COOKIEDENY = createExportWrapper('COOKIEDENY', 0);
   Module['_SETPERCENTCOBOL'] = _SETPERCENTCOBOL = createExportWrapper('SETPERCENTCOBOL', 2);
   Module['_SETLANGUS'] = _SETLANGUS = createExportWrapper('SETLANGUS', 0);
   Module['_SETLANGES'] = _SETLANGES = createExportWrapper('SETLANGES', 0);
+  Module['_TERMINPUT'] = _TERMINPUT = createExportWrapper('TERMINPUT', 1);
+  Module['_free'] = _free = createExportWrapper('free', 1);
   Module['_malloc'] = _malloc = createExportWrapper('malloc', 1);
   _fflush = createExportWrapper('fflush', 1);
   Module['_cob_init'] = _cob_init = createExportWrapper('cob_init', 2);
@@ -5174,7 +5177,7 @@ var wasmImports = {
   /** @export */
   cd_eval,
   /** @export */
-  cd_fetch,
+  cd_font_face,
   /** @export */
   cd_get_cookie,
   /** @export */
