@@ -5061,6 +5061,7 @@ function cd_font_face(font_family,font_source,cobol_func) { try { let fontFamily
 var _SETLANG = Module['_SETLANG'] = makeInvalidEarlyAccess('_SETLANG');
 var _SHAPEPAGE = Module['_SHAPEPAGE'] = makeInvalidEarlyAccess('_SHAPEPAGE');
 var _MAIN = Module['_MAIN'] = makeInvalidEarlyAccess('_MAIN');
+var _MENUTOGGLE = Module['_MENUTOGGLE'] = makeInvalidEarlyAccess('_MENUTOGGLE');
 var _FONTLOADED = Module['_FONTLOADED'] = makeInvalidEarlyAccess('_FONTLOADED');
 var _WINDOWCHANGE = Module['_WINDOWCHANGE'] = makeInvalidEarlyAccess('_WINDOWCHANGE');
 var _COOKIEACCEPT = Module['_COOKIEACCEPT'] = makeInvalidEarlyAccess('_COOKIEACCEPT');
@@ -5068,7 +5069,6 @@ var _COOKIEDENY = Module['_COOKIEDENY'] = makeInvalidEarlyAccess('_COOKIEDENY');
 var _SETPERCENTCOBOL = Module['_SETPERCENTCOBOL'] = makeInvalidEarlyAccess('_SETPERCENTCOBOL');
 var _SETLANGUS = Module['_SETLANGUS'] = makeInvalidEarlyAccess('_SETLANGUS');
 var _SETLANGES = Module['_SETLANGES'] = makeInvalidEarlyAccess('_SETLANGES');
-var _TERMINPUT = Module['_TERMINPUT'] = makeInvalidEarlyAccess('_TERMINPUT');
 var _free = Module['_free'] = makeInvalidEarlyAccess('_free');
 var _malloc = Module['_malloc'] = makeInvalidEarlyAccess('_malloc');
 var _fflush = makeInvalidEarlyAccess('_fflush');
@@ -5088,6 +5088,7 @@ function assignWasmExports(wasmExports) {
   Module['_SETLANG'] = _SETLANG = createExportWrapper('SETLANG', 1);
   Module['_SHAPEPAGE'] = _SHAPEPAGE = createExportWrapper('SHAPEPAGE', 0);
   Module['_MAIN'] = _MAIN = createExportWrapper('MAIN', 0);
+  Module['_MENUTOGGLE'] = _MENUTOGGLE = createExportWrapper('MENUTOGGLE', 0);
   Module['_FONTLOADED'] = _FONTLOADED = createExportWrapper('FONTLOADED', 0);
   Module['_WINDOWCHANGE'] = _WINDOWCHANGE = createExportWrapper('WINDOWCHANGE', 0);
   Module['_COOKIEACCEPT'] = _COOKIEACCEPT = createExportWrapper('COOKIEACCEPT', 0);
@@ -5095,7 +5096,6 @@ function assignWasmExports(wasmExports) {
   Module['_SETPERCENTCOBOL'] = _SETPERCENTCOBOL = createExportWrapper('SETPERCENTCOBOL', 2);
   Module['_SETLANGUS'] = _SETLANGUS = createExportWrapper('SETLANGUS', 0);
   Module['_SETLANGES'] = _SETLANGES = createExportWrapper('SETLANGES', 0);
-  Module['_TERMINPUT'] = _TERMINPUT = createExportWrapper('TERMINPUT', 1);
   Module['_free'] = _free = createExportWrapper('free', 1);
   Module['_malloc'] = _malloc = createExportWrapper('malloc', 1);
   _fflush = createExportWrapper('fflush', 1);
