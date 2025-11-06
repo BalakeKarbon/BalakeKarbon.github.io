@@ -304,7 +304,7 @@ function dbg(...args) {
   var h16 = new Int16Array(1);
   var h8 = new Int8Array(h16.buffer);
   h16[0] = 0x6373;
-  if (h8[0] !== 0x73 || h8[1] !== 0x63) abort('Runtime error: expected the system to be little-endian! (Run with -sSUPPORT_BIG_ENDIAN to bypass)');
+  if (h8[0] !== 0x73 || h8[1] !== 0x63) throw 'Runtime error: expected the system to be little-endian! (Run with -sSUPPORT_BIG_ENDIAN to bypass)';
 })();
 
 function consumedModuleProp(prop) {
@@ -345,12 +345,9 @@ function isExportedByForceFilesystem(name) {
 }
 
 /**
- * Intercept access to a symbols in the global symbol.  This enables us to give
- * informative warnings/errors when folks attempt to use symbols they did not
- * include in their build, or no symbols that no longer exist.
- *
- * We don't define this in MODULARIZE mode since in that mode emscripten symbols
- * are never placed in the global scope.
+ * Intercept access to a global symbol.  This enables us to give informative
+ * warnings/errors when folks attempt to use symbols they did not include in
+ * their build, or no symbols that no longer exist.
  */
 function hookGlobalSymbolAccess(sym, func) {
   if (typeof globalThis != 'undefined' && !Object.getOwnPropertyDescriptor(globalThis, sym)) {
@@ -366,7 +363,7 @@ function hookGlobalSymbolAccess(sym, func) {
 
 function missingGlobal(sym, msg) {
   hookGlobalSymbolAccess(sym, () => {
-    warnOnce(`\`${sym}\` is no longer defined by emscripten. ${msg}`);
+    warnOnce(`\`${sym}\` is not longer defined by emscripten. ${msg}`);
   });
 }
 
@@ -515,6 +512,73 @@ function postRun() {
   // End ATPOSTRUNS hooks
 }
 
+// A counter of dependencies for calling run(). If we need to
+// do asynchronous work before running, increment this and
+// decrement it. Incrementing must happen in a place like
+// Module.preRun (used by emcc to add file preloading).
+// Note that you can add dependencies in preRun, even though
+// it happens right before run - run will be postponed until
+// the dependencies are met.
+var runDependencies = 0;
+var dependenciesFulfilled = null; // overridden to take different actions when all run dependencies are fulfilled
+var runDependencyTracking = {};
+var runDependencyWatcher = null;
+
+function addRunDependency(id) {
+  runDependencies++;
+
+  Module['monitorRunDependencies']?.(runDependencies);
+
+  assert(id, 'addRunDependency requires an ID')
+  assert(!runDependencyTracking[id]);
+  runDependencyTracking[id] = 1;
+  if (runDependencyWatcher === null && typeof setInterval != 'undefined') {
+    // Check for missing dependencies every few seconds
+    runDependencyWatcher = setInterval(() => {
+      if (ABORT) {
+        clearInterval(runDependencyWatcher);
+        runDependencyWatcher = null;
+        return;
+      }
+      var shown = false;
+      for (var dep in runDependencyTracking) {
+        if (!shown) {
+          shown = true;
+          err('still waiting on run dependencies:');
+        }
+        err(`dependency: ${dep}`);
+      }
+      if (shown) {
+        err('(end of list)');
+      }
+    }, 10000);
+    // Prevent this timer from keeping the runtime alive if nothing
+    // else is.
+    runDependencyWatcher.unref?.()
+  }
+}
+
+function removeRunDependency(id) {
+  runDependencies--;
+
+  Module['monitorRunDependencies']?.(runDependencies);
+
+  assert(id, 'removeRunDependency requires an ID');
+  assert(runDependencyTracking[id]);
+  delete runDependencyTracking[id];
+  if (runDependencies == 0) {
+    if (runDependencyWatcher !== null) {
+      clearInterval(runDependencyWatcher);
+      runDependencyWatcher = null;
+    }
+    if (dependenciesFulfilled) {
+      var callback = dependenciesFulfilled;
+      dependenciesFulfilled = null;
+      callback(); // can add another dependenciesFulfilled
+    }
+  }
+}
+
 /** @param {string|number=} what */
 function abort(what) {
   Module['onAbort']?.(what);
@@ -572,8 +636,6 @@ function getBinarySync(file) {
   if (readBinary) {
     return readBinary(file);
   }
-  // Throwing a plain string here, even though it not normally adviables since
-  // this gets turning into an `abort` in instantiateArrayBuffer.
   throw 'both async and sync fetching of the wasm failed';
 }
 
@@ -602,8 +664,8 @@ async function instantiateArrayBuffer(binaryFile, imports) {
     err(`failed to asynchronously prepare wasm: ${reason}`);
 
     // Warn on some common problems.
-    if (isFileURI(binaryFile)) {
-      err(`warning: Loading from a file URI (${binaryFile}) is not supported in most browsers. See https://emscripten.org/docs/getting_started/FAQ.html#how-do-i-run-a-local-webserver-for-testing-why-does-my-program-stall-in-downloading-or-preparing`);
+    if (isFileURI(wasmBinaryFile)) {
+      err(`warning: Loading from a file URI (${wasmBinaryFile}) is not supported in most browsers. See https://emscripten.org/docs/getting_started/FAQ.html#how-do-i-run-a-local-webserver-for-testing-why-does-my-program-stall-in-downloading-or-preparing`);
     }
     abort(reason);
   }
@@ -669,6 +731,7 @@ async function createWasm() {
     removeRunDependency('wasm-instantiate');
     return wasmExports;
   }
+  // wait for the pthread pool (if any)
   addRunDependency('wasm-instantiate');
 
   // Prefer streaming instantiation if available.
@@ -738,71 +801,6 @@ async function createWasm() {
   var onPreRuns = [];
   var addOnPreRun = (cb) => onPreRuns.push(cb);
 
-  var runDependencies = 0;
-  
-  
-  var dependenciesFulfilled = null;
-  
-  var runDependencyTracking = {
-  };
-  
-  var runDependencyWatcher = null;
-  var removeRunDependency = (id) => {
-      runDependencies--;
-  
-      Module['monitorRunDependencies']?.(runDependencies);
-  
-      assert(id, 'removeRunDependency requires an ID');
-      assert(runDependencyTracking[id]);
-      delete runDependencyTracking[id];
-      if (runDependencies == 0) {
-        if (runDependencyWatcher !== null) {
-          clearInterval(runDependencyWatcher);
-          runDependencyWatcher = null;
-        }
-        if (dependenciesFulfilled) {
-          var callback = dependenciesFulfilled;
-          dependenciesFulfilled = null;
-          callback(); // can add another dependenciesFulfilled
-        }
-      }
-    };
-  
-  
-  var addRunDependency = (id) => {
-      runDependencies++;
-  
-      Module['monitorRunDependencies']?.(runDependencies);
-  
-      assert(id, 'addRunDependency requires an ID')
-      assert(!runDependencyTracking[id]);
-      runDependencyTracking[id] = 1;
-      if (runDependencyWatcher === null && typeof setInterval != 'undefined') {
-        // Check for missing dependencies every few seconds
-        runDependencyWatcher = setInterval(() => {
-          if (ABORT) {
-            clearInterval(runDependencyWatcher);
-            runDependencyWatcher = null;
-            return;
-          }
-          var shown = false;
-          for (var dep in runDependencyTracking) {
-            if (!shown) {
-              shown = true;
-              err('still waiting on run dependencies:');
-            }
-            err(`dependency: ${dep}`);
-          }
-          if (shown) {
-            err('(end of list)');
-          }
-        }, 10000);
-        // Prevent this timer from keeping the runtime alive if nothing
-        // else is.
-        runDependencyWatcher.unref?.()
-      }
-    };
-
 
   
     /**
@@ -828,11 +826,10 @@ async function createWasm() {
 
   var ptrToString = (ptr) => {
       assert(typeof ptr === 'number');
-      // Convert to 32-bit unsigned value
+      // With CAN_ADDRESS_2GB or MEMORY64, pointers are already unsigned.
       ptr >>>= 0;
       return '0x' + ptr.toString(16).padStart(8, '0');
     };
-
 
   
     /**
@@ -1851,8 +1848,6 @@ async function createWasm() {
         id = orig + Math.random();
       }
     };
-  
-  
   
   var preloadPlugins = [];
   var FS_handledByPreloadPlugin = async (byteArray, fullname) => {
@@ -3046,7 +3041,7 @@ async function createWasm() {
         opts.flags = opts.flags || 0;
         opts.encoding = opts.encoding || 'binary';
         if (opts.encoding !== 'utf8' && opts.encoding !== 'binary') {
-          abort(`Invalid encoding type "${opts.encoding}"`);
+          throw new Error(`Invalid encoding type "${opts.encoding}"`);
         }
         var stream = FS.open(path, opts.flags);
         var stat = FS.stat(path);
@@ -3068,7 +3063,7 @@ async function createWasm() {
         if (ArrayBuffer.isView(data)) {
           FS.write(stream, data, 0, data.byteLength, undefined, opts.canOwn);
         } else {
-          abort('Unsupported data type');
+          throw new Error('Unsupported data type');
         }
         FS.close(stream);
       },
@@ -3364,10 +3359,11 @@ async function createWasm() {
   forceLoadFile(obj) {
         if (obj.isDevice || obj.isFolder || obj.link || obj.contents) return true;
         if (typeof XMLHttpRequest != 'undefined') {
-          abort("Lazy loading should have been performed (contents set) in createLazyFile, but it was not. Lazy loading only works in web workers. Use --embed-file or --preload-file in emcc on the main thread.");
+          throw new Error("Lazy loading should have been performed (contents set) in createLazyFile, but it was not. Lazy loading only works in web workers. Use --embed-file or --preload-file in emcc on the main thread.");
         } else { // Command-line.
           try {
             obj.contents = readBinary(obj.url);
+            obj.usedBytes = obj.contents.length;
           } catch (e) {
             throw new FS.ErrnoError(29);
           }
@@ -3395,7 +3391,7 @@ async function createWasm() {
             var xhr = new XMLHttpRequest();
             xhr.open('HEAD', url, false);
             xhr.send(null);
-            if (!(xhr.status >= 200 && xhr.status < 300 || xhr.status === 304)) abort("Couldn't load " + url + ". Status: " + xhr.status);
+            if (!(xhr.status >= 200 && xhr.status < 300 || xhr.status === 304)) throw new Error("Couldn't load " + url + ". Status: " + xhr.status);
             var datalength = Number(xhr.getResponseHeader("Content-length"));
             var header;
             var hasByteServing = (header = xhr.getResponseHeader("Accept-Ranges")) && header === "bytes";
@@ -3407,8 +3403,8 @@ async function createWasm() {
   
             // Function to get a range from the remote URL.
             var doXHR = (from, to) => {
-              if (from > to) abort("invalid range (" + from + ", " + to + ") or no bytes requested!");
-              if (to > datalength-1) abort("only " + datalength + " bytes available! programmer error!");
+              if (from > to) throw new Error("invalid range (" + from + ", " + to + ") or no bytes requested!");
+              if (to > datalength-1) throw new Error("only " + datalength + " bytes available! programmer error!");
   
               // TODO: Use mozResponseArrayBuffer, responseStream, etc. if available.
               var xhr = new XMLHttpRequest();
@@ -3422,7 +3418,7 @@ async function createWasm() {
               }
   
               xhr.send(null);
-              if (!(xhr.status >= 200 && xhr.status < 300 || xhr.status === 304)) abort("Couldn't load " + url + ". Status: " + xhr.status);
+              if (!(xhr.status >= 200 && xhr.status < 300 || xhr.status === 304)) throw new Error("Couldn't load " + url + ". Status: " + xhr.status);
               if (xhr.response !== undefined) {
                 return new Uint8Array(/** @type{Array<number>} */(xhr.response || []));
               }
@@ -3436,7 +3432,7 @@ async function createWasm() {
               if (typeof lazyArray.chunks[chunkNum] == 'undefined') {
                 lazyArray.chunks[chunkNum] = doXHR(start, end);
               }
-              if (typeof lazyArray.chunks[chunkNum] == 'undefined') abort('doXHR failed!');
+              if (typeof lazyArray.chunks[chunkNum] == 'undefined') throw new Error('doXHR failed!');
               return lazyArray.chunks[chunkNum];
             });
   
@@ -3467,7 +3463,7 @@ async function createWasm() {
         }
   
         if (typeof XMLHttpRequest != 'undefined') {
-          if (!ENVIRONMENT_IS_WORKER) abort('Cannot do synchronous binary XHRs outside webworkers in modern browsers. Use --embed-file or --preload-file in emcc');
+          if (!ENVIRONMENT_IS_WORKER) throw 'Cannot do synchronous binary XHRs outside webworkers in modern browsers. Use --embed-file or --preload-file in emcc';
           var lazyArray = new LazyUint8Array();
           var properties = { isDevice: false, contents: lazyArray };
         } else {
@@ -4613,13 +4609,6 @@ if (Module['wasmBinary']) wasmBinary = Module['wasmBinary'];
   assert(typeof Module['wasmMemory'] == 'undefined', 'Use of `wasmMemory` detected.  Use -sIMPORTED_MEMORY to define wasmMemory externally');
   assert(typeof Module['INITIAL_MEMORY'] == 'undefined', 'Detected runtime INITIAL_MEMORY setting.  Use -sIMPORTED_MEMORY to define wasmMemory dynamically');
 
-  if (Module['preInit']) {
-    if (typeof Module['preInit'] == 'function') Module['preInit'] = [Module['preInit']];
-    while (Module['preInit'].length > 0) {
-      Module['preInit'].shift()();
-    }
-  }
-  consumedModuleProp('preInit');
 }
 
 // Begin runtime exports
@@ -4782,6 +4771,8 @@ missingLibrarySymbols.forEach(missingLibrarySymbol)
 
   var unexportedSymbols = [
   'run',
+  'addRunDependency',
+  'removeRunDependency',
   'out',
   'err',
   'callMain',
@@ -4826,8 +4817,6 @@ missingLibrarySymbols.forEach(missingLibrarySymbol)
   'wasmTable',
   'getUniqueRunDependency',
   'noExitRuntime',
-  'addRunDependency',
-  'removeRunDependency',
   'addOnPreRun',
   'addOnPostRun',
   'freeTableIndexes',
@@ -5220,6 +5209,8 @@ var wasmImports = {
   /** @export */
   proc_exit: _proc_exit
 };
+var wasmExports;
+createWasm();
 
 
 // include: postamble.js
@@ -5324,12 +5315,17 @@ function checkUnflushedContent() {
   }
 }
 
-var wasmExports;
+function preInit() {
+  if (Module['preInit']) {
+    if (typeof Module['preInit'] == 'function') Module['preInit'] = [Module['preInit']];
+    while (Module['preInit'].length > 0) {
+      Module['preInit'].shift()();
+    }
+  }
+  consumedModuleProp('preInit');
+}
 
-// With async instantation wasmExports is assigned asynchronously when the
-// instance is received.
-createWasm();
-
+preInit();
 run();
 
 // end include: postamble.js
