@@ -5053,6 +5053,8 @@ function cd_font_face(font_family,font_source,cobol_func) { try { let fontFamily
 var _SETLANG = Module['_SETLANG'] = makeInvalidEarlyAccess('_SETLANG');
 var _SHAPEPAGE = Module['_SHAPEPAGE'] = makeInvalidEarlyAccess('_SHAPEPAGE');
 var _MAIN = Module['_MAIN'] = makeInvalidEarlyAccess('_MAIN');
+var _LOADENAM = Module['_LOADENAM'] = makeInvalidEarlyAccess('_LOADENAM');
+var _LOADESAM = Module['_LOADESAM'] = makeInvalidEarlyAccess('_LOADESAM');
 var _MENUTOGGLE = Module['_MENUTOGGLE'] = makeInvalidEarlyAccess('_MENUTOGGLE');
 var _FONTLOADED = Module['_FONTLOADED'] = makeInvalidEarlyAccess('_FONTLOADED');
 var _WINDOWCHANGE = Module['_WINDOWCHANGE'] = makeInvalidEarlyAccess('_WINDOWCHANGE');
@@ -5080,6 +5082,8 @@ function assignWasmExports(wasmExports) {
   Module['_SETLANG'] = _SETLANG = createExportWrapper('SETLANG', 1);
   Module['_SHAPEPAGE'] = _SHAPEPAGE = createExportWrapper('SHAPEPAGE', 0);
   Module['_MAIN'] = _MAIN = createExportWrapper('MAIN', 0);
+  Module['_LOADENAM'] = _LOADENAM = createExportWrapper('LOADENAM', 2);
+  Module['_LOADESAM'] = _LOADESAM = createExportWrapper('LOADESAM', 2);
   Module['_MENUTOGGLE'] = _MENUTOGGLE = createExportWrapper('MENUTOGGLE', 0);
   Module['_FONTLOADED'] = _FONTLOADED = createExportWrapper('FONTLOADED', 0);
   Module['_WINDOWCHANGE'] = _WINDOWCHANGE = createExportWrapper('WINDOWCHANGE', 0);
@@ -5168,6 +5172,8 @@ var wasmImports = {
   cd_create_element,
   /** @export */
   cd_eval,
+  /** @export */
+  cd_fetch,
   /** @export */
   cd_font_face,
   /** @export */
