@@ -5048,6 +5048,7 @@ function cd_set_interval(variable_name,func,time) { try { let variableName = UTF
 function cd_clear_interval(variable_name) { try { let variableName = UTF8ToString(variable_name); clearInterval(window[variableName]); return 1; } catch (e) { console.error('CobDOMinate Error:'); console.error('  Clear Timeout: ' + e); return -1; } }
 function cd_scroll_into_view(variable_name) { try { let variableName = UTF8ToString(variable_name); window[variableName].scrollIntoView(); return 1; } catch (e) { console.error('CobDOMinate Error:'); console.error('  Clear Timeout: ' + e); return -1; } }
 function cd_font_face(font_family,font_source,cobol_func) { try { let fontFamily = UTF8ToString(font_family); let fontSource = UTF8ToString(font_source); let cobolFunc = UTF8ToString(cobol_func); let newFont = new FontFace(fontFamily, fontSource); newFont.load().then(function() { Module.ccall(cobolFunc, null, [], []); }).catch(function(error) { throw new Error(error); });; document.fonts.add(newFont); return 1; } catch (e) { console.error('CobDOMinate Error:'); console.error('  Font Face: ' + e); return -1; } }
+function cd_open_tab(location_url) { try { let locationURL = UTF8ToString(location_url); window.open(locationURL, "_blank"); return 1; } catch (e) { console.error('CobDOMinate Error:'); console.error('  Open Tab: ' + e); return -1; } }
 
 // Imports from the Wasm binary.
 var _SETLANG = Module['_SETLANG'] = makeInvalidEarlyAccess('_SETLANG');
@@ -5059,6 +5060,16 @@ var _LOADENCOBA = Module['_LOADENCOBA'] = makeInvalidEarlyAccess('_LOADENCOBA');
 var _LOADENCOBB = Module['_LOADENCOBB'] = makeInvalidEarlyAccess('_LOADENCOBB');
 var _LOADESCOBA = Module['_LOADESCOBA'] = makeInvalidEarlyAccess('_LOADESCOBA');
 var _LOADESCOBB = Module['_LOADESCOBB'] = makeInvalidEarlyAccess('_LOADESCOBB');
+var _NAVABOUT = Module['_NAVABOUT'] = makeInvalidEarlyAccess('_NAVABOUT');
+var _NAVCONTACT = Module['_NAVCONTACT'] = makeInvalidEarlyAccess('_NAVCONTACT');
+var _NAVPROJECTS = Module['_NAVPROJECTS'] = makeInvalidEarlyAccess('_NAVPROJECTS');
+var _NAVCOBOL = Module['_NAVCOBOL'] = makeInvalidEarlyAccess('_NAVCOBOL');
+var _OPENCOBOLSOURCE = Module['_OPENCOBOLSOURCE'] = makeInvalidEarlyAccess('_OPENCOBOLSOURCE');
+var _OPENGH = Module['_OPENGH'] = makeInvalidEarlyAccess('_OPENGH');
+var _OPENLI = Module['_OPENLI'] = makeInvalidEarlyAccess('_OPENLI');
+var _OPENYT = Module['_OPENYT'] = makeInvalidEarlyAccess('_OPENYT');
+var _OPENTT = Module['_OPENTT'] = makeInvalidEarlyAccess('_OPENTT');
+var _OPENIG = Module['_OPENIG'] = makeInvalidEarlyAccess('_OPENIG');
 var _MENUTOGGLE = Module['_MENUTOGGLE'] = makeInvalidEarlyAccess('_MENUTOGGLE');
 var _FONTLOADED = Module['_FONTLOADED'] = makeInvalidEarlyAccess('_FONTLOADED');
 var _WINDOWCHANGE = Module['_WINDOWCHANGE'] = makeInvalidEarlyAccess('_WINDOWCHANGE');
@@ -5092,6 +5103,16 @@ function assignWasmExports(wasmExports) {
   Module['_LOADENCOBB'] = _LOADENCOBB = createExportWrapper('LOADENCOBB', 2);
   Module['_LOADESCOBA'] = _LOADESCOBA = createExportWrapper('LOADESCOBA', 2);
   Module['_LOADESCOBB'] = _LOADESCOBB = createExportWrapper('LOADESCOBB', 2);
+  Module['_NAVABOUT'] = _NAVABOUT = createExportWrapper('NAVABOUT', 0);
+  Module['_NAVCONTACT'] = _NAVCONTACT = createExportWrapper('NAVCONTACT', 0);
+  Module['_NAVPROJECTS'] = _NAVPROJECTS = createExportWrapper('NAVPROJECTS', 0);
+  Module['_NAVCOBOL'] = _NAVCOBOL = createExportWrapper('NAVCOBOL', 0);
+  Module['_OPENCOBOLSOURCE'] = _OPENCOBOLSOURCE = createExportWrapper('OPENCOBOLSOURCE', 0);
+  Module['_OPENGH'] = _OPENGH = createExportWrapper('OPENGH', 0);
+  Module['_OPENLI'] = _OPENLI = createExportWrapper('OPENLI', 0);
+  Module['_OPENYT'] = _OPENYT = createExportWrapper('OPENYT', 0);
+  Module['_OPENTT'] = _OPENTT = createExportWrapper('OPENTT', 0);
+  Module['_OPENIG'] = _OPENIG = createExportWrapper('OPENIG', 0);
   Module['_MENUTOGGLE'] = _MENUTOGGLE = createExportWrapper('MENUTOGGLE', 0);
   Module['_FONTLOADED'] = _FONTLOADED = createExportWrapper('FONTLOADED', 0);
   Module['_WINDOWCHANGE'] = _WINDOWCHANGE = createExportWrapper('WINDOWCHANGE', 0);
@@ -5188,6 +5209,10 @@ var wasmImports = {
   cd_get_cookie,
   /** @export */
   cd_inner_html,
+  /** @export */
+  cd_open_tab,
+  /** @export */
+  cd_scroll_into_view,
   /** @export */
   cd_set_class,
   /** @export */
