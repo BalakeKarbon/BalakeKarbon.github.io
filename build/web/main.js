@@ -5051,6 +5051,7 @@ function cd_font_face(font_family,font_source,cobol_func) { try { let fontFamily
 function cd_open_tab(location_url) { try { let locationURL = UTF8ToString(location_url); window.open(locationURL, "_blank"); return 1; } catch (e) { console.error('CobDOMinate Error:'); console.error('  Open Tab: ' + e); return -1; } }
 
 // Imports from the Wasm binary.
+var _UPDATETEXT = Module['_UPDATETEXT'] = makeInvalidEarlyAccess('_UPDATETEXT');
 var _SETLANG = Module['_SETLANG'] = makeInvalidEarlyAccess('_SETLANG');
 var _SHAPEPAGE = Module['_SHAPEPAGE'] = makeInvalidEarlyAccess('_SHAPEPAGE');
 var _MAIN = Module['_MAIN'] = makeInvalidEarlyAccess('_MAIN');
@@ -5094,6 +5095,7 @@ var __emscripten_stack_alloc = makeInvalidEarlyAccess('__emscripten_stack_alloc'
 var _emscripten_stack_get_current = makeInvalidEarlyAccess('_emscripten_stack_get_current');
 
 function assignWasmExports(wasmExports) {
+  Module['_UPDATETEXT'] = _UPDATETEXT = createExportWrapper('UPDATETEXT', 0);
   Module['_SETLANG'] = _SETLANG = createExportWrapper('SETLANG', 1);
   Module['_SHAPEPAGE'] = _SHAPEPAGE = createExportWrapper('SHAPEPAGE', 0);
   Module['_MAIN'] = _MAIN = createExportWrapper('MAIN', 0);
