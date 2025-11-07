@@ -164,7 +164,7 @@
 016400-'ats.vercel.app/api/top-langs?username=BalakeKarbon&show_icons=tr
 016500-'ue&locale=en&layout=compact&hide=html&hide_title=true&card_width
 016600-'=500'.
-016700   CALL 'cobdom_style' USING 'ghStatsImg', 'height', '15rem'.
+016700   CALL 'cobdom_style' USING 'ghStatsImg', 'height', '35rem'.
 016800   CALL 'cobdom_style' USING 'ghStatsImg', 'width', '100%'.
 016900   CALL 'cobdom_append_child' USING 'ghStatsImg', 'aboutSection'.
 017000*Contact section / Links / Socials
@@ -376,11 +376,11 @@
 037600   CALL 'cobdom_style' USING 'headerDiv', 'display', 'flex'.
 037700   CALL 'cobdom_style' USING 'headerDiv', 'justifyContent', 
 037800     'space-between'.
-037900   CALL 'cobdom_style' USING 'headerDiv', 'top', '0'.
-038000   CALL 'cobdom_style' USING 'headerDiv', 'left', '0'.
-038100   CALL 'cobdom_style' USING 'headerDiv', 'width', '100%'.
-038200   CALL 'cobdom_style' USING 'headerDiv', 'backgroundColor',
-038300     '#c9c9c9'.
+037900   CALL 'cobdom_style' USING 'headerDiv', 'flexDirection',
+038000     'column'.
+038100   CALL 'cobdom_style' USING 'headerDiv', 'top', '0'.
+038200   CALL 'cobdom_style' USING 'headerDiv', 'left', '0'.
+038300   CALL 'cobdom_style' USING 'headerDiv', 'width', '100%'.
 038400*  CALL 'cobdom_style' USING 'headerDiv', 'backdropFilter',
 038500*    'blur(.3rem)'.
 038600*  CALL 'cobdom_style' USING 'headerDiv', 'backdropFilter',
@@ -392,506 +392,525 @@
 039200*  CALL 'cobdom_style' USING 'headerDiv',
 039300*    'borderBottomRightRadius','1rem'.
 039400   CALL 'cobdom_append_child' USING 'headerDiv', 'body'.
-039500*Setup menu
-039600   CALL 'cobdom_create_element' USING 'navArea', 'div'.
-039700*  CALL 'cobdom_style' USING 'navArea', 'position', 'relative'.
-039800   CALL 'cobdom_create_element' USING 'navButton', 'img'.
-039900   CALL 'cobdom_style' USING 'navButton', 'position', 'absolute'.
-040000   CALL 'cobdom_append_child' USING 'navButton', 'navArea'.
-040100   CALL 'cobdom_src' USING 'navButton', 
-040200     '/res/icons/tabler-icons/icons/outline/menu-2.svg'.
-040300   CALL 'cobdom_style' USING 'navButton', 'backgroundColor',
-040400     '#898989'.
-040500*  CALL 'cobdom_style' USING 'navButton', 'filter', 
-040600*    'invert(100%)'.
-040700   CALL 'cobdom_style' USING 'navButton', 'width', '8rem'.
-040800   CALL 'cobdom_style' USING 'navButton', 'height', '8rem'.
-040900   CALL 'cobdom_style' USING 'navButton', 'padding', '.25rem'.
-041000   CALL 'cobdom_style' USING 'navButton', 'margin', '.5rem'.
-041100   CALL 'cobdom_style' USING 'navButton', 'borderRadius', '2rem'.
-041200   CALL 'cobdom_style' USING 'navButton', 'top', '0rem'.
-041300   CALL 'cobdom_style' USING 'navButton', 'left', '0rem'.
-041400*Setup menu selectors
-041500*About Me
-041600   CALL 'cobdom_create_element' USING 'navAbout', 'div'.
-041700   CALL 'cobdom_add_event_listener' USING 'navAbout',
-041800     'click', 'NAVABOUT'.
-041900   CALL 'cobdom_style' USING 'navAbout', 'position', 'absolute'.
-042000   CALL 'cobdom_style' USING 'navAbout', 'backgroundColor', 
-042100     '#c9c9c9'.
-042200*  CALL 'cobdom_style' USING 'navAbout', 'backdropFilter',
-042300*    'blur(.3rem)'.
-042400*  CALL 'cobdom_style' USING 'navAbout', 'backdropFilter',
-042500*    'blur(5px)'.
-042600   CALL 'cobdom_style' USING 'navAbout', 
-042700     'borderBottomRightRadius', '0.5rem'.
-042800   CALL 'cobdom_style' USING 'navAbout', 
-042900     'borderTopRightRadius', '0.5rem'.
-043000   CALL 'cobdom_inner_html' USING 'navAbout', 'About Me'.
-043100   CALL 'cobdom_style' USING 'navAbout', 'padding', '.3rem'.
-043200   CALL 'cobdom_style' USING 'navAbout', 'top', '9.46rem'.
-043300   CALL 'cobdom_style' USING 'navAbout', 'left', '-15rem'.
-043400   CALL 'cobdom_style' USING 'navAbout', 'transition', 
-043500     'transform 0.5s ease 0.1s'.
-043600   CALL 'cobdom_append_child' USING 'navAbout', 'headerDiv'.
-043700*Contact Me
-043800   CALL 'cobdom_create_element' USING 'navContact', 'div'.
-043900   CALL 'cobdom_add_event_listener' USING 'navContact',
-044000     'click', 'NAVCONTACT'.
-044100   CALL 'cobdom_style' USING 'navContact', 'position', 'absolute'.
-044200   CALL 'cobdom_style' USING 'navContact', 'backgroundColor', 
-044300     '#c9c9c9'.
-044400*  CALL 'cobdom_style' USING 'navContact', 'backdropFilter',
-044500*    'blur(.3rem)'.
-044600*  CALL 'cobdom_style' USING 'navContact', 'backdropFilter',
-044700*    'blur(5px)'.
-044800   CALL 'cobdom_style' USING 'navContact', 
-044900     'borderBottomRightRadius', '0.5rem'.
-045000   CALL 'cobdom_style' USING 'navContact', 
-045100     'borderTopRightRadius', '0.5rem'.
-045200   CALL 'cobdom_inner_html' USING 'navContact', 'Contact'.
-045300   CALL 'cobdom_style' USING 'navContact', 'padding', '.3rem'.
-045400   CALL 'cobdom_style' USING 'navContact', 'top', '11.86rem'.
-045500   CALL 'cobdom_style' USING 'navContact', 'left', '-15rem'.
-045600   CALL 'cobdom_style' USING 'navContact', 'transition', 
-045700     'transform 0.5s ease 0.2s'.
-045800   CALL 'cobdom_append_child' USING 'navContact', 'headerDiv'.
-045900*Skills
-046000*  CALL 'cobdom_create_element' USING 'navSkills', 'div'.
-046100*  CALL 'cobdom_style' USING 'navSkills', 'position', 'absolute'.
-046200*  CALL 'cobdom_style' USING 'navSkills', 'backgroundColor', 
-046300*    '#c9c9c9'.
-046400*  CALL 'cobdom_style' USING 'navSkills', 'backdropFilter',
-046500*    'blur(5px)'.
-046600*  CALL 'cobdom_style' USING 'navSkills', 
-046700*    'borderBottomRightRadius', '0.5rem'.
-046800*  CALL 'cobdom_style' USING 'navSkills', 
-046900*    'borderTopRightRadius', '0.5rem'.
-047000*  CALL 'cobdom_inner_html' USING 'navSkills', 'Skills'.
-047100*  CALL 'cobdom_style' USING 'navSkills', 'padding', '.3rem'.
-047200*  CALL 'cobdom_style' USING 'navSkills', 'top', '13rem'.
-047300*  CALL 'cobdom_style' USING 'navSkills', 'left', '-15rem'.
-047400*  CALL 'cobdom_style' USING 'navSkills', 'transition', 
-047500*    'transform 0.5s ease 0.3s'.
-047600*  CALL 'cobdom_append_child' USING 'navSkills', 'headerDiv'.
-047700*Projects
-047800   CALL 'cobdom_create_element' USING 'navProjects', 'div'.
-047900   CALL 'cobdom_add_event_listener' USING 'navProjects',
-048000     'click', 'NAVPROJECTS'.
-048100   CALL 'cobdom_style' USING 'navProjects', 'position', 
-048200     'absolute'.
-048300   CALL 'cobdom_style' USING 'navProjects', 'backgroundColor', 
-048400     '#c9c9c9'.
-048500*  CALL 'cobdom_style' USING 'navProjects', 'backdropFilter',
-048600*    'blur(.3rem)'.
-048700*  CALL 'cobdom_style' USING 'navProjects', 'backdropFilter',
-048800*    'blur(5px)'.
-048900   CALL 'cobdom_style' USING 'navProjects', 
-049000     'borderBottomRightRadius', '0.5rem'.
-049100   CALL 'cobdom_style' USING 'navProjects', 
-049200     'borderTopRightRadius', '0.5rem'.
-049300   CALL 'cobdom_inner_html' USING 'navProjects', 'Projects'.
-049400   CALL 'cobdom_style' USING 'navProjects', 'padding', '.3rem'.
-049500   CALL 'cobdom_style' USING 'navProjects', 'top', '14.27rem'.
-049600   CALL 'cobdom_style' USING 'navProjects', 'left', '-15rem'.
-049700   CALL 'cobdom_style' USING 'navProjects', 'transition', 
-049800     'transform 0.5s ease 0.4s'.
-049900   CALL 'cobdom_append_child' USING 'navProjects', 'headerDiv'.
-050000*Cobol?
-050100   CALL 'cobdom_append_child' USING 'blinkStyle', 'body'.
-050200   CALL 'cobdom_create_element' USING 'navCobol', 'div'.
-050300   CALL 'cobdom_add_event_listener' USING 'navCobol',
-050400     'click', 'NAVCOBOL'.
-050500   CALL 'cobdom_style' USING 'navCobol', 'position', 
-050600     'absolute'.
-050700   CALL 'cobdom_style' USING 'navCobol', 'backgroundColor', 
-050800     '#000000'.
-050900*    '#c9c9c9'.
-051000*  CALL 'cobdom_style' USING 'navCobol', 'backdropFilter',
-051100*    'blur(5px)'.
-051200   CALL 'cobdom_style' USING 'navCobol', 'color', 
-051300     '#00FF00'.
-051400   CALL 'cobdom_style' USING 'navCobol', 
-051500     'borderBottomRightRadius', '0.5rem'.
-051600   CALL 'cobdom_style' USING 'navCobol', 
-051700     'borderTopRightRadius', '0.5rem'.
-051800   CALL 'cobdom_create_element' USING 'navCobolText', 'span'.
-051900   CALL 'cobdom_inner_html' USING 'navCobolText', 'COBOL'.
-052000   CALL 'cobdom_create_element' USING 'navCobolCursor', 'span'.
-052100   CALL 'cobdom_inner_html' USING 'navCobolCursor', '?'.
-052200   CALL 'cobdom_set_class' USING 'navCobolCursor', 'blink'.
-052300   CALL 'cobdom_append_child' USING 'navCobolText', 'navCobol'.
-052400   CALL 'cobdom_append_child' USING 'navCobolCursor', 'navCobol'.
-052500   CALL 'cobdom_style' USING 'navCobol', 'padding', '.3rem'.
-052600   CALL 'cobdom_style' USING 'navCobol', 'top', '16.7rem'.
-052700   CALL 'cobdom_style' USING 'navCobol', 'left', '-15rem'.
-052800   CALL 'cobdom_style' USING 'navCobol', 'transition', 
-052900     'transform 0.5s ease 0.5s'.
-053000   CALL 'cobdom_append_child' USING 'navCobol', 'headerDiv'.
-053100*Add main menu button
-053200   CALL 'cobdom_append_child' USING 'navArea', 'headerDiv'.
-053300   CALL 'cobdom_add_event_listener' USING 'navButton', 'click', 
-053400     'MENUTOGGLE'.
-053500*Setup ID area
-053600   CALL 'cobdom_create_element' USING 'idDiv', 'div'.
-053700   CALL 'cobdom_style' USING 'idDiv', 'padding', '.5rem'.
-053800   CALL 'cobdom_style' USING 'idDiv', 'marginLeft', '9rem'.
-053900   CALL 'cobdom_create_element' USING 'nameDiv', 'div'.
-054000   CALL 'cobdom_style' USING 'nameDiv', 'fontSize', '4rem'.
-054100   CALL 'cobdom_inner_html' USING 'nameDiv', 'Blake Karbon'.
-054200   CALL 'cobdom_append_child' USING 'nameDiv', 'idDiv'.
-054300   CALL 'cobdom_create_element' USING 'taglineDiv', 'div'.
-054400*  CALL 'cobdom_inner_html' USING 'taglineDiv', 
-054500*    'A guy that knows a guy.'.
-054600   CALL 'cobdom_append_child' USING 'taglineDiv', 'idDiv'.
-054700   CALL 'cobdom_append_child' USING 'idDiv', 'headerDiv'.
-054800*Setup lang area
-054900   CALL 'cobdom_create_element' USING 'langArea', 'span'.
-055000   CALL 'cobdom_style' USING 'langArea', 'marginLeft', 'auto'.
-055100   CALL 'cobdom_append_child' USING 'langArea', 'headerDiv'.
-055200*Setup language selector
-055300   CALL 'cobdom_create_element' USING 'langUS', 'img'.
-055400   CALL 'cobdom_create_element' USING 'langES', 'img'.
-055500   CALL 'cobdom_src' USING 'langUS', '/res/icons/us.svg'.
-055600   CALL 'cobdom_style' USING 'langUS', 'width', '7rem'.
-055700   CALL 'cobdom_style' USING 'langUS', 'height', '7rem'.
-055800   CALL 'cobdom_style' USING 'langUS', 'margin', '1rem'.
-055900   CALL 'cobdom_style' USING 'langUS', 'borderRadius', '2rem'.
-056000   CALL 'cobdom_style' USING 'langUS', 'transition', 
-056100     'opacity 0.5s ease, transform 0.5s ease'.
-056200*  CALL 'cobdom_style' USING 'langUS', 'boxShadow', 
-056300*    '.5rem .5rem 0.5rem rgba(0, 0, 0, 0.2)'.
-056400   CALL 'cobdom_src' USING 'langES', '/res/icons/es.svg'.
-056500   CALL 'cobdom_style' USING 'langES', 'width', '7rem'.
-056600   CALL 'cobdom_style' USING 'langES', 'height', '7rem'.
-056700   CALL 'cobdom_style' USING 'langES', 'margin', '1rem'.
-056800   CALL 'cobdom_style' USING 'langES', 'borderRadius', '2rem'.
-056900   CALL 'cobdom_style' USING 'langES', 'transition', 
-057000     'opacity 0.5s ease, transform 0.5s ease'.
-057100*  CALL 'cobdom_style' USING 'langES', 'boxShadow', 
-057200*    '.5rem .5rem 0.5rem rgba(0, 0, 0, 0.2)'.
-057300   CALL 'cobdom_append_child' USING 'langUS', 'langArea'.
-057400   CALL 'cobdom_add_event_listener' USING 'langUS', 'click', 
-057500     'SETLANGUS'.
-057600   CALL 'cobdom_append_child' USING 'langES', 'langArea'.
-057700   CALL 'cobdom_add_event_listener' USING 'langES', 'click', 
-057800     'SETLANGES'.
-057900   CONTINUE.
-058000 SET-ACTIVE-FLAG.
-058100   IF WS-LANG = 'us' THEN
-058200     CALL 'cobdom_style' USING 'langES', 'opacity', '0'
-058300     CALL 'cobdom_style' USING 'langUS', 'transform', 
-058400       'translate(9rem, 0rem)'
-058500     PERFORM UPDATE-TEXT
-058600   ELSE
-058700     CALL 'cobdom_style' USING 'langUS', 'opacity', '0'
-058800     CALL 'cobdom_style' USING 'langUS', 'transform', 
-058900       'translate(9rem, 0rem)'
-059000     PERFORM UPDATE-TEXT
-059100   END-IF.
-059200   CONTINUE.
-059300 LOAD-TEXTS.
-059400   CALL 'cobdom_fetch' USING 'LOADENAM',
-059500     '/res/text/en/aboutme.txt', 'GET', WS-NULL-BYTE.
-059600   CALL 'cobdom_fetch' USING 'LOADESAM',
-059700     '/res/text/es/aboutme.txt', 'GET', WS-NULL-BYTE.
-059800   CALL 'cobdom_fetch' USING 'LOADENCOBA',
-059900     '/res/text/en/cobol/cobolA.txt', 'GET', WS-NULL-BYTE.
-060000   CALL 'cobdom_fetch' USING 'LOADENCOBB',
-060100     '/res/text/en/cobol/cobolB.txt', 'GET', WS-NULL-BYTE.
-060200   CALL 'cobdom_fetch' USING 'LOADESCOBA',
-060300     '/res/text/es/cobol/cobolA.txt', 'GET', WS-NULL-BYTE.
-060400   CALL 'cobdom_fetch' USING 'LOADESCOBB',
-060500     '/res/text/es/cobol/cobolB.txt', 'GET', WS-NULL-BYTE.
-060600   CONTINUE.
-060700 UPDATE-TEXT.
-060800   IF WS-LANG = 'us' THEN
-060900     CALL 'cobdom_inner_html' USING 'aboutHeader', 'About Me'
-061000     CALL 'cobdom_inner_html' USING 'contactHeader',
-061100       'Contact Information / Links'
-061200*    CALL 'cobdom_inner_html' USING 'skillsHeader', 'Skills'
-061300     CALL 'cobdom_inner_html' USING 'projectHeader', 'Projects'
-061400     CALL 'cobdom_inner_html' USING 'navAbout', 'About Me'
-061500     CALL 'cobdom_inner_html' USING 'navContact', 'Contact/Links'
-061600*    CALL 'cobdom_inner_html' USING 'navSkills', 'Skills'
-061700     CALL 'cobdom_inner_html' USING 'navProjects', 'Projects'
-061800     CALL 'cobdom_inner_html' USING 'aboutContent',
-061900       TAB OF EN OF WS-TEXTS
-062000     CALL 'cobdom_inner_html' USING 'cobolContent',
-062100       TAB-COB OF EN OF WS-TEXTS
-062200   ELSE
-062300     CALL 'cobdom_inner_html' USING 'aboutHeader', 'Sobre Mi'
-062400     CALL 'cobdom_inner_html' USING 'contactHeader',
-062500       'Informacion de Contacto / Enlaces'
-062600*    CALL 'cobdom_inner_html' USING 'skillsHeader', 'Habilidades'
-062700     CALL 'cobdom_inner_html' USING 'projectHeader', 'Proyectos'
-062800     CALL 'cobdom_inner_html' USING 'navAbout', 'Sobre Mi'
-062900     CALL 'cobdom_inner_html' USING 'navContact',
-063000       'Contacto/Enlaces'
-063100*    CALL 'cobdom_inner_html' USING 'navSkills', 'Habilidades'
-063200     CALL 'cobdom_inner_html' USING 'navProjects', 'Proyectos'
-063300     CALL 'cobdom_inner_html' USING 'aboutContent',
-063400       TAB OF ES OF WS-TEXTS
-063500     CALL 'cobdom_inner_html' USING 'cobolContent',
-063600       TAB-COB OF ES OF WS-TEXTS
-063700   END-IF.
-063800   CONTINUE.
-063900 LANG-CHECK.
-064000   CALL 'cobdom_get_cookie' USING BY REFERENCE WS-LANG,
-064100     'lang'.
-064200   IF WS-LANG = WS-NULL-BYTE THEN
-064300     CALL 'cobdom_set_cookie' USING 'us', 'lang'
-064400     MOVE 'us' TO WS-LANG
-064500   END-IF.
-064600   PERFORM SET-ACTIVE-FLAG.
-064700   CONTINUE.
-064800 COOKIE-ASK.
-064900   CALL 'cobdom_create_element' USING 'cookieDiv', 'div'.
-065000   CALL 'cobdom_style' USING 'cookieDiv', 'position', 'fixed'.
-065100   CALL 'cobdom_style' USING 'cookieDiv', 'bottom', '0'.
-065200   CALL 'cobdom_style' USING 'cookieDiv', 'left', '0'.
-065300   CALL 'cobdom_style' USING 'cookieDiv', 'width', '100%'.
-065400   CALL 'cobdom_style' USING 'cookieDiv', 'backgroundColor', 
-065500     'rgba(37,186,181,.9)'.
-065600   CALL 'cobdom_style' USING 'cookieDiv', 'textAlign', 
-065700     'center'.
-065800   CALL 'cobdom_style' USING 'cookieDiv', 'fontSize', 
-065900     '4rem'.
-066000   CALL 'cobdom_inner_html' USING 'cookieDiv','Would you like to a
-066100-'llow cookies to store your preferences such as language?&nbsp;'.
-066200   CALL 'cobdom_create_element' USING 'cookieYes', 'span'.
-066300   CALL 'cobdom_set_class' USING 'cookieYes', 'cookieButton'.
-066400   CALL 'cobdom_inner_html' USING 'cookieYes', 'Yes'.
-066500   CALL 'cobdom_style' USING 'cookieYes', 'margin', '.3rem'.
-066600   CALL 'cobdom_style' USING 'cookieYes', 'padding', '.3rem'.
-066700   CALL 'cobdom_style' USING 'cookieYes', 'borderRadius', '1rem'.
-066800   CALL 'cobdom_create_element' USING 'cookieNo', 'span'.
-066900   CALL 'cobdom_set_class' USING 'cookieNo', 'cookieButton'.
-067000   CALL 'cobdom_inner_html' USING 'cookieNo', 'No'.
-067100   CALL 'cobdom_style' USING 'cookieNo', 'margin', '.3rem'.
-067200   CALL 'cobdom_style' USING 'cookieNo', 'padding', '.3rem'.
-067300   CALL 'cobdom_style' USING 'cookieNo', 'borderRadius', '1rem'.
-067400   CALL 'cobdom_add_event_listener' USING 'cookieYes', 'click',
-067500     'COOKIEACCEPT'.
-067600   CALL 'cobdom_add_event_listener' USING 'cookieNo', 'click',
-067700     'COOKIEDENY'.
-067800   CALL 'cobdom_append_child' USING 'cookieYes', 'cookieDiv'.
-067900   CALL 'cobdom_append_child' USING 'cookieNo', 'cookieDiv'.
-068000   CALL 'cobdom_append_child' USING 'cookieDiv', 'body'.
-068100*Note this must be called after the elements are added to the
-068200*document because it must search for them.
-068300   CALL 'cobdom_class_style' USING 'cookieButton', 
-068400     'backgroundColor', '#25bab5'.
-068500   CONTINUE.
-068600 LOADENAM SECTION.
-068700 ENTRY 'LOADENAM' USING BY REFERENCE LS-BLOB-SIZE,LS-BLOB.
-068800   MOVE LS-BLOB(1:LS-BLOB-SIZE) TO ABOUT-ME OF EN OF WS-TEXTS.
-068900   PERFORM UPDATE-TEXT.
-069000   GOBACK.
-069100 LOADESAM SECTION.
-069200 ENTRY 'LOADESAM' USING BY REFERENCE LS-BLOB-SIZE,LS-BLOB.
-069300   MOVE LS-BLOB(1:LS-BLOB-SIZE) TO ABOUT-ME OF ES OF WS-TEXTS.
-069400   PERFORM UPDATE-TEXT.
-069500   GOBACK.
-069600 LOADENCOBA SECTION.
-069700 ENTRY 'LOADENCOBA' USING BY REFERENCE LS-BLOB-SIZE,LS-BLOB.
-069800   MOVE LS-BLOB(1:LS-BLOB-SIZE) TO COBOL-A OF EN OF WS-TEXTS.
-069900   PERFORM UPDATE-TEXT.
-070000   GOBACK.
-070100 LOADENCOBB SECTION.
-070200 ENTRY 'LOADENCOBB' USING BY REFERENCE LS-BLOB-SIZE,LS-BLOB.
-070300   MOVE LS-BLOB(1:LS-BLOB-SIZE) TO COBOL-B OF EN OF WS-TEXTS.
-070400   PERFORM UPDATE-TEXT.
-070500   GOBACK.
-070600 LOADESCOBA SECTION.
-070700 ENTRY 'LOADESCOBA' USING BY REFERENCE LS-BLOB-SIZE,LS-BLOB.
-070800   MOVE LS-BLOB(1:LS-BLOB-SIZE) TO COBOL-A OF ES OF WS-TEXTS.
-070900   PERFORM UPDATE-TEXT.
-071000   GOBACK.
-071100 LOADESCOBB SECTION.
-071200 ENTRY 'LOADESCOBB' USING BY REFERENCE LS-BLOB-SIZE,LS-BLOB.
-071300   MOVE LS-BLOB(1:LS-BLOB-SIZE) TO COBOL-B OF ES OF WS-TEXTS.
-071400*  DISPLAY ABOUT-ME OF ES OF WS-TEXTS.
-071500   PERFORM UPDATE-TEXT.
-071600   GOBACK.
-071700 NAVABOUT SECTION.
-071800 ENTRY 'NAVABOUT'.
-071900   CALL 'cobdom_scroll_into_view' USING 'aboutHeader'.
-072000   GOBACK.
-072100 NAVCONTACT SECTION.
-072200 ENTRY 'NAVCONTACT'.
-072300   CALL 'cobdom_scroll_into_view' USING 'contactHeader'.
+039500   CALL 'cobdom_create_element' USING 'topArea', 'div'.
+039600   CALL 'cobdom_style' USING 'topArea', 'display', 'flex'.
+039700   CALL 'cobdom_style' USING 'topArea', 'backgroundColor',
+039800     '#c9c9c9'.
+039900   CALL 'cobdom_append_child' USING 'topArea', 'headerDiv'.
+040000*Setup menu
+040100   CALL 'cobdom_create_element' USING 'navArea', 'div'.
+040200*  CALL 'cobdom_style' USING 'navArea', 'position', 'relative'.
+040300   CALL 'cobdom_create_element' USING 'navButton', 'img'.
+040400   CALL 'cobdom_style' USING 'navButton', 'position', 'absolute'.
+040500   CALL 'cobdom_append_child' USING 'navButton', 'navArea'.
+040600   CALL 'cobdom_src' USING 'navButton', 
+040700     '/res/icons/tabler-icons/icons/outline/menu-2.svg'.
+040800   CALL 'cobdom_style' USING 'navButton', 'backgroundColor',
+040900     '#898989'.
+041000*  CALL 'cobdom_style' USING 'navButton', 'filter', 
+041100*    'invert(100%)'.
+041200   CALL 'cobdom_style' USING 'navButton', 'width', '8rem'.
+041300   CALL 'cobdom_style' USING 'navButton', 'height', '8rem'.
+041400   CALL 'cobdom_style' USING 'navButton', 'padding', '.35rem'.
+041500   CALL 'cobdom_style' USING 'navButton', 'margin', '.5rem'.
+041600   CALL 'cobdom_style' USING 'navButton', 'borderRadius', '2rem'.
+041700   CALL 'cobdom_style' USING 'navButton', 'top', '0rem'.
+041800   CALL 'cobdom_style' USING 'navButton', 'left', '0rem'.
+041900*Setup menu selectors
+042000   CALL 'cobdom_create_element' USING 'selectorDiv', 'div'.
+042100*About Me
+042200   CALL 'cobdom_create_element' USING 'navAbout', 'div'.
+042300   CALL 'cobdom_style' USING 'navAbout', 'fontSize', '4rem'.
+042400   CALL 'cobdom_style' USING 'navAbout', 'width', 
+042500     'max-content'.
+042600   CALL 'cobdom_add_event_listener' USING 'navAbout',
+042700     'click', 'NAVABOUT'.
+042800   CALL 'cobdom_style' USING 'navAbout', 'position', 'relative'.
+042900   CALL 'cobdom_style' USING 'navAbout', 'backgroundColor', 
+043000     '#c9c9c9'.
+043100*  CALL 'cobdom_style' USING 'navAbout', 'backdropFilter',
+043200*    'blur(.3rem)'.
+043300*  CALL 'cobdom_style' USING 'navAbout', 'backdropFilter',
+043400*    'blur(5px)'.
+043500   CALL 'cobdom_style' USING 'navAbout', 
+043600     'borderBottomRightRadius', '0.5rem'.
+043700   CALL 'cobdom_style' USING 'navAbout', 
+043800     'borderTopRightRadius', '0.5rem'.
+043900   CALL 'cobdom_inner_html' USING 'navAbout', 'About Me'.
+044000   CALL 'cobdom_style' USING 'navAbout', 'padding', '.3rem'.
+044100*  CALL 'cobdom_style' USING 'navAbout', 'top', '9.46rem'.
+044200   CALL 'cobdom_style' USING 'navAbout', 'left', '-35rem'.
+044300   CALL 'cobdom_style' USING 'navAbout', 'transition', 
+044400     'transform 0.5s ease 0.1s'.
+044500   CALL 'cobdom_append_child' USING 'navAbout', 'selectorDiv'.
+044600*Contact Me
+044700   CALL 'cobdom_create_element' USING 'navContact', 'div'.
+044800   CALL 'cobdom_style' USING 'navContact', 'fontSize', '4rem'.
+044900   CALL 'cobdom_style' USING 'navContact', 'width', 
+045000     'max-content'.
+045100   CALL 'cobdom_add_event_listener' USING 'navContact',
+045200     'click', 'NAVCONTACT'.
+045300   CALL 'cobdom_style' USING 'navContact', 'position', 'relative'.
+045400   CALL 'cobdom_style' USING 'navContact', 'backgroundColor', 
+045500     '#c9c9c9'.
+045600*  CALL 'cobdom_style' USING 'navContact', 'backdropFilter',
+045700*    'blur(.3rem)'.
+045800*  CALL 'cobdom_style' USING 'navContact', 'backdropFilter',
+045900*    'blur(5px)'.
+046000   CALL 'cobdom_style' USING 'navContact', 
+046100     'borderBottomRightRadius', '0.5rem'.
+046200   CALL 'cobdom_style' USING 'navContact', 
+046300     'borderTopRightRadius', '0.5rem'.
+046400   CALL 'cobdom_inner_html' USING 'navContact', 'Contact'.
+046500   CALL 'cobdom_style' USING 'navContact', 'padding', '.3rem'.
+046600*  CALL 'cobdom_style' USING 'navContact', 'top', '14.86rem'.
+046700   CALL 'cobdom_style' USING 'navContact', 'left', '-35rem'.
+046800   CALL 'cobdom_style' USING 'navContact', 'transition', 
+046900     'transform 0.5s ease 0.2s'.
+047000   CALL 'cobdom_append_child' USING 'navContact', 'selectorDiv'.
+047100*Skills
+047200*  CALL 'cobdom_create_element' USING 'navSkills', 'div'.
+047300*  CALL 'cobdom_style' USING 'navSkills', 'position', 'absolute'.
+047400*  CALL 'cobdom_style' USING 'navSkills', 'backgroundColor', 
+047500*    '#c9c9c9'.
+047600*  CALL 'cobdom_style' USING 'navSkills', 'backdropFilter',
+047700*    'blur(5px)'.
+047800*  CALL 'cobdom_style' USING 'navSkills', 
+047900*    'borderBottomRightRadius', '0.5rem'.
+048000*  CALL 'cobdom_style' USING 'navSkills', 
+048100*    'borderTopRightRadius', '0.5rem'.
+048200*  CALL 'cobdom_inner_html' USING 'navSkills', 'Skills'.
+048300*  CALL 'cobdom_style' USING 'navSkills', 'padding', '.3rem'.
+048400*  CALL 'cobdom_style' USING 'navSkills', 'top', '13rem'.
+048500*  CALL 'cobdom_style' USING 'navSkills', 'left', '-35rem'.
+048600*  CALL 'cobdom_style' USING 'navSkills', 'transition', 
+048700*    'transform 0.5s ease 0.3s'.
+048800*  CALL 'cobdom_append_child' USING 'navSkills', 'headerDiv'.
+048900*Projects
+049000   CALL 'cobdom_create_element' USING 'navProjects', 'div'.
+049100   CALL 'cobdom_style' USING 'navProjects', 'fontSize', '4rem'.
+049200   CALL 'cobdom_style' USING 'navProjects', 'width', 
+049300     'max-content'.
+049400   CALL 'cobdom_add_event_listener' USING 'navProjects',
+049500     'click', 'NAVPROJECTS'.
+049600   CALL 'cobdom_style' USING 'navProjects', 'position', 
+049700     'relative'.
+049800   CALL 'cobdom_style' USING 'navProjects', 'backgroundColor', 
+049900     '#c9c9c9'.
+050000*  CALL 'cobdom_style' USING 'navProjects', 'backdropFilter',
+050100*    'blur(.3rem)'.
+050200*  CALL 'cobdom_style' USING 'navProjects', 'backdropFilter',
+050300*    'blur(5px)'.
+050400   CALL 'cobdom_style' USING 'navProjects', 
+050500     'borderBottomRightRadius', '0.5rem'.
+050600   CALL 'cobdom_style' USING 'navProjects', 
+050700     'borderTopRightRadius', '0.5rem'.
+050800   CALL 'cobdom_inner_html' USING 'navProjects', 'Projects'.
+050900   CALL 'cobdom_style' USING 'navProjects', 'padding', '.3rem'.
+051000*  CALL 'cobdom_style' USING 'navProjects', 'top', '20.27rem'.
+051100   CALL 'cobdom_style' USING 'navProjects', 'left', '-35rem'.
+051200   CALL 'cobdom_style' USING 'navProjects', 'transition', 
+051300     'transform 0.5s ease 0.4s'.
+051400   CALL 'cobdom_append_child' USING 'navProjects', 'selectorDiv'.
+051500*Cobol?
+051600   CALL 'cobdom_append_child' USING 'blinkStyle', 'body'.
+051700   CALL 'cobdom_create_element' USING 'navCobol', 'div'.
+051800   CALL 'cobdom_style' USING 'navCobol', 'fontSize', '4rem'.
+051900   CALL 'cobdom_style' USING 'navCobol', 'width',
+052000     'max-content'.
+052100   CALL 'cobdom_add_event_listener' USING 'navCobol',
+052200     'click', 'NAVCOBOL'.
+052300   CALL 'cobdom_style' USING 'navCobol', 'position', 
+052400     'relative'.
+052500   CALL 'cobdom_style' USING 'navCobol', 'backgroundColor', 
+052600     '#000000'.
+052700*    '#c9c9c9'.
+052800*  CALL 'cobdom_style' USING 'navCobol', 'backdropFilter',
+052900*    'blur(5px)'.
+053000   CALL 'cobdom_style' USING 'navCobol', 'color', 
+053100     '#00FF00'.
+053200   CALL 'cobdom_style' USING 'navCobol', 
+053300     'borderBottomRightRadius', '0.5rem'.
+053400   CALL 'cobdom_style' USING 'navCobol', 
+053500     'borderTopRightRadius', '0.5rem'.
+053600   CALL 'cobdom_create_element' USING 'navCobolText', 'span'.
+053700   CALL 'cobdom_inner_html' USING 'navCobolText', 'COBOL'.
+053800   CALL 'cobdom_create_element' USING 'navCobolCursor', 'span'.
+053900   CALL 'cobdom_inner_html' USING 'navCobolCursor', '?'.
+054000   CALL 'cobdom_set_class' USING 'navCobolCursor', 'blink'.
+054100   CALL 'cobdom_append_child' USING 'navCobolText', 'navCobol'.
+054200   CALL 'cobdom_append_child' USING 'navCobolCursor', 'navCobol'.
+054300   CALL 'cobdom_style' USING 'navCobol', 'padding', '.3rem'.
+054400*  CALL 'cobdom_style' USING 'navCobol', 'top', '25.7rem'.
+054500   CALL 'cobdom_style' USING 'navCobol', 'left', '-35rem'.
+054600   CALL 'cobdom_style' USING 'navCobol', 'transition', 
+054700     'transform 0.5s ease 0.5s'.
+054800   CALL 'cobdom_append_child' USING 'navCobol', 'selectorDiv'.
+054900*Add main menu button
+055000   CALL 'cobdom_append_child' USING 'navArea', 'topArea'.
+055100   CALL 'cobdom_add_event_listener' USING 'navButton', 'click', 
+055200     'MENUTOGGLE'.
+055300*Setup ID area
+055400   CALL 'cobdom_create_element' USING 'idDiv', 'div'.
+055500   CALL 'cobdom_style' USING 'idDiv', 'padding', '.5rem'.
+055600   CALL 'cobdom_style' USING 'idDiv', 'marginLeft', '9rem'.
+055700   CALL 'cobdom_create_element' USING 'nameDiv', 'div'.
+055800   CALL 'cobdom_style' USING 'nameDiv', 'fontSize', '6rem'.
+055900   CALL 'cobdom_inner_html' USING 'nameDiv', 'Blake Karbon'.
+056000   CALL 'cobdom_append_child' USING 'nameDiv', 'idDiv'.
+056100   CALL 'cobdom_create_element' USING 'taglineDiv', 'div'.
+056200*  CALL 'cobdom_inner_html' USING 'taglineDiv', 
+056300*    'A guy that knows a guy.'.
+056400   CALL 'cobdom_append_child' USING 'taglineDiv', 'idDiv'.
+056500*Setup lang area
+056600   CALL 'cobdom_create_element' USING 'langArea', 'span'.
+056700   CALL 'cobdom_style' USING 'langArea', 'marginLeft', 'auto'.
+056800*Setup language selector
+056900   CALL 'cobdom_create_element' USING 'langUS', 'img'.
+057000   CALL 'cobdom_create_element' USING 'langES', 'img'.
+057100   CALL 'cobdom_src' USING 'langUS', '/res/icons/us.svg'.
+057200   CALL 'cobdom_style' USING 'langUS', 'width', '7rem'.
+057300   CALL 'cobdom_style' USING 'langUS', 'height', '7rem'.
+057400   CALL 'cobdom_style' USING 'langUS', 'margin', '1rem'.
+057500   CALL 'cobdom_style' USING 'langUS', 'borderRadius', '2rem'.
+057600   CALL 'cobdom_style' USING 'langUS', 'transition', 
+057700     'opacity 0.5s ease, transform 0.5s ease'.
+057800*  CALL 'cobdom_style' USING 'langUS', 'boxShadow', 
+057900*    '.5rem .5rem 0.5rem rgba(0, 0, 0, 0.2)'.
+058000   CALL 'cobdom_src' USING 'langES', '/res/icons/es.svg'.
+058100   CALL 'cobdom_style' USING 'langES', 'width', '7rem'.
+058200   CALL 'cobdom_style' USING 'langES', 'height', '7rem'.
+058300   CALL 'cobdom_style' USING 'langES', 'margin', '1rem'.
+058400   CALL 'cobdom_style' USING 'langES', 'borderRadius', '2rem'.
+058500   CALL 'cobdom_style' USING 'langES', 'transition', 
+058600     'opacity 0.5s ease, transform 0.5s ease'.
+058700*  CALL 'cobdom_style' USING 'langES', 'boxShadow', 
+058800*    '.5rem .5rem 0.5rem rgba(0, 0, 0, 0.2)'.
+058900   CALL 'cobdom_append_child' USING 'langUS', 'langArea'.
+059000   CALL 'cobdom_add_event_listener' USING 'langUS', 'click', 
+059100     'SETLANGUS'.
+059200   CALL 'cobdom_append_child' USING 'langES', 'langArea'.
+059300   CALL 'cobdom_add_event_listener' USING 'langES', 'click', 
+059400     'SETLANGES'.
+059500   CALL 'cobdom_append_child' USING 'selectorDiv', 'headerDiv'.
+059600   CALL 'cobdom_append_child' USING 'idDiv', 'topArea'.
+059700   CALL 'cobdom_append_child' USING 'langArea', 'topArea'.
+059800   CONTINUE.
+059900 SET-ACTIVE-FLAG.
+060000   IF WS-LANG = 'us' THEN
+060100     CALL 'cobdom_style' USING 'langES', 'opacity', '0'
+060200     CALL 'cobdom_style' USING 'langUS', 'transform', 
+060300       'translate(9rem, 0rem)'
+060400     PERFORM UPDATE-TEXT
+060500   ELSE
+060600     CALL 'cobdom_style' USING 'langUS', 'opacity', '0'
+060700     CALL 'cobdom_style' USING 'langUS', 'transform', 
+060800       'translate(9rem, 0rem)'
+060900     PERFORM UPDATE-TEXT
+061000   END-IF.
+061100   CONTINUE.
+061200 LOAD-TEXTS.
+061300   CALL 'cobdom_fetch' USING 'LOADENAM',
+061400     '/res/text/en/aboutme.txt', 'GET', WS-NULL-BYTE.
+061500   CALL 'cobdom_fetch' USING 'LOADESAM',
+061600     '/res/text/es/aboutme.txt', 'GET', WS-NULL-BYTE.
+061700   CALL 'cobdom_fetch' USING 'LOADENCOBA',
+061800     '/res/text/en/cobol/cobolA.txt', 'GET', WS-NULL-BYTE.
+061900   CALL 'cobdom_fetch' USING 'LOADENCOBB',
+062000     '/res/text/en/cobol/cobolB.txt', 'GET', WS-NULL-BYTE.
+062100   CALL 'cobdom_fetch' USING 'LOADESCOBA',
+062200     '/res/text/es/cobol/cobolA.txt', 'GET', WS-NULL-BYTE.
+062300   CALL 'cobdom_fetch' USING 'LOADESCOBB',
+062400     '/res/text/es/cobol/cobolB.txt', 'GET', WS-NULL-BYTE.
+062500   CONTINUE.
+062600 UPDATE-TEXT.
+062700   IF WS-LANG = 'us' THEN
+062800     CALL 'cobdom_inner_html' USING 'aboutHeader', 'About Me'
+062900     CALL 'cobdom_inner_html' USING 'contactHeader',
+063000       'Contact Information / Links'
+063100*    CALL 'cobdom_inner_html' USING 'skillsHeader', 'Skills'
+063200     CALL 'cobdom_inner_html' USING 'projectHeader', 'Projects'
+063300     CALL 'cobdom_inner_html' USING 'navAbout', 'About Me'
+063400     CALL 'cobdom_inner_html' USING 'navContact', 'Contact/Links'
+063500*    CALL 'cobdom_inner_html' USING 'navSkills', 'Skills'
+063600     CALL 'cobdom_inner_html' USING 'navProjects', 'Projects'
+063700     CALL 'cobdom_inner_html' USING 'aboutContent',
+063800       TAB OF EN OF WS-TEXTS
+063900     CALL 'cobdom_inner_html' USING 'cobolContent',
+064000       TAB-COB OF EN OF WS-TEXTS
+064100   ELSE
+064200     CALL 'cobdom_inner_html' USING 'aboutHeader', 'Sobre Mi'
+064300     CALL 'cobdom_inner_html' USING 'contactHeader',
+064400       'Informacion de Contacto / Enlaces'
+064500*    CALL 'cobdom_inner_html' USING 'skillsHeader', 'Habilidades'
+064600     CALL 'cobdom_inner_html' USING 'projectHeader', 'Proyectos'
+064700     CALL 'cobdom_inner_html' USING 'navAbout', 'Sobre Mi'
+064800     CALL 'cobdom_inner_html' USING 'navContact',
+064900       'Contacto/Enlaces'
+065000*    CALL 'cobdom_inner_html' USING 'navSkills', 'Habilidades'
+065100     CALL 'cobdom_inner_html' USING 'navProjects', 'Proyectos'
+065200     CALL 'cobdom_inner_html' USING 'aboutContent',
+065300       TAB OF ES OF WS-TEXTS
+065400     CALL 'cobdom_inner_html' USING 'cobolContent',
+065500       TAB-COB OF ES OF WS-TEXTS
+065600   END-IF.
+065700   CONTINUE.
+065800 LANG-CHECK.
+065900   CALL 'cobdom_get_cookie' USING BY REFERENCE WS-LANG,
+066000     'lang'.
+066100   IF WS-LANG = WS-NULL-BYTE THEN
+066200     CALL 'cobdom_set_cookie' USING 'us', 'lang'
+066300     MOVE 'us' TO WS-LANG
+066400   END-IF.
+066500   PERFORM SET-ACTIVE-FLAG.
+066600   CONTINUE.
+066700 COOKIE-ASK.
+066800   CALL 'cobdom_create_element' USING 'cookieDiv', 'div'.
+066900   CALL 'cobdom_style' USING 'cookieDiv', 'position', 'fixed'.
+067000   CALL 'cobdom_style' USING 'cookieDiv', 'bottom', '0'.
+067100   CALL 'cobdom_style' USING 'cookieDiv', 'left', '0'.
+067200   CALL 'cobdom_style' USING 'cookieDiv', 'width', '100%'.
+067300   CALL 'cobdom_style' USING 'cookieDiv', 'backgroundColor', 
+067400     'rgba(37,186,181,.9)'.
+067500   CALL 'cobdom_style' USING 'cookieDiv', 'textAlign', 
+067600     'center'.
+067700   CALL 'cobdom_style' USING 'cookieDiv', 'fontSize', 
+067800     '4rem'.
+067900   CALL 'cobdom_inner_html' USING 'cookieDiv','Would you like to a
+068000-'llow cookies to store your preferences such as language?&nbsp;'.
+068100   CALL 'cobdom_create_element' USING 'cookieYes', 'span'.
+068200   CALL 'cobdom_set_class' USING 'cookieYes', 'cookieButton'.
+068300   CALL 'cobdom_inner_html' USING 'cookieYes', 'Yes'.
+068400   CALL 'cobdom_style' USING 'cookieYes', 'margin', '.3rem'.
+068500   CALL 'cobdom_style' USING 'cookieYes', 'padding', '.3rem'.
+068600   CALL 'cobdom_style' USING 'cookieYes', 'borderRadius', '1rem'.
+068700   CALL 'cobdom_style' USING 'cookieYes', 'backgroundColor', 
+068800     '#86e059'.
+068900   CALL 'cobdom_create_element' USING 'cookieNo', 'span'.
+069000   CALL 'cobdom_set_class' USING 'cookieNo', 'cookieButton'.
+069100   CALL 'cobdom_inner_html' USING 'cookieNo', 'No'.
+069200   CALL 'cobdom_style' USING 'cookieNo', 'margin', '.3rem'.
+069300   CALL 'cobdom_style' USING 'cookieNo', 'padding', '.3rem'.
+069400   CALL 'cobdom_style' USING 'cookieNo', 'borderRadius', '1rem'.
+069500   CALL 'cobdom_style' USING 'cookieNo', 'backgroundColor', 
+069600     '#e05e59'.
+069700   CALL 'cobdom_add_event_listener' USING 'cookieYes', 'click',
+069800     'COOKIEACCEPT'.
+069900   CALL 'cobdom_add_event_listener' USING 'cookieNo', 'click',
+070000     'COOKIEDENY'.
+070100   CALL 'cobdom_append_child' USING 'cookieYes', 'cookieDiv'.
+070200   CALL 'cobdom_append_child' USING 'cookieNo', 'cookieDiv'.
+070300   CALL 'cobdom_append_child' USING 'cookieDiv', 'body'.
+070400   CONTINUE.
+070500 LOADENAM SECTION.
+070600 ENTRY 'LOADENAM' USING BY REFERENCE LS-BLOB-SIZE,LS-BLOB.
+070700   MOVE LS-BLOB(1:LS-BLOB-SIZE) TO ABOUT-ME OF EN OF WS-TEXTS.
+070800   PERFORM UPDATE-TEXT.
+070900   GOBACK.
+071000 LOADESAM SECTION.
+071100 ENTRY 'LOADESAM' USING BY REFERENCE LS-BLOB-SIZE,LS-BLOB.
+071200   MOVE LS-BLOB(1:LS-BLOB-SIZE) TO ABOUT-ME OF ES OF WS-TEXTS.
+071300   PERFORM UPDATE-TEXT.
+071400   GOBACK.
+071500 LOADENCOBA SECTION.
+071600 ENTRY 'LOADENCOBA' USING BY REFERENCE LS-BLOB-SIZE,LS-BLOB.
+071700   MOVE LS-BLOB(1:LS-BLOB-SIZE) TO COBOL-A OF EN OF WS-TEXTS.
+071800   PERFORM UPDATE-TEXT.
+071900   GOBACK.
+072000 LOADENCOBB SECTION.
+072100 ENTRY 'LOADENCOBB' USING BY REFERENCE LS-BLOB-SIZE,LS-BLOB.
+072200   MOVE LS-BLOB(1:LS-BLOB-SIZE) TO COBOL-B OF EN OF WS-TEXTS.
+072300   PERFORM UPDATE-TEXT.
 072400   GOBACK.
-072500 NAVPROJECTS SECTION.
-072600 ENTRY 'NAVPROJECTS'.
-072700   CALL 'cobdom_scroll_into_view' USING 'projectHeader'.
-072800   GOBACK.
-072900 NAVCOBOL SECTION.
-073000 ENTRY 'NAVCOBOL'.
-073100   CALL 'cobdom_scroll_into_view' USING 'cobolHeader'.
-073200   GOBACK.
-073300 OPENCOBOLSOURCE SECTION.
-073400 ENTRY 'OPENCOBOLSOURCE'.
-073500   CALL 'cobdom_open_tab' USING 
-073600     'https://github.com/BalakeKarbon/BalakeKarbon.github.io'.
-073700   GOBACK.
-073800 OPENGH SECTION.
-073900 ENTRY 'OPENGH'.
-074000   CALL 'cobdom_open_tab' USING 
-074100     'https://github.com/BalakeKarbon/'.
-074200   GOBACK.
-074300 OPENLI SECTION.
-074400 ENTRY 'OPENLI'.
-074500   CALL 'cobdom_open_tab' USING 
-074600     'https://www.linkedin.com/in/blake-karbon/'.
+072500 LOADESCOBA SECTION.
+072600 ENTRY 'LOADESCOBA' USING BY REFERENCE LS-BLOB-SIZE,LS-BLOB.
+072700   MOVE LS-BLOB(1:LS-BLOB-SIZE) TO COBOL-A OF ES OF WS-TEXTS.
+072800   PERFORM UPDATE-TEXT.
+072900   GOBACK.
+073000 LOADESCOBB SECTION.
+073100 ENTRY 'LOADESCOBB' USING BY REFERENCE LS-BLOB-SIZE,LS-BLOB.
+073200   MOVE LS-BLOB(1:LS-BLOB-SIZE) TO COBOL-B OF ES OF WS-TEXTS.
+073300*  DISPLAY ABOUT-ME OF ES OF WS-TEXTS.
+073400   PERFORM UPDATE-TEXT.
+073500   GOBACK.
+073600 NAVABOUT SECTION.
+073700 ENTRY 'NAVABOUT'.
+073800   CALL 'cobdom_scroll_into_view' USING 'aboutHeader'.
+073900   GOBACK.
+074000 NAVCONTACT SECTION.
+074100 ENTRY 'NAVCONTACT'.
+074200   CALL 'cobdom_scroll_into_view' USING 'contactHeader'.
+074300   GOBACK.
+074400 NAVPROJECTS SECTION.
+074500 ENTRY 'NAVPROJECTS'.
+074600   CALL 'cobdom_scroll_into_view' USING 'projectHeader'.
 074700   GOBACK.
-074800 OPENYT SECTION.
-074900 ENTRY 'OPENYT'.
-075000   CALL 'cobdom_open_tab' USING 
-075100     'https://www.youtube.com/@karboncodes'.
-075200   GOBACK.
-075300 OPENTT SECTION.
-075400 ENTRY 'OPENTT'.
-075500   CALL 'cobdom_open_tab' USING 
-075600     'https://www.tiktok.com/@karboncodes'.
-075700   GOBACK.
-075800 OPENIG SECTION.
-075900 ENTRY 'OPENIG'.
-076000   CALL 'cobdom_open_tab' USING 
-076100     'https://www.instagram.com/karboncodes'.
-076200   GOBACK.
-076300 MENUTOGGLE SECTION.
-076400 ENTRY 'MENUTOGGLE'.
-076500   IF WS-MENU-TOGGLE = 0 THEN
-076600     MOVE 1 TO WS-MENU-TOGGLE
-076700     CALL 'cobdom_style' USING 'navButton', 'transform', 
-076800       'scale(0.85)'
-076900     CALL 'cobdom_src' USING 'navButton', 
-077000       '/res/icons/tabler-icons/icons/outline/menu-4.svg'
-077100     CALL 'cobdom_style' USING 'navAbout', 'transform', 
-077200       'translate(15rem, 0rem)' 
-077300     CALL 'cobdom_style' USING 'navContact', 'transform', 
-077400       'translate(15rem, 0rem)' 
-077500     CALL 'cobdom_style' USING 'navSkills', 'transform', 
-077600       'translate(15rem, 0rem)'
-077700    CALL 'cobdom_style' USING 'navProjects', 'transform', 
-077800       'translate(15rem, 0rem)'
-077900    CALL 'cobdom_style' USING 'navCobol', 'transform', 
-078000       'translate(15rem, 0rem)'
-078100   ELSE
-078200     MOVE 0 TO WS-MENU-TOGGLE
-078300     CALL 'cobdom_style' USING 'navButton', 'transform', 
-078400       'scale(1.0)'
-078500     CALL 'cobdom_src' USING 'navButton', 
-078600       '/res/icons/tabler-icons/icons/outline/menu-2.svg'
-078700     CALL 'cobdom_style' USING 'navAbout', 'transform', 
-078800       'translate(0rem, 0rem)' 
-078900     CALL 'cobdom_style' USING 'navContact', 'transform', 
-079000       'translate(0rem, 0rem)' 
-079100     CALL 'cobdom_style' USING 'navSkills', 'transform', 
-079200       'translate(0rem, 0rem)'
-079300    CALL 'cobdom_style' USING 'navProjects', 'transform', 
-079400       'translate(0rem, 0rem)'
-079500    CALL 'cobdom_style' USING 'navCobol', 'transform', 
-079600       'translate(0rem, 0rem)'
-079700   END-IF.
-079800   GOBACK.
-079900*TO-DO: Add a timer in case some fonts do never load
-080000 FONTLOADED SECTION.
-080100 ENTRY 'FONTLOADED'.
-080200   ADD 1 TO WS-FONTS-LOADED.
-080300   IF WS-FONTS-LOADED = 2 THEN
-080400     CALL 'cobdom_style' USING 'body', 'fontFamily', 'mainFont'
-080500     CALL 'cobdom_style' USING 'navCobol', 'fontFamily', 'ibmpc'
-080600     CALL 'cobdom_style' USING 'cobolSection', 'fontFamily',
-080700       'ibmpc'
-080800   END-IF.
-080900   GOBACK.
-081000 WINDOWCHANGE SECTION.
-081100 ENTRY 'WINDOWCHANGE'.
-081200   CALL 'cobdom_clear_timeout' USING 'renderTimeout'.
-081300   CALL 'cobdom_set_timeout' USING 'renderTimeout', 'SHAPEPAGE'
-081400     '300'.
-081500*Optimize this buffer time to not have a noticeable delay but also
-081600*not call to often.
+074800 NAVCOBOL SECTION.
+074900 ENTRY 'NAVCOBOL'.
+075000   CALL 'cobdom_scroll_into_view' USING 'cobolHeader'.
+075100   GOBACK.
+075200 OPENCOBOLSOURCE SECTION.
+075300 ENTRY 'OPENCOBOLSOURCE'.
+075400   CALL 'cobdom_open_tab' USING 
+075500     'https://github.com/BalakeKarbon/BalakeKarbon.github.io'.
+075600   GOBACK.
+075700 OPENGH SECTION.
+075800 ENTRY 'OPENGH'.
+075900   CALL 'cobdom_open_tab' USING 
+076000     'https://github.com/BalakeKarbon/'.
+076100   GOBACK.
+076200 OPENLI SECTION.
+076300 ENTRY 'OPENLI'.
+076400   CALL 'cobdom_open_tab' USING 
+076500     'https://www.linkedin.com/in/blake-karbon/'.
+076600   GOBACK.
+076700 OPENYT SECTION.
+076800 ENTRY 'OPENYT'.
+076900   CALL 'cobdom_open_tab' USING 
+077000     'https://www.youtube.com/@karboncodes'.
+077100   GOBACK.
+077200 OPENTT SECTION.
+077300 ENTRY 'OPENTT'.
+077400   CALL 'cobdom_open_tab' USING 
+077500     'https://www.tiktok.com/@karboncodes'.
+077600   GOBACK.
+077700 OPENIG SECTION.
+077800 ENTRY 'OPENIG'.
+077900   CALL 'cobdom_open_tab' USING 
+078000     'https://www.instagram.com/karboncodes'.
+078100   GOBACK.
+078200 MENUTOGGLE SECTION.
+078300 ENTRY 'MENUTOGGLE'.
+078400   IF WS-MENU-TOGGLE = 0 THEN
+078500     MOVE 1 TO WS-MENU-TOGGLE
+078600     CALL 'cobdom_style' USING 'navButton', 'transform', 
+078700       'scale(0.85)'
+078800     CALL 'cobdom_src' USING 'navButton', 
+078900       '/res/icons/tabler-icons/icons/outline/menu-4.svg'
+079000     CALL 'cobdom_style' USING 'navAbout', 'transform', 
+079100       'translate(35rem, 0rem)' 
+079200     CALL 'cobdom_style' USING 'navContact', 'transform', 
+079300       'translate(35rem, 0rem)' 
+079400     CALL 'cobdom_style' USING 'navSkills', 'transform', 
+079500       'translate(35rem, 0rem)'
+079600    CALL 'cobdom_style' USING 'navProjects', 'transform', 
+079700       'translate(35rem, 0rem)'
+079800    CALL 'cobdom_style' USING 'navCobol', 'transform', 
+079900       'translate(35rem, 0rem)'
+080000   ELSE
+080100     MOVE 0 TO WS-MENU-TOGGLE
+080200     CALL 'cobdom_style' USING 'navButton', 'transform', 
+080300       'scale(1.0)'
+080400     CALL 'cobdom_src' USING 'navButton', 
+080500       '/res/icons/tabler-icons/icons/outline/menu-2.svg'
+080600     CALL 'cobdom_style' USING 'navAbout', 'transform', 
+080700       'translate(0rem, 0rem)' 
+080800     CALL 'cobdom_style' USING 'navContact', 'transform', 
+080900       'translate(0rem, 0rem)' 
+081000     CALL 'cobdom_style' USING 'navSkills', 'transform', 
+081100       'translate(0rem, 0rem)'
+081200    CALL 'cobdom_style' USING 'navProjects', 'transform', 
+081300       'translate(0rem, 0rem)'
+081400    CALL 'cobdom_style' USING 'navCobol', 'transform', 
+081500       'translate(0rem, 0rem)'
+081600   END-IF.
 081700   GOBACK.
-081800 SHAPEPAGE SECTION.
-081900 ENTRY 'SHAPEPAGE'.
-082000*  MOVE FUNCTION CURRENT-DATE(13:4) TO CENTISECS OF WS-TMP
-082100*  DISPLAY 'Rendering! ' CENTISECS.
-082200   CALL 'cobdom_eval' USING BY REFERENCE WS-BLOB-SIZE, WS-BLOB, 
-082300     'window.innerWidth'.
-082400   MOVE WS-BLOB(1:WS-BLOB-SIZE) TO WIDTH OF WS-WINDOW.
-082500   CALL 'cobdom_eval' USING BY REFERENCE WS-BLOB-SIZE, WS-BLOB, 
-082600     'window.innerHeight'.
-082700   MOVE WS-BLOB(1:WS-BLOB-SIZE) TO HEIGHT OF WS-WINDOW.
+081800*TO-DO: Add a timer in case some fonts do never load
+081900 FONTLOADED SECTION.
+082000 ENTRY 'FONTLOADED'.
+082100   ADD 1 TO WS-FONTS-LOADED.
+082200   IF WS-FONTS-LOADED = 2 THEN
+082300     CALL 'cobdom_style' USING 'body', 'fontFamily', 'mainFont'
+082400     CALL 'cobdom_style' USING 'navCobol', 'fontFamily', 'ibmpc'
+082500     CALL 'cobdom_style' USING 'cobolSection', 'fontFamily',
+082600       'ibmpc'
+082700   END-IF.
 082800   GOBACK.
-082900 COOKIEACCEPT SECTION.
-083000 ENTRY 'COOKIEACCEPT'.
-083100   CALL 'cobdom_style' USING 'cookieDiv', 'display', 'none'.
-083200   CALL 'cobdom_set_cookie' USING 'y', 'allowCookies' .
-083300   MOVE 'y' TO WS-COOKIE-ALLOWED.
-083400   IF WS-LANG = 'us' THEN
-083500     CALL 'cobdom_set_cookie' USING 'us', 'lang'
-083600   ELSE
-083700     CALL 'cobdom_set_cookie' USING 'en', 'lang'
-083800   END-IF.
-083900   GOBACK.
-084000 COOKIEDENY SECTION.
-084100 ENTRY 'COOKIEDENY'.
-084200   CALL 'cobdom_style' USING 'cookieDiv', 'display', 'none'.
-084300   MOVE 'n' TO WS-COOKIE-ALLOWED.
-084400   GOBACK.
-084500 SETPERCENTCOBOL SECTION.
-084600 ENTRY 'SETPERCENTCOBOL' USING BY REFERENCE LS-BLOB-SIZE,LS-BLOB.
-084700   MOVE LS-BLOB(1:LS-BLOB-SIZE) TO PERCENT OF EN OF WS-TEXTS.
-084800   MOVE LS-BLOB(1:LS-BLOB-SIZE) TO PERCENT OF ES OF WS-TEXTS.
-084900*  CALL 'cobdom_inner_html' USING 'percentCobol',
-085000*    WS-PERCENT-COBOL.
-085100*  DISPLAY 'Currently this website is written in ' 
-085200*    WS-PERCENT-COBOL '% COBOL.'.
-085300   GOBACK.
-085400 SETLANG SECTION.
-085500 ENTRY 'SETLANG' USING LS-LANG-CHOICE.
-085600   if WS-LANG-SELECT-TOGGLE = 0 THEN
-085700     MOVE 1 TO WS-LANG-SELECT-TOGGLE
-085800     IF WS-LANG = 'us' THEN
-085900       CALL 'cobdom_style' USING 'langES', 'opacity', '1'
-086000       CALL 'cobdom_style' USING 'langUS', 'transform', 
-086100         'translate(0rem, 0rem)'
-086200*      CALL 'cobdom_style' USING 'langES', 'display', 'inline'
-086300     ELSE
-086400       CALL 'cobdom_style' USING 'langUS', 'opacity', '1'
-086500       CALL 'cobdom_style' USING 'langUS', 'transform', 
-086600         'translate(0rem, 0rem)'
-086700*      CALL 'cobdom_style' USING 'langUS', 'display', 'inline'
-086800     END-IF
-086900   ELSE
-087000     MOVE 0 TO WS-LANG-SELECT-TOGGLE
-087100     IF WS-COOKIE-ALLOWED = 'y' THEN
-087200       IF LS-LANG-CHOICE = 'us' THEN
-087300         CALL 'cobdom_set_cookie' USING 'us', 'lang'
-087400         MOVE 'us' TO WS-LANG
-087500       ELSE
-087600         CALL 'cobdom_set_cookie' USING 'es', 'lang'
-087700         MOVE 'es' TO WS-LANG
-087800       END-IF
-087900       PERFORM SET-ACTIVE-FLAG
-088000     ELSE
-088100       MOVE LS-LANG-CHOICE TO WS-LANG
-088200       PERFORM SET-ACTIVE-FLAG 
-088300     END-IF
-088400   END-IF.
-088500   GOBACK.
-088600 SETLANGUS SECTION.
-088700 ENTRY 'SETLANGUS'.
-088800   CALL 'SETLANG' USING 'us'.
-088900   GOBACK.
-089000 SETLANGES SECTION.
-089100 ENTRY 'SETLANGES'.
-089200   CALL 'SETLANG' USING 'es'.
-089300   GOBACK.
-089400*TERMINPUT SECTION.
-089500*ENTRY 'TERMINPUT' USING LS-TERM-IN.
-089600*  DISPLAY LS-TERM-IN.
-089700*  GOBACK.
+082900 WINDOWCHANGE SECTION.
+083000 ENTRY 'WINDOWCHANGE'.
+083100   CALL 'cobdom_clear_timeout' USING 'renderTimeout'.
+083200   CALL 'cobdom_set_timeout' USING 'renderTimeout', 'SHAPEPAGE'
+083300     '300'.
+083400*Optimize this buffer time to not have a noticeable delay but also
+083500*not call to often.
+083600   GOBACK.
+083700 SHAPEPAGE SECTION.
+083800 ENTRY 'SHAPEPAGE'.
+083900*  MOVE FUNCTION CURRENT-DATE(13:4) TO CENTISECS OF WS-TMP
+084000*  DISPLAY 'Rendering! ' CENTISECS.
+084100   CALL 'cobdom_eval' USING BY REFERENCE WS-BLOB-SIZE, WS-BLOB, 
+084200     'window.innerWidth'.
+084300   MOVE WS-BLOB(1:WS-BLOB-SIZE) TO WIDTH OF WS-WINDOW.
+084400   CALL 'cobdom_eval' USING BY REFERENCE WS-BLOB-SIZE, WS-BLOB, 
+084500     'window.innerHeight'.
+084600   MOVE WS-BLOB(1:WS-BLOB-SIZE) TO HEIGHT OF WS-WINDOW.
+084700   GOBACK.
+084800 COOKIEACCEPT SECTION.
+084900 ENTRY 'COOKIEACCEPT'.
+085000   CALL 'cobdom_style' USING 'cookieDiv', 'display', 'none'.
+085100   CALL 'cobdom_set_cookie' USING 'y', 'allowCookies' .
+085200   MOVE 'y' TO WS-COOKIE-ALLOWED.
+085300   IF WS-LANG = 'us' THEN
+085400     CALL 'cobdom_set_cookie' USING 'us', 'lang'
+085500   ELSE
+085600     CALL 'cobdom_set_cookie' USING 'en', 'lang'
+085700   END-IF.
+085800   GOBACK.
+085900 COOKIEDENY SECTION.
+086000 ENTRY 'COOKIEDENY'.
+086100   CALL 'cobdom_style' USING 'cookieDiv', 'display', 'none'.
+086200   MOVE 'n' TO WS-COOKIE-ALLOWED.
+086300   GOBACK.
+086400 SETPERCENTCOBOL SECTION.
+086500 ENTRY 'SETPERCENTCOBOL' USING BY REFERENCE LS-BLOB-SIZE,LS-BLOB.
+086600   MOVE LS-BLOB(1:LS-BLOB-SIZE) TO PERCENT OF EN OF WS-TEXTS.
+086700   MOVE LS-BLOB(1:LS-BLOB-SIZE) TO PERCENT OF ES OF WS-TEXTS.
+086800*  CALL 'cobdom_inner_html' USING 'percentCobol',
+086900*    WS-PERCENT-COBOL.
+087000*  DISPLAY 'Currently this website is written in ' 
+087100*    WS-PERCENT-COBOL '% COBOL.'.
+087200   GOBACK.
+087300 SETLANG SECTION.
+087400 ENTRY 'SETLANG' USING LS-LANG-CHOICE.
+087500   if WS-LANG-SELECT-TOGGLE = 0 THEN
+087600     MOVE 1 TO WS-LANG-SELECT-TOGGLE
+087700     IF WS-LANG = 'us' THEN
+087800       CALL 'cobdom_style' USING 'langES', 'opacity', '1'
+087900       CALL 'cobdom_style' USING 'langUS', 'transform', 
+088000         'translate(0rem, 0rem)'
+088100*      CALL 'cobdom_style' USING 'langES', 'display', 'inline'
+088200     ELSE
+088300       CALL 'cobdom_style' USING 'langUS', 'opacity', '1'
+088400       CALL 'cobdom_style' USING 'langUS', 'transform', 
+088500         'translate(0rem, 0rem)'
+088600*      CALL 'cobdom_style' USING 'langUS', 'display', 'inline'
+088700     END-IF
+088800   ELSE
+088900     MOVE 0 TO WS-LANG-SELECT-TOGGLE
+089000     IF WS-COOKIE-ALLOWED = 'y' THEN
+089100       IF LS-LANG-CHOICE = 'us' THEN
+089200         CALL 'cobdom_set_cookie' USING 'us', 'lang'
+089300         MOVE 'us' TO WS-LANG
+089400       ELSE
+089500         CALL 'cobdom_set_cookie' USING 'es', 'lang'
+089600         MOVE 'es' TO WS-LANG
+089700       END-IF
+089800       PERFORM SET-ACTIVE-FLAG
+089900     ELSE
+090000       MOVE LS-LANG-CHOICE TO WS-LANG
+090100       PERFORM SET-ACTIVE-FLAG 
+090200     END-IF
+090300   END-IF.
+090400   GOBACK.
+090500 SETLANGUS SECTION.
+090600 ENTRY 'SETLANGUS'.
+090700   CALL 'SETLANG' USING 'us'.
+090800   GOBACK.
+090900 SETLANGES SECTION.
+091000 ENTRY 'SETLANGES'.
+091100   CALL 'SETLANG' USING 'es'.
+091200   GOBACK.
+091300*TERMINPUT SECTION.
+091400*ENTRY 'TERMINPUT' USING LS-TERM-IN.
+091500*  DISPLAY LS-TERM-IN.
+091600*  GOBACK.
