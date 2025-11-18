@@ -5068,6 +5068,7 @@ var _NAVCOBOL = Module['_NAVCOBOL'] = makeInvalidEarlyAccess('_NAVCOBOL');
 var _OPENCOBOLSOURCE = Module['_OPENCOBOLSOURCE'] = makeInvalidEarlyAccess('_OPENCOBOLSOURCE');
 var _OPENGH = Module['_OPENGH'] = makeInvalidEarlyAccess('_OPENGH');
 var _OPENLI = Module['_OPENLI'] = makeInvalidEarlyAccess('_OPENLI');
+var _OPENME = Module['_OPENME'] = makeInvalidEarlyAccess('_OPENME');
 var _OPENYT = Module['_OPENYT'] = makeInvalidEarlyAccess('_OPENYT');
 var _OPENTT = Module['_OPENTT'] = makeInvalidEarlyAccess('_OPENTT');
 var _OPENIG = Module['_OPENIG'] = makeInvalidEarlyAccess('_OPENIG');
@@ -5112,6 +5113,7 @@ function assignWasmExports(wasmExports) {
   Module['_OPENCOBOLSOURCE'] = _OPENCOBOLSOURCE = createExportWrapper('OPENCOBOLSOURCE', 0);
   Module['_OPENGH'] = _OPENGH = createExportWrapper('OPENGH', 0);
   Module['_OPENLI'] = _OPENLI = createExportWrapper('OPENLI', 0);
+  Module['_OPENME'] = _OPENME = createExportWrapper('OPENME', 0);
   Module['_OPENYT'] = _OPENYT = createExportWrapper('OPENYT', 0);
   Module['_OPENTT'] = _OPENTT = createExportWrapper('OPENTT', 0);
   Module['_OPENIG'] = _OPENIG = createExportWrapper('OPENIG', 0);
