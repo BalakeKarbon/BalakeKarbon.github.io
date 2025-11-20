@@ -617,7 +617,7 @@
 061700   CALL 'cobdom_style' USING 'idDiv', 'padding', '.5rem'.
 061800   CALL 'cobdom_style' USING 'idDiv', 'marginLeft', '9rem'.
 061900   CALL 'cobdom_create_element' USING 'nameDiv', 'div'.
-062000   CALL 'cobdom_style' USING 'nameDiv', 'fontSize', '6rem'.
+062000   CALL 'cobdom_style' USING 'nameDiv', 'fontSize', '5rem'.
 062100   CALL 'cobdom_inner_html' USING 'nameDiv', 'Blake Karbon'.
 062200   CALL 'cobdom_append_child' USING 'nameDiv', 'idDiv'.
 062300   CALL 'cobdom_create_element' USING 'taglineDiv', 'div'.
