@@ -168,7 +168,7 @@
 016800*'ats.vercel.app/api/top-langs?username=BalakeKarbon&show_icons=tr
 016900*'ue&locale=en&layout=compact&hide=html&hide_title=true&card_width
 017000*'=500'.
-017100   CALL 'cobdom_src' USING 'ghStatsImg', '/res/img/top-lang.svg'.
+017100   CALL 'cobdom_src' USING 'ghStatsImg', '/res/img/top-langs.svg'.
 017200   CALL 'cobdom_style' USING 'ghStatsImg', 'height', '10rem'.
 017300*  CALL 'cobdom_style' USING 'ghStatsImg', 'transform', 
 017400*    'translate(50%,0)'.
