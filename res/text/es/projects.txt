@@ -1,5 +1,4 @@
 <ul>
-<li>Escribí todo mi <a href="https://balakekarbon.github.io/">portafolio web</a> en COBOL de formato fijo de la década de 1960 en una IBM 5155 de 16 bits de 1984 para la cual construí el kernel de Linux y un userland POSIX. <a href="https://medium.com/@karboncodes/writing-web-apps-in-cobol-a18f74dc44f5">Artículo</a>.</li>
 <li>Escribí una <a href="https://github.com/BalakeKarbon/neuralNet">Red Neuronal evolutiva</a> desde cero usando solo la biblioteca estándar hace 10 años, se encuentra en <a href="https://github.com/BalakeKarbon/">github</a>. (Actualmente escribiendo otra implementando un <a href="https://github.com/BalakeKarbon/lm--">"LLM" usando matemáticas de punto fijo</a> en ~512KB de memoria)</li>
 <li>Escribí <a href="https://github.com/David-Gonzalez-Sua/ModelPit">ModelPit</a>, un campo de juegos de LLM para probar la fuerza adversaria en ataque y defensa de varios agentes, puntuado con el recuento de tokens necesarios para comprometer al defensor. También puede usarse como herramienta educativa para técnicas de LLM adversarias y jailbreaking. Escrito para <a href="https://devpost.com/software/modelpit?_gl=1*5f8cjw*_gcl_au*MjE0NTU2NjgzNi4xNzcyOTc5NDcw*_ga*MTA2NzY5ODE4Mi4xNzcyOTc5NDcx*_ga_0YHJK3Y10M*czE3NzMxMDMyNTMkbzQkZzEkdDE3NzMxMDMyNzckajM2JGwwJGgw">CU Hacks 12</a> con un equipo.</li>
 <li>He diseñado e implementado <a href="https://balakekarbon.github.io/res/img/dlatch-characteristics.svg">circuitos lógicos DTL</a> de la década de 1960 para su uso en una minicomputadora.</li>
@@ -13,6 +12,7 @@
 <li>Asistí y disfruté de muchos <a href="https://www.hackcu.org/">Hackathons</a>.</li>
 <li>Creo contenido en redes sociales vinculado en mi <a href="https://balakekarbon.github.io/">portafolio web</a>.</li>
 <li>Me he mantenido actualizado continuamente y he estado escribiendo código desde los 12 años (2011).</li>
+<li>Escribí todo mi <a href="https://balakekarbon.github.io/">portafolio web</a> en COBOL de formato fijo de la década de 1960 en una IBM 5155 de 16 bits de 1984 para la cual construí el kernel de Linux y un userland POSIX. <a href="https://medium.com/@karboncodes/writing-web-apps-in-cobol-a18f74dc44f5">Artículo</a>.</li>
 <li>Construí y programé dos máquinas CNC para mi escuela secundaria (2016).</li>
 <li>Escribí e implementé un sistema de seguridad digital para mi escuela secundaria (2016).</li>
 <li>Co-fundé OBICool LLC, realizando consultoría de enfriamiento de supercomputadoras y servidores en la escuela secundaria (2016).</li>
