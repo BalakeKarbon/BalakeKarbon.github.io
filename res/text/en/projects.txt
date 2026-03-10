@@ -1,0 +1,19 @@
+<ul>
+<li>I wrote my entire <a href="https://balakekarbon.github.io/">web-portfolio</a> in fixed format COBOL from the 1960s on a 1984 16 bit IBM 5155 I built the linux Kernel and a POSIX userland for. <a href="https://medium.com/@karboncodes/writing-web-apps-in-cobol-a18f74dc44f5">Article</a>.</li>
+<li>I wrote an <a href="https://github.com/BalakeKarbon/neuralNet">evolutionary Neural Network</a> from the ground up only using the standard library 10 years ago, found on <a href="https://github.com/BalakeKarbon/">github</a>. (Currently writing another implementing a <a href="https://github.com/BalakeKarbon/lm--">"LLM" using fixed point math</a> in ~512KB of memory)</li>
+<li>Wrote <a href="https://github.com/David-Gonzalez-Sua/ModelPit">ModelPit</a> a LLM playground to test the adversarial strength in attack and defense of various agents scored with the count of tokens it took to compromise the defender. It also can be used as an educational tool for adversarial LLM techniques and jailbreaking. Written for <a href="https://devpost.com/software/modelpit?_gl=1*5f8cjw*_gcl_au*MjE0NTU2NjgzNi4xNzcyOTc5NDcw*_ga*MTA2NzY5ODE4Mi4xNzcyOTc5NDcx*_ga_0YHJK3Y10M*czE3NzMxMDMyNTMkbzQkZzEkdDE3NzMxMDMyNzckajM2JGwwJGgw">CU Hacks 12</a> with a team.</li>
+<li>I have designed and implemented 1960s <a href="https://balakekarbon.github.io/res/img/dlatch-characteristics.svg">DTL logic circuits</a> for use in a minicomputer.</li>
+<li>I daily drive custom <a href="https://youtu.be/1OcmRTrRyM8">mainline linux on a phone</a> and have done kernel modification etc.</li>
+<li>Developing a self-hosted, auditable FPGA Linux system using an entirely open-source toolchain.</li>
+<li>I have done normal developer stuff like write <a href="https://karbonsclassics.com/">responsive ReactJS websites</a>, placed <b>second in state</b> and 11th regionally in <a href="https://rmc.kattis.com/contests/rmc24/teams/722359">ICPC</a>, made a <a href="https://github.com/BalakeKarbon/Fumble/tree/main">fake dating app</a> with a team, wrote a <a href="https://github.com/BalakeKarbon/illogic-simulator">logic simulator</a> in rust, etc.</li>
+<li>I have held multiple professional roles, full-stack++ from firmware to front end, notably before vibe coding was a thing but I can do that too.</li>
+<li>Founding President of the Computer Science Club (An ACM Chapter) at the University Of Northern Colorado.</li>
+<li>Preformed academic research as an undergraduate and aided graduate students in endeavors.</li>
+<li>Carried a team through full-stack development and hosting of a Data Science Research project for <a href="https://www.dataminerockies.org/">Data Mine of the Rockies</a>.</li>
+<li>Attended and enjoyed many <a href="https://www.hackcu.org/">Hackathons</a>.</li>
+<li>Make social media content linked on my <a href="https://balakekarbon.github.io/">web-portfolio</a>.</li>
+<li>Continually stayed up to date and have been writing code since the age of 12 (2011).</li>
+<li>Built and programmed two CNC machines for my high-school (2016).</li>
+<li>Wrote and implemented a digital security system for my high school (2016).</li>
+<li>Co-Founded OBICool LLC doing supercomputer and server cooling consulting in high school (2016).</li>
+</ul>

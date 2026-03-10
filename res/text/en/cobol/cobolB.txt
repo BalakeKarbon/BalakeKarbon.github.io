@@ -1,1 +1,1 @@
-% as of last build) Yes your reading that correctly, that 1960s programming language developed for business professionals commonly found on mainframes. The source code can be found on 
+% as of last build) Yes you're reading that correctly, that 1960s programming language developed for business professionals commonly found on mainframes. The source code can be found on 
