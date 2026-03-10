@@ -278,7 +278,7 @@
 027800   CALL 'cobdom_inner_html' USING 'projectHeader', 'Projects:'.
 027900   CALL 'cobdom_create_element' USING 'projectContent', 'div'.
 028000   CALL 'cobdom_style' USING 'projectContent', 'textAlign',
-028100     'center'.
+028100     'left'.
 028200   CALL 'cobdom_inner_html' USING 'projectContent', '&nbsp;'.
 028300   CALL 'cobdom_append_child' USING 'projectSection', 
 028400     'contentDiv'.
